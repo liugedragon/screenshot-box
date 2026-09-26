@@ -22,6 +22,14 @@ internal static class SelfTest
         var results=new Dictionary<string,object>{["text"]=text,["blocks"]=blocks,["width"]=image.PixelWidth,["height"]=image.PixelHeight,["model"]=OcrQueue.ModelVersion};
         foreach(var query in new[]{"课程","订单","保修","AB-20260926","100%","A_B","English"})results["search:"+query]=(await app.Store.QueryAsync(query)).Any(i=>i.Id==item.Id);
         var clipboard=false;try{await ClipboardHelper.CopyImageAsync(image);await Task.Delay(80);var read=Clipboard.GetImage();results["clipboardReadWidth"]=read?.PixelWidth??0;results["clipboardReadHeight"]=read?.PixelHeight??0;results["clipboardFormats"]=Clipboard.GetDataObject()?.GetFormats()??[];clipboard=read?.PixelWidth==1000&&read.PixelHeight==600;}catch(Exception ex){results["clipboardError"]=ex.Message;}
+        var atomic=Path.Combine(root,"atomic-overwrite.png");ImageLibrary.WritePngAtomic(image,atomic);
+        var before=File.ReadAllBytes(atomic);bool rejected=false;
+        using(var locked=new FileStream(atomic,FileMode.Open,FileAccess.Read,FileShare.Read)) {
+            try{ImageLibrary.WritePngAtomic(image,atomic);}catch(Exception ex)when(ex is IOException or UnauthorizedAccessException){rejected=true;}
+        }
+        results["atomicOverwritePreservesLockedDestination"]=rejected&&before.SequenceEqual(File.ReadAllBytes(atomic))&&!Directory.EnumerateFiles(root,".atomic-overwrite.png.*.tmp").Any();
+        ImageLibrary.WritePngAtomic(image,atomic);results["atomicPngOverwrite"]=ImageLibrary.Load(atomic).PixelWidth==1000;
+        ImageLibrary.ExportAtomic(app.Store.ResolvePath(item.ImagePath),atomic);results["atomicExportOverwrite"]=ImageLibrary.Load(atomic).PixelHeight==600;
         results["clipboardImage"]=clipboard;
         results["ocrMilliseconds"]=stopwatch.ElapsedMilliseconds;
         results["workingSetAfterOcrMiB"]=System.Diagnostics.Process.GetCurrentProcess().WorkingSet64/1048576.0;
@@ -60,22 +68,54 @@ internal static class SelfTest
         window.Width=800;window.Height=580;await Task.Delay(150);SaveVisual(window,Path.Combine(root,"ui-narrow.png"));
         results["uiGalleryCount"]=gallery.Items.Count;
         results["narrowDetailsCollapsed"]=((FrameworkElement)window.FindName("Details")).Visibility==Visibility.Collapsed;
-        var hotkey=new ScreenshotBox.App.Native.HotkeyService(window,()=>{});var settings=new SettingsWindow(app,hotkey);settings.Show();await Task.Delay(150);SaveVisual(settings,Path.Combine(root,"ui-settings.png"));settings.Close();hotkey.Dispose();
+        var selected=((ScreenshotCard)gallery.SelectedItem).Item;
+        typeof(MainWindow).GetMethod("OpenItemEditor",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.Invoke(window,null);
+        var editor=Application.Current.Windows.OfType<ItemEditorWindow>().Single(w=>w.ItemId==selected.Id);await Task.Delay(150);
+        results["onlyOneMetadataEditor"]=!((FrameworkElement)window.FindName("MetadataFields")).IsEnabled;
+        var externalTitle="中文长标题：独立编辑窗口修改，课程资料、订单和保修记录仍可查询";
+        ((TextBox)typeof(ItemEditorWindow).GetField("_title",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(editor)!).Text=externalTitle;
+        ((TextBox)typeof(ItemEditorWindow).GetField("_notes",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(editor)!).Text="来自独立详情窗口的备注修改";
+        SaveVisual(editor,Path.Combine(root,"ui-editor-dark.png"));editor.Width=410;editor.Height=500;await Task.Delay(100);SaveVisual(editor,Path.Combine(root,"ui-editor-small.png"));
+        editor.Close();results["metadataDraftSurvivesEditorClose"]=title.Text==externalTitle&&((TextBox)window.FindName("NotesBox")).Text=="来自独立详情窗口的备注修改"&&((FrameworkElement)window.FindName("MetadataFields")).IsEnabled;
+        ((Button)window.FindName("SaveMetadataButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));await Task.Delay(500);
+        results["metadataSavedAndDirtyCleared"]=(await app.Store.GetAsync(selected.Id))?.Title.StartsWith("中文长标题")==true&&!((Button)window.FindName("SaveMetadataButton")).IsEnabled;
+        var tagPanel=(Panel)window.FindName("TagsPanel");tagPanel.Children.OfType<Button>().Single(b=>(string)b.Content=="凭证").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));await Task.Delay(350);
+        results["uiExactTagFilter"]=gallery.Items.Cast<ScreenshotCard>().All(c=>c.Item.Id==item.Id)&&gallery.Items.Count==1;
+        var hotkey=new ScreenshotBox.App.Native.HotkeyService(window,()=>{});var settings=new SettingsWindow(app,hotkey);settings.Show();await Task.Delay(150);SaveVisual(settings,Path.Combine(root,"ui-settings.png"));
+        var settingsScroll=((DockPanel)settings.Content).Children.OfType<ScrollViewer>().Single();settingsScroll.ScrollToBottom();await Task.Delay(100);SaveVisual(settings,Path.Combine(root,"ui-settings-bottom.png"));
+        app.Preferences.Theme="Light";AppearanceService.Apply("Light");((StackPanel)settingsScroll.Content).Children.OfType<ComboBox>().Single().SelectedIndex=1;settings.Width=510;settings.Height=550;settingsScroll.ScrollToHome();await Task.Delay(150);SaveVisual(settings,Path.Combine(root,"ui-settings-small-light.png"));settings.Close();app.Preferences.Theme="Dark";AppearanceService.Apply("Dark");hotkey.Dispose();
+        var missingFiles=await app.Store.MissingFilesAsync();var failedItems=await app.Store.QueryAsync("","failed");
+        var diagnostic=new ReportWindow("资料检查",$"原图缺失：{missingFiles.Count}\n识别失败：{failedItems.Count}\n\n识别失败可以在资料详情中重试。\n模型：{OcrQueue.ModelVersion}");diagnostic.Show();await Task.Delay(100);SaveVisual(diagnostic,Path.Combine(root,"ui-diagnostic.png"));diagnostic.Close();
         var recognized=await app.Store.GetAsync(item.Id)??item;var preview=new PreviewWindow(recognized,app.Store,"课程");preview.Show();await Task.Delay(250);SaveVisual(preview,Path.Combine(root,"ui-preview.png"));
-        var previewRoot=(DockPanel)preview.Content;var previewTools=(StackPanel)previewRoot.Children[0];
+        var previewRoot=(DockPanel)preview.Content;var previewTools=(Panel)previewRoot.Children[0];
         previewTools.Children.OfType<Button>().Single(b=>(string)b.Content=="实际大小").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));preview.UpdateLayout();
         var previewImage=(Grid)((ScrollViewer)previewRoot.Children[1]).Content;var previewScale=(ScaleTransform)previewImage.LayoutTransform;
         var actualWidth=previewImage.Width*previewScale.ScaleX*VisualTreeHelper.GetDpi(preview).DpiScaleX;
         results["previewActualSizePixelWidth"]=actualWidth;results["previewActualSizeIsOneToOne"]=Math.Abs(actualWidth-image.PixelWidth)<.1;
-        preview.Close();window.Hide();
+        preview.Close();
+        var longImage=BitmapSource.Create(40,20000,96,96,PixelFormats.Bgra32,null,new byte[40*20000*4],40*4);longImage.Freeze();
+        var longItem=await new ImageLibrary(app.Store).AddAsync(longImage,"长图适应测试（合成）");
+        var longPreview=new PreviewWindow(longItem,app.Store,""){Width=620,Height=440};longPreview.Show();await Task.Delay(200);longPreview.UpdateLayout();
+        var longRoot=(DockPanel)longPreview.Content;var longScroll=(ScrollViewer)longRoot.Children[1];var longContent=(Grid)longScroll.Content;var longScale=(ScaleTransform)longContent.LayoutTransform;
+        results["longImageFitsWindow"]=longScale.ScaleY<.05&&longContent.Height*longScale.ScaleY<=longScroll.ViewportHeight;
+        var initialFit=longScale.ScaleY;longPreview.Height=600;await Task.Delay(150);
+        var expectedFit=Math.Min(1/VisualTreeHelper.GetDpi(longPreview).DpiScaleX,Math.Min((longScroll.ViewportWidth-24)/longImage.PixelWidth,(longScroll.ViewportHeight-24)/longImage.PixelHeight));
+        results["fitTracksWindowResize"]=longScale.ScaleY>initialFit&&Math.Abs(longScale.ScaleY-expectedFit)<.00001;
+        longPreview.Height=420;await Task.Delay(150);results["fitTracksSmallerWindow"]=longScale.ScaleY<initialFit&&longContent.Height*longScale.ScaleY<=longScroll.ViewportHeight;
+        longPreview.Close();window.Hide();
         var interrupted=await new ImageLibrary(app.Store).AddAsync(image,"重启恢复用合成图");await app.Store.BeginOcrAsync(interrupted.Id);results["interruptedItemId"]=interrupted.Id;
         if(Environment.GetCommandLineArgs().Contains("--idle-memory-test")){await Task.Delay(92000);results["workingSetAfterIdleMiB"]=System.Diagnostics.Process.GetCurrentProcess().WorkingSet64/1048576.0;}
         File.WriteAllText(Path.Combine(root,"self-test.json"),JsonSerializer.Serialize(results,new JsonSerializerOptions{WriteIndented=true}));
+        var failedChecks=results.Where(p=>p.Value is bool success&&!success).Select(p=>p.Key).ToArray();
+        if(failedChecks.Length>0)throw new InvalidOperationException("验收断言失败："+string.Join(", ",failedChecks));
     }
     private static void SaveVisual(Window window,string path)
     {
-        window.UpdateLayout();var content=(FrameworkElement)window.Content;var bitmap=new RenderTargetBitmap((int)content.ActualWidth,(int)content.ActualHeight,96,96,PixelFormats.Pbgra32);
-        var background=new DrawingVisual();using(var dc=background.RenderOpen())dc.DrawRectangle(window.Background,null,new Rect(0,0,content.ActualWidth,content.ActualHeight));bitmap.Render(background);bitmap.Render(content);bitmap.Freeze();ImageLibrary.WritePng(bitmap,path);
+        window.UpdateLayout();var content=(FrameworkElement)window.Content;
+        // Render keeps the root's layout offset; include its margins instead of clipping the right/bottom edges.
+        int width=(int)Math.Ceiling(content.ActualWidth+content.Margin.Left+content.Margin.Right),height=(int)Math.Ceiling(content.ActualHeight+content.Margin.Top+content.Margin.Bottom);
+        var bitmap=new RenderTargetBitmap(width,height,96,96,PixelFormats.Pbgra32);
+        var background=new DrawingVisual();using(var dc=background.RenderOpen())dc.DrawRectangle(window.Background,null,new Rect(0,0,width,height));bitmap.Render(background);bitmap.Render(content);bitmap.Freeze();ImageLibrary.WritePng(bitmap,path);
     }
     private static async Task<ScreenshotItem> WaitAsync(App app,string id,string status)
     {

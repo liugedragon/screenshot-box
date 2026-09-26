@@ -2,6 +2,7 @@
  <Application.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
  <ui:ThemesDictionary Theme="Light"/><ui:ControlsDictionary/>
  </ResourceDictionary.MergedDictionaries>
+ <Style TargetType="Window"><Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI"/><Setter Property="FontSize" Value="14"/></Style>
  <Style TargetType="TextBlock"><Setter Property="FontSize" Value="14"/><Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI"/></Style>
  <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}"><Setter Property="Margin" Value="4"/><Setter Property="Padding" Value="12,6"/><Setter Property="MinHeight" Value="32"/><Setter Property="Foreground" Value="{DynamicResource SbText}"/><Setter Property="Background" Value="{DynamicResource SbSurface}"/><Setter Property="BorderBrush" Value="{DynamicResource SbStroke}"/></Style>
  <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}"><Setter Property="FontSize" Value="14"/><Setter Property="Padding" Value="8"/><Setter Property="Margin" Value="0,4,0,12"/><Setter Property="Foreground" Value="{DynamicResource SbText}"/><Setter Property="Background" Value="{DynamicResource SbSurface}"/><Setter Property="BorderBrush" Value="{DynamicResource SbStroke}"/></Style>

@@ -38,3 +38,9 @@ jobs:
       - name: Restore locked dependencies, build App, and test Core
         shell: pwsh
         run: ./scripts/build.ps1 -Configuration Release
+      - name: Restore locked capture probe dependencies
+        shell: pwsh
+        run: dotnet restore tests/ScreenshotBox.Capture.Probe/ScreenshotBox.Capture.Probe.csproj --locked-mode
+      - name: Run synthetic capture pixel probe
+        shell: pwsh
+        run: dotnet run --project tests/ScreenshotBox.Capture.Probe/ScreenshotBox.Capture.Probe.csproj --configuration Release --no-restore

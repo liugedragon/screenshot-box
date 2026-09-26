@@ -283,6 +283,72 @@ public sealed class LibraryStoreTests : IDisposable
         Assert.Equal(6, (await store.QueryAsync("最近", "recent")).Count);
     }
 
+    [Theory]
+    [InlineData("学习")]
+    [InlineData("50%")]
+    [InlineData("a_b")]
+    [InlineData("\"报价\"")]
+    [InlineData("' OR 1=1 --")]
+    [InlineData("Learning")]
+    [InlineData("école")]
+    public async Task TagClassificationUsesLiteralWholeMembersRatherThanImageText(string tag)
+    {
+        using var store = await CreateStoreAsync();
+        var matching = await AddImageAsync(store, "已分类", tags: $"其他,  {tag}  ，末尾");
+        await AddImageAsync(store, tag, tag, tags: $"prefix{tag},其他");
+        await AddImageAsync(store, "未分类", tag);
+
+        var result = await store.QueryAsync("", requiredTag: "  " + tag.ToUpperInvariant() + "  ");
+        Assert.Equal(matching.Id, Assert.Single(result).Id);
+        Assert.Contains(tag, await store.GetTagsAsync());
+        Assert.Empty(await store.QueryAsync("", requiredTag: tag + "额外"));
+    }
+
+    [Fact]
+    public async Task ExactTagsIntersectSearchAndFavoritesBeforeStablePagination()
+    {
+        using var store = await CreateStoreAsync();
+        var start = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var matching = new List<ScreenshotItem>();
+        for (var n = 0; n < 12; n++)
+        {
+            var item = await AddImageAsync(store, "Learning " + n,
+                n < 8 ? "保修订单" : "课程安排", start.AddMinutes(n),
+                n % 2 == 0 ? "Learning， 凭据, learning, " : "Learning-extra");
+            await store.UpdateMetadataAsync(item.Id, item.Title, "", item.Tags, n % 4 == 0);
+            if (n % 2 == 0) matching.Add(item);
+        }
+        var deleted = await AddImageAsync(store, "Learning", "保修订单", start.AddDays(-1), "learning");
+        await store.SetDeletedAsync(deleted.Id, true);
+
+        var first = await store.QueryAsync("", limit: 2, oldestFirst: true, requiredTag: "LEARNING");
+        var second = await store.QueryAsync("", limit: 2, offset: 2, oldestFirst: true, requiredTag: "learning");
+        Assert.Equal(matching.Take(4).Select(i => i.Id), first.Concat(second).Select(i => i.Id));
+        Assert.Equal(matching.TakeLast(2).Reverse().Select(i => i.Id),
+            (await store.QueryAsync("", limit: 2, requiredTag: "Learning")).Select(i => i.Id));
+        Assert.Equal(new[] { matching[0].Id, matching[2].Id },
+            (await store.QueryAsync("保修", "favorites", oldestFirst: true, requiredTag: "learning")).Select(i => i.Id));
+        Assert.Equal(matching[2].Id, Assert.Single(await store.QueryAsync("保修", "favorites", limit: 1, offset: 1,
+            oldestFirst: true, requiredTag: "learning")).Id);
+        Assert.Equal(deleted.Id, Assert.Single(await store.QueryAsync("", "trash", requiredTag: "Learning")).Id);
+        Assert.Single(await store.GetTagsAsync(), tag => tag.Equals("learning", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task UpdatingTagsImmediatelyChangesClassificationAndSurvivesReopening()
+    {
+        var store = await CreateStoreAsync();
+        var item = await AddImageAsync(store, "标题仍然包含旧标签", "旧标签", tags: "旧标签");
+        await store.UpdateMetadataAsync(item.Id, item.Title, "", " 新标签 ， 50%_\"报价\" , ", true);
+        Assert.Empty(await store.QueryAsync("", requiredTag: "旧标签"));
+        store.Dispose();
+
+        using var reopened = await CreateStoreAsync();
+        Assert.Equal(item.Id, Assert.Single(await reopened.QueryAsync("", "favorites", requiredTag: "50%_\"报价\"")).Id);
+        Assert.Equal(item.Id, Assert.Single(await reopened.QueryAsync("旧标签", requiredTag: "新标签")).Id);
+        Assert.DoesNotContain("旧标签", await reopened.GetTagsAsync());
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_root)) Directory.Delete(_root, recursive: true);

@@ -4,7 +4,7 @@
  <DockPanel Margin="12,16,12,12">
   <StackPanel x:Name="NavigationPanel" DockPanel.Dock="Top"><TextBlock Text="截图资料盒" FontSize="20" FontWeight="SemiBold" Margin="8,0,0,24"/>
    <ui:Button Content="全部截图" Tag="all" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}" Background="{DynamicResource SbSelection}" Foreground="{DynamicResource SbAccentText}"/>
-   <ui:Button Content="最近收藏" Tag="recent" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
+   <ui:Button Content="最近保存" Tag="recent" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
    <ui:Button Content="星标" Tag="favorites" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
    <ui:Button Content="标签" Tag="tags" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
    <ui:Button Content="回收站" Tag="trash" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
@@ -18,11 +18,11 @@
    <ui:TextBox x:Name="SearchBox" PlaceholderText="搜索标题、备注、标签和图片文字" ToolTip="搜索标题、备注、标签和图片文字" TextChanged="SearchChanged" Margin="0,4,8,8" VerticalContentAlignment="Center"/>
    <StackPanel Grid.Column="1" Orientation="Horizontal"><ui:Button Content="新截图" Appearance="Primary" Click="CaptureClicked"/><ui:Button Content="导入" Click="ImportClicked"/></StackPanel>
   </Grid>
-  <DockPanel Grid.Row="1" Margin="0,4,0,12"><TextBlock x:Name="SectionTitle" Text="全部截图" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
-   <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><ComboBox x:Name="SortBox" SelectedIndex="0" SelectionChanged="SortChanged" Width="90" Margin="8,0"><ComboBoxItem Content="最新优先"/><ComboBoxItem Content="最早优先"/></ComboBox>
+  <Grid Grid.Row="1" Margin="0,4,0,12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="SectionTitle" Text="全部截图" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+   <StackPanel Grid.Column="1" Orientation="Horizontal"><ComboBox x:Name="SortBox" SelectedIndex="0" SelectionChanged="SortChanged" Width="112" Margin="8,0"><ComboBoxItem Content="最新优先"/><ComboBoxItem Content="最早优先"/></ComboBox>
     <Slider Width="86" Minimum="160" Maximum="320" Value="{Binding ThumbnailSize, Mode=TwoWay}" ToolTip="缩略图大小" VerticalAlignment="Center"/>
     <ui:Button Content="详情" Click="ToggleDetails" Margin="8,0,0,0"/></StackPanel>
-  </DockPanel>
+  </Grid>
   <Grid Grid.Row="2"><ListBox x:Name="Gallery" ItemsSource="{Binding Items}" SelectionChanged="SelectionChanged" MouseDoubleClick="OpenPreview" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0" Background="Transparent">
    <ListBox.ItemsPanel><ItemsPanelTemplate><WrapPanel IsItemsHost="True"/></ItemsPanelTemplate></ListBox.ItemsPanel>
    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="Margin" Value="0"/><Setter Property="Padding" Value="4"/><Setter Property="Background" Value="Transparent"/><Setter Property="BorderBrush" Value="Transparent"/><Setter Property="BorderThickness" Value="1"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="4"><ContentPresenter/></Border></ControlTemplate></Setter.Value></Setter><Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource SbStroke}"/></Trigger><Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{DynamicResource SbSelection}"/><Setter Property="BorderBrush" Value="{DynamicResource SbAccent}"/></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource SbAccent}"/></Trigger></Style.Triggers></Style></ListBox.ItemContainerStyle><ListBox.ItemTemplate><DataTemplate><StackPanel Width="{Binding DataContext.ThumbnailSize, RelativeSource={RelativeSource AncestorType=Window}}" Margin="4,4,4,12">
@@ -37,10 +37,12 @@
  </Grid>
  <Border x:Name="Details" Grid.Column="2" BorderBrush="{DynamicResource SbStroke}" BorderThickness="1,0,0,0" Padding="16"><Grid><TextBlock x:Name="DetailEmptyText" Text="选择一张截图查看资料" Foreground="{DynamicResource SbMuted}" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"/><ScrollViewer x:Name="DetailsScroll" VerticalScrollBarVisibility="Auto" Visibility="Collapsed"><StackPanel x:Name="DetailContents" IsEnabled="False" Margin="0,0,12,0">
   <TextBlock Text="资料详情" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+  <TextBlock x:Name="MetadataStatus" FontSize="12" Foreground="{DynamicResource SbMuted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+  <StackPanel x:Name="MetadataFields">
   <TextBlock Text="标题" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="TitleBox" TextWrapping="Wrap" MaxLength="1000"/>
   <TextBlock Text="备注" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="NotesBox" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="84" MaxLength="20000"/>
   <TextBlock Text="标签（逗号分隔）" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="TagBox" MaxLength="2000"/>
-  <CheckBox x:Name="FavoriteBox" Content="星标" Margin="0,0,0,8"/><ui:Button Content="保存资料" Click="SaveMetadata"/>
+  <CheckBox x:Name="FavoriteBox" Content="星标" Margin="0,0,0,8"/><ui:Button x:Name="SaveMetadataButton" Content="保存修改" Click="SaveMetadata"/></StackPanel>
   <WrapPanel><ui:Button Content="预览" Click="OpenPreview"/><ui:Button Content="导出图片" Click="ExportClicked"/><ui:Button x:Name="DeleteButton" Content="移入回收站" Click="DeleteClicked"/></WrapPanel>
   <Separator Margin="0,16"/><TextBlock x:Name="OcrStatusLabel" TextWrapping="Wrap"/><WrapPanel><ui:Button x:Name="CopyTextButton" Content="复制文字" Click="CopyTextClicked"/><ui:Button Content="重新识别" Click="RetryClicked"/></WrapPanel>
   <ui:TextBox x:Name="OcrTextBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="180" MaxHeight="400" VerticalScrollBarVisibility="Auto"/>

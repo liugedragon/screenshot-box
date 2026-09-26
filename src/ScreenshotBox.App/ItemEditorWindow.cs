@@ -24,25 +24,32 @@ internal sealed class ItemEditorWindow : Window
     private readonly TextBlock _status = new() { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 8) };
     private readonly TextBlock _ocrStatus = new() { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 12, 0, 8) };
     private readonly StackPanel _editable = new();
+    private readonly TextBlock _dirty = new() { FontSize = 12, Margin = new Thickness(0, 0, 0, 6) };
+    private Button? _saveButton, _copyButton, _retryButton;
+    private MetadataDraft _savedDraft;
     private readonly DispatcherTimer _ocrDelay = new() { Interval = TimeSpan.FromMilliseconds(350) };
-    private bool _closed;
+    private bool _closed, _saving;
     public string ItemId => _item.Id;
+    public bool HasUnsavedChanges => Draft != _savedDraft;
+    public bool IsSaving => _saving;
     private MetadataDraft Draft => new(_title.Text, _notes.Text, _tags.Text, _favorite.IsChecked == true);
 
     public ItemEditorWindow(App app, ScreenshotItem item, MetadataDraft draft,
         Action<MetadataDraft> onChanged, Func<MetadataDraft, Task> save)
     {
         _app = app; _item = item; _onChanged = onChanged; _save = save;
+        _savedDraft = MetadataDraft.From(item);
         Title = "资料详情 · 截图资料盒"; Width = 570; Height = 740; MinWidth = 400; MinHeight = 480;
         SetResourceReference(BackgroundProperty, "SbBackground");
         SetResourceReference(ForegroundProperty, "SbText");
         var root = new DockPanel { Margin = new Thickness(20) };
         var footer = new StackPanel(); DockPanel.SetDock(footer, Dock.Bottom); root.Children.Add(footer);
+        footer.Children.Add(_dirty);
         footer.Children.Add(_status);
         var shortcut = new TextBlock { Text = "Ctrl+S 保存", FontSize = 12, Margin = new Thickness(4, 0, 0, 4) };
         shortcut.SetResourceReference(TextBlock.ForegroundProperty, "SbMuted");footer.Children.Add(shortcut);
         var buttons = new WrapPanel(); footer.Children.Add(buttons);
-        AddButton(buttons, "保存资料", SaveAsync);
+        _saveButton = AddButton(buttons, "保存修改", SaveAsync, primary: true);
         AddButton(buttons, "关闭", () => { Close(); return Task.CompletedTask; });
         var body = new StackPanel { Margin = new Thickness(0, 0, 12, 0) }; root.Children.Add(new ScrollViewer { Content = body, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled });
         body.Children.Add(new TextBlock { Text = "资料详情", FontSize = 20, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 16) });
@@ -55,21 +62,22 @@ internal sealed class ItemEditorWindow : Window
         AddField(_editable, "标题", _title); AddField(_editable, "备注", _notes); AddField(_editable, "标签（逗号分隔）", _tags);
         _editable.Children.Add(_favorite);
         _title.Text = draft.Title; _notes.Text = draft.Notes; _tags.Text = draft.Tags; _favorite.IsChecked = draft.Favorite;
-        _title.TextChanged += (_, _) => _onChanged(Draft); _notes.TextChanged += (_, _) => _onChanged(Draft);
-        _tags.TextChanged += (_, _) => _onChanged(Draft); _favorite.Checked += (_, _) => _onChanged(Draft); _favorite.Unchecked += (_, _) => _onChanged(Draft);
+        _title.TextChanged += (_, _) => DraftChanged(); _notes.TextChanged += (_, _) => DraftChanged();
+        _tags.TextChanged += (_, _) => DraftChanged(); _favorite.Checked += (_, _) => DraftChanged(); _favorite.Unchecked += (_, _) => DraftChanged();
         var imageActions = new WrapPanel(); body.Children.Add(imageActions);
         AddButton(imageActions, "预览原图", () => { new PreviewWindow(_item, app.Store, "") { Owner = this }.Show(); return Task.CompletedTask; });
         AddButton(imageActions, "导出图片", () =>
         {
             var dialog = new SaveFileDialog { Filter = "PNG 图片|*.png", FileName = "截图.png" };
-            if (dialog.ShowDialog(this) == true) { File.Copy(app.Store.ResolvePath(_item.ImagePath), dialog.FileName, true); _status.Text = "图片已导出"; }
+            if (dialog.ShowDialog(this) == true) { ImageLibrary.ExportAtomic(app.Store.ResolvePath(_item.ImagePath), dialog.FileName); _status.Text = "图片已导出"; }
             return Task.CompletedTask;
         });
         body.Children.Add(_ocrStatus);
         var ocrActions = new WrapPanel(); body.Children.Add(ocrActions);
-        AddButton(ocrActions, "复制文字", () => { if (_ocr.Text.Length > 0) { Clipboard.SetText(_ocr.Text); _status.Text = "识别文字已复制"; } else _status.Text = "这张图片暂时没有可复制的识别文字"; return Task.CompletedTask; });
-        AddButton(ocrActions, "重新识别", () => { if (app.DataTransition) _status.Text = "正在迁移资料库，请稍后再识别"; else if (_item.IsDeleted) _status.Text = "请先从回收站恢复资料"; else { app.Ocr.Enqueue(_item.Id); _status.Text = "已加入识别队列"; } return Task.CompletedTask; });
+        _copyButton = AddButton(ocrActions, "复制文字", () => { if (_ocr.Text.Length > 0) { Clipboard.SetText(_ocr.Text); _status.Text = "识别文字已复制"; } else _status.Text = "这张图片暂时没有可复制的识别文字"; return Task.CompletedTask; });
+        _retryButton = AddButton(ocrActions, "重新识别", () => { if (app.DataTransition) _status.Text = "正在处理资料库，请稍后再识别"; else if (_item.IsDeleted) _status.Text = "请先从回收站恢复资料"; else { app.Ocr.Enqueue(_item.Id); _status.Text = "已加入识别队列"; } return Task.CompletedTask; });
         body.Children.Add(_ocr); Content = root; RefreshOcr();
+        UpdateSavingState();
         app.Ocr.Changed += OnOcrChanged;
         _ocrDelay.Tick += async (_, _) =>
         {
@@ -78,16 +86,33 @@ internal sealed class ItemEditorWindow : Window
             catch (Exception ex) { if (!_closed) _status.Text = "读取识别结果失败：" + ex.Message; }
         };
         Closed += (_, _) => { _closed = true; _ocrDelay.Stop(); app.Ocr.Changed -= OnOcrChanged; };
-        PreviewKeyDown += async (_, e) => { if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; await SaveAsync(); } };
+        PreviewKeyDown += async (_, e) => { if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; await SaveAsync(); } else if (e.Key == Key.Escape && !_saving) { e.Handled = true; Close(); } };
     }
 
     private async Task SaveAsync()
     {
-        if (!_editable.IsEnabled) return;
-        _editable.IsEnabled = false;
-        try { await _save(Draft); _status.Text = "资料已保存"; }
+        if (_saving || !HasUnsavedChanges) return;
+        if (_app.DataTransition) { _status.Text = "正在处理资料库，请稍后再保存"; return; }
+        var draft = Draft; _saving = true; _editable.IsEnabled = false; UpdateSavingState();
+        try { await _save(draft); NotifySaved(draft); _status.Text = "资料已保存"; }
         catch (Exception ex) { _status.Text = "保存失败：" + ex.Message; }
-        finally { _editable.IsEnabled = true; }
+        finally { _saving = false; _editable.IsEnabled = true; UpdateSavingState(); }
+    }
+
+    // MainWindow also calls this after saving a draft during backup, migration,
+    // or quit. It updates the baseline without replacing a newer unsaved draft.
+    public void NotifySaved(MetadataDraft saved)
+    {
+        _savedDraft = saved;
+        _item.Title = saved.Title; _item.Notes = saved.Notes; _item.Tags = saved.Tags; _item.IsFavorite = saved.Favorite;
+        UpdateSavingState();
+    }
+    private void DraftChanged() { _onChanged(Draft); UpdateSavingState(); }
+    private void UpdateSavingState()
+    {
+        _dirty.Text = _saving ? "正在保存…" : HasUnsavedChanges ? "有未保存的修改 · 点击保存修改写入资料库" : "修改已保存";
+        _dirty.SetResourceReference(TextBlock.ForegroundProperty, HasUnsavedChanges ? "SbAccentText" : "SbMuted");
+        if (_saveButton is not null) _saveButton.IsEnabled = HasUnsavedChanges && !_saving;
     }
 
     private void OnOcrChanged(string id)
@@ -99,7 +124,9 @@ internal sealed class ItemEditorWindow : Window
     private void RefreshOcr()
     {
         _ocr.Text = _item.OcrText;
-        _ocrStatus.Text = _item.OcrStatus switch { "Ready" => "识别完成", "Failed" => "识别失败：" + _item.OcrError, _ => "正在识别 · 完成后可搜索图片文字" };
+        _ocrStatus.Text = _item.OcrStatus switch { "Ready" => "可搜索 · 本地识别完成", "Failed" => "识别失败，可重试\n" + _item.OcrError, _ => "正在识别 · 完成后可搜索图片文字" };
+        if (_copyButton is not null) _copyButton.IsEnabled = !string.IsNullOrEmpty(_item.OcrText);
+        if (_retryButton is not null) _retryButton.IsEnabled = !_item.IsDeleted;
     }
 
     private static void AddField(Panel panel, string label, TextBox input)
@@ -109,10 +136,11 @@ internal sealed class ItemEditorWindow : Window
         panel.Children.Add(caption); panel.Children.Add(input);
     }
 
-    private void AddButton(Panel panel, string text, Func<Task> action)
+    private Button AddButton(Panel panel, string text, Func<Task> action, bool primary = false)
     {
-        var button = new Button { Content = text };
+        Button button = primary ? new Wpf.Ui.Controls.Button { Content = text, Appearance = Wpf.Ui.Controls.ControlAppearance.Primary } : new Button { Content = text };
         button.Click += async (_, _) => { try { await action(); } catch (Exception ex) { _status.Text = "操作失败：" + ex.Message; } };
         panel.Children.Add(button);
+        return button;
     }
 }

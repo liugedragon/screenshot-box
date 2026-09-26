@@ -13,9 +13,19 @@ or wildcards. ASCII letters are case-insensitive. It is intentionally a linear
 scan and is not advertised as FTS, fuzzy, semantic, or pinyin search.
 
 Supported filters: `all`, `favorites` (`favorite`), `trash` (`deleted`),
-`pending` (Pending or Processing), and `failed`. Pagination order is UTC date
-descending followed by ID ascending. Item JSON and queryable columns update in
-the same transaction.
+`recent` (the last seven UTC days), `pending` (Pending or Processing), and `failed`.
+Pagination sorts the entire filtered result by UTC date (newest by default, or
+oldest with `oldestFirst`), then ID ascending, before applying `limit`/`offset`.
+The maximum per-query limit is 1,000,000; the UI should use result pages. Item JSON
+and queryable columns update in the same transaction.
+
+The optional `requiredTag` is an independent exact-member classification, combined
+with the text query and other filters before pagination. SQLite runs a deterministic
+registered member function; no `LIKE` pattern is used. Both this function and
+`GetTagsAsync` split English/Chinese commas, trim whitespace, and compare tags using
+.NET ordinal case-insensitive rules. Percent, underscore, and quotes are literal.
+The original tag metadata is preserved rather than silently rewriting editor text.
+Title or OCR matches alone never qualify an item for a tag classification.
 
 ## OCR durability
 

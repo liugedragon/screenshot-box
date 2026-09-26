@@ -1,0 +1,53 @@
+OVERLAY large/Select: 960 DIP, toolbar width 494, left 402, bottom 243/720
+HANDLES large/Select: toolbar covers 0/8
+OVERLAY large/Pen: 960 DIP, toolbar width 494, left 402, bottom 281/720
+HANDLES large/Pen: toolbar covers 0/8
+PALETTE: custom RGB/Hex applied, popup closes without cancelling capture
+OVERLAY large/Arrow: 960 DIP, toolbar width 494, left 402, bottom 281/720
+HANDLES large/Arrow: toolbar covers 0/8
+OVERLAY large/Rectangle: 960 DIP, toolbar width 494, left 402, bottom 281/720
+HANDLES large/Rectangle: toolbar covers 0/8
+OVERLAY large/Eraser: 960 DIP, toolbar width 494, left 402, bottom 271/720
+HANDLES large/Eraser: toolbar covers 0/8
+OVERLAY large/Mosaic: 960 DIP, toolbar width 494, left 402, bottom 271/720
+HANDLES large/Mosaic: toolbar covers 0/8
+OVERLAY small/Select: 560 DIP, toolbar width 494, left 8, bottom 243/720
+HANDLES small/Select: toolbar covers 0/8
+OVERLAY small/Pen: 560 DIP, toolbar width 494, left 8, bottom 281/720
+HANDLES small/Pen: toolbar covers 0/8
+OVERLAY small/Arrow: 560 DIP, toolbar width 494, left 8, bottom 281/720
+HANDLES small/Arrow: toolbar covers 0/8
+OVERLAY small/Rectangle: 560 DIP, toolbar width 494, left 8, bottom 281/720
+HANDLES small/Rectangle: toolbar covers 0/8
+OVERLAY small/Eraser: 560 DIP, toolbar width 494, left 8, bottom 271/720
+HANDLES small/Eraser: toolbar covers 0/8
+OVERLAY small/Mosaic: 560 DIP, toolbar width 494, left 8, bottom 271/720
+HANDLES small/Mosaic: toolbar covers 0/8
+OVERLAY narrow/Select: 320 DIP, toolbar width 289, left 8, bottom 224/560
+HANDLES narrow/Select: toolbar covers 0/8
+COMPACT MENU: all six tools present, selection changes real session mode
+OVERLAY narrow/Pen: 320 DIP, toolbar width 289, left 8, bottom 280/560
+HANDLES narrow/Pen: toolbar covers 0/8
+OVERLAY narrow/Arrow: 320 DIP, toolbar width 289, left 8, bottom 280/560
+HANDLES narrow/Arrow: toolbar covers 0/8
+OVERLAY narrow/Rectangle: 320 DIP, toolbar width 289, left 8, bottom 280/560
+HANDLES narrow/Rectangle: toolbar covers 0/8
+OVERLAY narrow/Eraser: 320 DIP, toolbar width 289, left 8, bottom 252/560
+HANDLES narrow/Eraser: toolbar covers 0/8
+OVERLAY narrow/Mosaic: 320 DIP, toolbar width 289, left 8, bottom 252/560
+HANDLES narrow/Mosaic: toolbar covers 0/8
+OVERLAY light/Select: 720 DIP, toolbar width 494, left 162, bottom 243/560
+HANDLES light/Select: toolbar covers 0/8
+OVERLAY light/Pen: 720 DIP, toolbar width 494, left 162, bottom 281/560
+HANDLES light/Pen: toolbar covers 0/8
+PALETTE: custom RGB/Hex applied, popup closes without cancelling capture
+OVERLAY light/Arrow: 720 DIP, toolbar width 494, left 162, bottom 281/560
+HANDLES light/Arrow: toolbar covers 0/8
+OVERLAY light/Rectangle: 720 DIP, toolbar width 494, left 162, bottom 281/560
+HANDLES light/Rectangle: toolbar covers 0/8
+OVERLAY light/Eraser: 720 DIP, toolbar width 494, left 162, bottom 271/560
+HANDLES light/Eraser: toolbar covers 0/8
+OVERLAY light/Mosaic: 720 DIP, toolbar width 494, left 162, bottom 271/560
+HANDLES light/Mosaic: toolbar covers 0/8
+DISPLAY CHANGE: programmed callback cancels and releases event subscription; not a physical multi-screen test
+VISUAL REVIEW EXPORT PASSED

@@ -11,7 +11,7 @@ App不启用单文件发布或裁剪，因为WPF资源、ONNX Runtime和SkiaShar
 发行包集成自测（使用合成内容，不会导入真实截图）：
 
 ```powershell
-.\artifacts\ScreenshotBox-0.1.1-win-x64\ScreenshotBox.exe --self-test --data-dir E:\temp\ScreenshotBox验收
+.\artifacts\ScreenshotBox-0.1.2-win-x64\ScreenshotBox.exe --self-test --data-dir E:\temp\ScreenshotBox验收
 ```
 
 完成后读取该目录self-test.json。包括真实中文OCR、源像素文字行框、两字词和符号查询、剪贴板原图以及备份到新目录再打开。注意这项自测不能代替常见外部应用实际粘贴、双屏拖动和物理断网测试。

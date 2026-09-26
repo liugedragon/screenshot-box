@@ -107,9 +107,9 @@ public sealed class LibraryStore : IDisposable
     /// deliberately treats quotes, percent, underscore, and one/two-character
     /// Chinese queries as normal text. This version does not claim an FTS index.
     /// </summary>
-    public async Task<List<ScreenshotItem>> QueryAsync(string query, string filter = "all", int limit = 200, int offset = 0, bool oldestFirst = false)
+    public async Task<List<ScreenshotItem>> QueryAsync(string query, string filter = "all", int limit = 200, int offset = 0, bool oldestFirst = false, string? requiredTag = null)
     {
-        if (limit is < 1 or > 10000) throw new ArgumentOutOfRangeException(nameof(limit));
+        if (limit is < 1 or > 1_000_000) throw new ArgumentOutOfRangeException(nameof(limit));
         if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
         var condition = filter switch
         {
@@ -125,9 +125,16 @@ public sealed class LibraryStore : IDisposable
         try
         {
             using var connection = Open();
+            // Keep classification independent of free-text search, and filter in SQL
+            // before ordering/paging. The same parser is used by the navigation list.
+            if (requiredTag is not null)
+                connection.CreateFunction<string, string, int>("sb_has_tag",
+                    (raw, tag) => ParseTags(raw).Contains(tag, StringComparer.OrdinalIgnoreCase) ? 1 : 0,
+                    isDeterministic: true);
             using var command = connection.CreateCommand();
             command.CommandText = $"""
                 SELECT item_json FROM screenshots WHERE {condition}
+                {(requiredTag is null ? "" : "AND sb_has_tag(tags,$requiredTag)=1")}
                 AND ($q='' OR instr(lower(title),lower($q))>0
                     OR instr(lower(notes),lower($q))>0
                     OR instr(lower(tags),lower($q))>0
@@ -137,6 +144,7 @@ public sealed class LibraryStore : IDisposable
             command.Parameters.AddWithValue("$q", query?.Trim() ?? "");
             command.Parameters.AddWithValue("$limit", limit);
             command.Parameters.AddWithValue("$offset", offset);
+            if (requiredTag is not null) command.Parameters.AddWithValue("$requiredTag", requiredTag.Trim());
             if (filter == "recent") command.Parameters.AddWithValue("$recentCutoff", DateTime.UtcNow.AddDays(-7).ToString("O", CultureInfo.InvariantCulture));
             return ReadMany(command);
         }
@@ -155,12 +163,17 @@ public sealed class LibraryStore : IDisposable
             using var reader = command.ExecuteReader();
             var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             while (reader.Read())
-                foreach (var tag in reader.GetString(0).Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                foreach (var tag in ParseTags(reader.GetString(0)))
                     tags.Add(tag);
             return tags.OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase).ToList();
         }
         finally { _gate.Release(); }
     }
+
+    // Preserve the original metadata text; normalize separators and whitespace only
+    // when interpreting tags. English and Chinese commas are equivalent separators.
+    private static IEnumerable<string> ParseTags(string tags) =>
+        tags.Split([',', '，'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
     public async Task<ScreenshotItem?> GetAsync(string id)
     {

@@ -2,9 +2,9 @@
 
 需要 Windows 10 2004（19041）或更新版本，x64。源码构建使用 .NET SDK 10.0.401；优先使用项目 `.tools/dotnet/dotnet.exe`，否则使用本机 SDK。依赖由锁文件固定，运行 `scripts/build.ps1` 会检查锁文件、编译应用并执行核心模块测试。
 
-`scripts/package.ps1 -Version 0.1.1` 先构建测试，再产生自带 .NET 运行时的 `artifacts/ScreenshotBox-0.1.1-win-x64.zip`。用户不必安装 Python、.NET 或登录账号；中文 OCR 模型随包携带。包中只包含 Windows x64 原生组件，包含依赖锁文件、许可证、每个文件的校验清单。ZIP 的 SHA-256 写在同目录 `.sha256` 文件中。
+`scripts/package.ps1 -Version 0.1.2` 先构建测试，再产生自带 .NET 运行时的 `artifacts/ScreenshotBox-0.1.2-win-x64.zip`。用户不必安装 Python、.NET 或登录账号；中文 OCR 模型随包携带。包中只包含 Windows x64 原生组件，包含依赖锁文件、许可证、每个文件的校验清单。ZIP 的 SHA-256 写在同目录 `.sha256` 文件中。
 
-`scripts/installer.ps1 -Version 0.1.1` 使用 Inno Setup 编译器，把已生成的版本目录打成 `ScreenshotBox-0.1.1-win-x64-setup.exe`，并生成单独校验文件。默认查找 `.tools/inno/ISCC.exe`，也可传入 `-CompilerPath`。安装向导支持简体中文与英文，默认安装到当前用户的 `%LOCALAPPDATA%/Programs/ScreenshotBox`，可在目录选择页更改为其他有写入权限的位置，创建开始菜单入口和系统“已安装应用”卸载入口，不需要管理员权限。
+`scripts/installer.ps1 -Version 0.1.2` 使用 Inno Setup 编译器，把已生成的版本目录打成 `ScreenshotBox-0.1.2-win-x64-setup.exe`，并生成单独校验文件。默认查找 `.tools/inno/ISCC.exe`，也可传入 `-CompilerPath`。安装向导支持简体中文与英文，默认安装到当前用户的 `%LOCALAPPDATA%/Programs/ScreenshotBox`，可在目录选择页更改为其他有写入权限的位置，创建开始菜单入口和系统“已安装应用”卸载入口，不需要管理员权限。
 
 如果只使用 ZIP，可以解压后直接启动 `ScreenshotBox.exe`。ZIP 还包含 `installer/install.ps1` 和 `installer/uninstall.ps1`，供不使用安装向导的用户安装到当前用户目录。安装脚本也支持 `-Destination` 自定义目录，卸载仅删除清单内的应用文件，保留额外资料。这两个脚本不能在程序运行期间替换或删除应用文件，需要先正常退出应用。
 

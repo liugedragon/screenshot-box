@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -15,14 +16,33 @@ using System.Windows.Threading;
 namespace ScreenshotBox.App.Native;
 
 public sealed record CaptureResult(BitmapSource Image, string Action);
+public sealed record CaptureToolPreferences(string ColorHex, double PenWidth, double EraserWidth, int MosaicSize);
 
 public static class CaptureService
 {
     private static bool _active;
-    private enum EditMode { Select, Pen, Mosaic }
+    private static CaptureToolPreferences _preferences = new("#E63737", 2, 24, 12);
+    public static CaptureToolPreferences GetToolPreferences() => _preferences;
+    public static void ConfigureTools(string colorHex, double penWidth, double eraserWidth, int mosaicSize)
+    {
+        if (!TryColor(colorHex, out var color)) color = Color.FromRgb(230, 55, 55);
+        _preferences = new(Hex(color), double.IsFinite(penWidth) ? Math.Clamp(penWidth, 1, 32) : 2,
+            double.IsFinite(eraserWidth) ? Math.Clamp(eraserWidth, 4, 80) : 24, Math.Clamp(mosaicSize, 6, 32));
+    }
+    private static string Hex(Color color) => $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+    private static bool TryColor(string? text, out Color color)
+    {
+        string value = (text ?? "").Trim().TrimStart('#');color = default;
+        if (value.Length != 6 || !uint.TryParse(value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out uint rgb)) return false;
+        color = Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb);return true;
+    }
+    private enum EditMode { Select, Pen, Arrow, Rectangle, Eraser, Mosaic }
     private abstract record Annotation;
     private sealed record Stroke(List<PixelPoint> Points, Color Color, double Width) : Annotation;
     private sealed record Mosaic(PixelRect Bounds, BitmapSource Image) : Annotation;
+    private sealed record Erase(List<PixelPoint> Points, double Width) : Annotation;
+    private sealed record Shape(EditMode Mode, PixelPoint Start, PixelPoint End, Color Color, double Width) : Annotation;
+    private sealed record Clear : Annotation;
 
     /// <summary>
     /// Caller hides its own windows first. The frozen real desktop is captured before any overlay exists.
@@ -61,9 +81,15 @@ public static class CaptureService
         public EditMode Mode { get; private set; }
         public Color PenColor { get; private set; } = Color.FromRgb(230, 55, 55);
         public double PenWidth { get; private set; } = 2;
+        public double EraserWidth { get; private set; } = 24;
+        public int MosaicBlock { get; private set; } = 12;
         public bool CanUndo => !Dragging && _annotations.Count > 0;
+        public bool CanRedo => !Dragging && _redo.Count > 0;
         private readonly List<Annotation> _annotations = [];
+        private readonly Stack<Annotation> _redo = [];
         private Stroke? _pendingStroke;
+        private Erase? _pendingErase;
+        private Shape? _pendingShape;
         private PixelRect _pendingMosaic;
         private readonly List<CaptureOverlay> _windows = [];
         private readonly TaskCompletionSource<CaptureResult?> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -72,14 +98,20 @@ public static class CaptureService
         private SelectionHandle _mode;
         private bool _finished;
         private CaptureOverlay? _toolbarOwner;
+        private bool _displaySubscribed;
 
         public CaptureSession(BitmapSource screenshot, PixelRect desktop, PixelRect[] monitors)
-        { Screenshot = screenshot; Desktop = desktop; Monitors = monitors; }
+        {
+            Screenshot = screenshot; Desktop = desktop; Monitors = monitors;
+            TryColor(_preferences.ColorHex, out var color);PenColor = color;PenWidth = _preferences.PenWidth;EraserWidth = _preferences.EraserWidth;MosaicBlock = _preferences.MosaicSize;
+        }
 
         public Task<CaptureResult?> RunAsync()
         {
             try
             {
+                Microsoft.Win32.SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+                _displaySubscribed = true;
                 foreach (PixelRect monitor in Monitors)
                 {
                     var overlay = new CaptureOverlay(this, monitor);
@@ -96,6 +128,11 @@ public static class CaptureService
             }
             return _completion.Task;
         }
+        private void OnDisplaySettingsChanged(object? sender, EventArgs e)
+        {
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher is not null && !dispatcher.HasShutdownStarted) dispatcher.BeginInvoke(Cancel);
+        }
 
         public void Begin(PixelPoint point)
         {
@@ -104,12 +141,15 @@ public static class CaptureService
             _start = SelectionGeometry.Clamp(point, Desktop);
             _original = Selection;
             if (Mode == EditMode.Pen) _pendingStroke = new Stroke([point], PenColor, PenWidth);
+            if (Mode == EditMode.Eraser) _pendingErase = new Erase([point], EraserWidth);
+            if (Mode is EditMode.Arrow or EditMode.Rectangle) _pendingShape = new Shape(Mode, point, point, PenColor, PenWidth);
             if (Mode == EditMode.Mosaic) _pendingMosaic = default;
             _mode = SelectionGeometry.HitTest(Selection, point);
             if (Mode == EditMode.Select && _mode == SelectionHandle.None)
             {
                 Selection = default;
                 _annotations.Clear();
+                _redo.Clear();
             }
             Dragging = true;
             Refresh();
@@ -118,13 +158,20 @@ public static class CaptureService
         public void Update(PixelPoint point)
         {
             if (!Dragging || _finished) return;
-            if (Mode == EditMode.Pen)
+            if (Mode is EditMode.Pen or EditMode.Eraser)
             {
                 point = SelectionGeometry.Clamp(point, Selection);
                 if (_pendingStroke is not null && _pendingStroke.Points[^1] != point)
                     _pendingStroke.Points.Add(point);
+                if (_pendingErase is not null && _pendingErase.Points[^1] != point)
+                    _pendingErase.Points.Add(point);
                 Refresh();
                 return;
+            }
+            if (Mode is EditMode.Arrow or EditMode.Rectangle)
+            {
+                if (_pendingShape is not null) _pendingShape = _pendingShape with { End = SelectionGeometry.Clamp(point, Selection) };
+                Refresh();return;
             }
             if (Mode == EditMode.Mosaic)
             {
@@ -148,12 +195,14 @@ public static class CaptureService
             Dragging = false;
             if (_pendingStroke is not null)
             {
-                _annotations.Add(_pendingStroke);
+                Commit(_pendingStroke);
                 _pendingStroke = null;
             }
+            if (_pendingErase is not null) { Commit(_pendingErase); _pendingErase = null; }
+            if (_pendingShape is not null) { if (_pendingShape.Start != _pendingShape.End) Commit(_pendingShape); _pendingShape = null; }
             if (!_pendingMosaic.IsEmpty)
             {
-                _annotations.Add(new Mosaic(_pendingMosaic, Pixelate(_pendingMosaic)));
+                Commit(new Mosaic(_pendingMosaic, Pixelate(_pendingMosaic)));
                 _pendingMosaic = default;
             }
             if (Selection.Width < 2 || Selection.Height < 2) Selection = default;
@@ -167,50 +216,86 @@ public static class CaptureService
             Dragging = false;
             Selection = default;
             _annotations.Clear();
+            _redo.Clear();
             _pendingStroke = null;
+            _pendingErase = null;
+            _pendingShape = null;
             _pendingMosaic = default;
             Mode = EditMode.Select;
             Refresh();
         }
 
         public void SetMode(EditMode mode) { if (!Dragging) { Mode = mode; Refresh(); } }
-        public void SetPenColor(Color color) { if (!Dragging) { PenColor = color; Refresh(); } }
-        public void SetPenWidth(double width) { if (!Dragging) { PenWidth = Math.Clamp(width, 2, 8); Refresh(); } }
+        private void SaveToolPreferences() => _preferences = new(Hex(PenColor), PenWidth, EraserWidth, MosaicBlock);
+        public void SetPenColor(Color color) { if (!Dragging) { PenColor = Color.FromRgb(color.R, color.G, color.B);SaveToolPreferences();Refresh(); } }
+        public void SetPenWidth(double width) { if (!Dragging && double.IsFinite(width)) { PenWidth = Math.Clamp(width, 1, 32);SaveToolPreferences();Refresh(); } }
+        public void SetEraserWidth(double width) { if (!Dragging && double.IsFinite(width)) { EraserWidth = Math.Clamp(width, 4, 80);SaveToolPreferences();Refresh(); } }
+        public void SetMosaicBlock(double width) { if (!Dragging && double.IsFinite(width)) { MosaicBlock = (int)Math.Clamp(Math.Round(width), 6, 32);SaveToolPreferences();Refresh(); } }
+        private void Commit(Annotation annotation) { _annotations.Add(annotation); _redo.Clear(); }
         public void Undo()
         {
-            if (!Dragging && _annotations.Count > 0) _annotations.RemoveAt(_annotations.Count - 1);
+            if (CanUndo) { _redo.Push(_annotations[^1]); _annotations.RemoveAt(_annotations.Count - 1); }
             Refresh();
         }
+        public void Redo() { if (CanRedo) _annotations.Add(_redo.Pop()); Refresh(); }
+        public void ClearAnnotations() { if (CanUndo) Commit(new Clear()); Refresh(); }
 
         public void DrawAnnotations(DrawingContext dc)
         {
             foreach (Annotation annotation in _annotations) Draw(annotation);
             if (_pendingStroke is not null) Draw(_pendingStroke);
+            if (_pendingErase is not null) Draw(_pendingErase);
+            if (_pendingShape is not null) Draw(_pendingShape);
             if (!_pendingMosaic.IsEmpty)
                 dc.DrawRectangle(new SolidColorBrush(Color.FromArgb(80, 240, 240, 240)),
                     new Pen(Brushes.White, 1), ToRect(_pendingMosaic));
             void Draw(Annotation annotation)
             {
                 if (annotation is Mosaic mosaic) dc.DrawImage(mosaic.Image, ToRect(mosaic.Bounds));
+                else if (annotation is Clear) dc.DrawImage(Screenshot, ToRect(Desktop));
+                else if (annotation is Erase erase && erase.Points.Count > 0)
+                {
+                    Geometry clip = erase.Points.Count == 1
+                        ? new EllipseGeometry(new Point(erase.Points[0].X, erase.Points[0].Y), erase.Width / 2, erase.Width / 2)
+                        : Path(erase.Points).GetWidenedPathGeometry(RoundPen(Brushes.Black, erase.Width));
+                    dc.PushClip(clip);dc.DrawImage(Screenshot, ToRect(Desktop));dc.Pop();
+                }
+                else if (annotation is Shape shape)
+                {
+                    var brush = new SolidColorBrush(shape.Color);var pen = RoundPen(brush, shape.Width);
+                    Point start = new(shape.Start.X, shape.Start.Y), end = new(shape.End.X, shape.End.Y);
+                    if (shape.Mode == EditMode.Rectangle) dc.DrawRectangle(null, pen, new Rect(start, end));
+                    else
+                    {
+                        Vector direction = end - start;
+                        if (direction.Length < 0.01) return;
+                        double length = Math.Min(direction.Length, Math.Max(10, shape.Width * 3));direction.Normalize();
+                        Vector normal = new(-direction.Y, direction.X);
+                        dc.DrawLine(pen, start, end);
+                        var head = new StreamGeometry();using(var ctx = head.Open())
+                        { ctx.BeginFigure(end, true, true);ctx.LineTo(end - direction * length + normal * length * .45, true, false);ctx.LineTo(end - direction * length - normal * length * .45, true, false); }
+                        head.Freeze();dc.DrawGeometry(brush, null, head);
+                    }
+                }
                 else if (annotation is Stroke stroke && stroke.Points.Count > 0)
                 {
                     var brush = new SolidColorBrush(stroke.Color);
-                    var pen = new Pen(brush, stroke.Width) { StartLineCap = PenLineCap.Round, EndLineCap = PenLineCap.Round, LineJoin = PenLineJoin.Round };
+                    var pen = RoundPen(brush, stroke.Width);
                     if (stroke.Points.Count == 1)
                         dc.DrawEllipse(brush, null, new Point(stroke.Points[0].X, stroke.Points[0].Y), stroke.Width / 2, stroke.Width / 2);
                     else
                     {
-                        var geometry = new StreamGeometry();
-                        using (var context = geometry.Open())
-                        {
-                            context.BeginFigure(new Point(stroke.Points[0].X, stroke.Points[0].Y), false, false);
-                            context.PolyLineTo(stroke.Points.Skip(1).Select(p => new Point(p.X, p.Y)).ToArray(), true, false);
-                        }
-                        geometry.Freeze();
-                        dc.DrawGeometry(null, pen, geometry);
+                        dc.DrawGeometry(null, pen, Path(stroke.Points));
                     }
                 }
             }
+        }
+        private static Pen RoundPen(Brush brush, double width) => new(brush, width) { StartLineCap = PenLineCap.Round, EndLineCap = PenLineCap.Round, LineJoin = PenLineJoin.Round };
+        private static StreamGeometry Path(List<PixelPoint> points)
+        {
+            var geometry = new StreamGeometry();using(var context = geometry.Open())
+            { context.BeginFigure(new Point(points[0].X, points[0].Y), false, false);context.PolyLineTo(points.Skip(1).Select(p => new Point(p.X, p.Y)).ToArray(), true, false); }
+            geometry.Freeze();return geometry;
         }
 
         private BitmapSource Pixelate(PixelRect region)
@@ -220,7 +305,7 @@ public static class CaptureService
             int stride = checked(region.Width * 4);
             var pixels = new byte[checked(stride * region.Height)];
             crop.CopyPixels(pixels, stride, 0);
-            const int block = 12;
+            int block = MosaicBlock;
             for (int y = 0; y < region.Height; y += block)
                 for (int x = 0; x < region.Width; x += block)
                 {
@@ -281,6 +366,7 @@ public static class CaptureService
         {
             if (_finished) return;
             _finished = true;
+            if (_displaySubscribed) { Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged; _displaySubscribed = false; }
             Mouse.Capture(null);
             foreach (CaptureOverlay window in _windows) if (window.IsVisible) window.Close();
             _windows.Clear();
@@ -297,9 +383,15 @@ public static class CaptureService
         private readonly Border _toolbar;
         private readonly TextBlock _help;
         private readonly Dictionary<EditMode, Button> _modeButtons = [];
-        private WrapPanel? _penOptions;
-        private readonly Dictionary<string, Button> _penButtons = [];
-        private Button? _undoButton;
+        private readonly Dictionary<EditMode, WrapPanel> _toolOptions = [];
+        private readonly Dictionary<Color, Button> _colorButtons = [];
+        private Slider? _penSlider, _eraserSlider, _mosaicSlider;
+        private TextBlock? _penValue, _eraserValue, _mosaicValue;
+        private Button? _undoButton, _redoButton, _clearButton;
+        private Button? _toolMenuButton;
+        private bool _updatingOptions;
+        private readonly Popup _palettePopup = new() { AllowsTransparency = true, StaysOpen = false, Placement = PlacementMode.Bottom };
+        private Border? _customColorPreview;
         private readonly List<Button> _toolbarButtons = [];
         public PixelRect Monitor { get; }
 
@@ -324,7 +416,7 @@ public static class CaptureService
             _floating.Children.Add(_toolbar);
             _help = new TextBlock
             {
-                Text = "拖动选择截图范围  ·  选区可移动和调整大小  ·  Enter 收藏并复制  ·  Esc 取消",
+                Text = "拖动选择截图范围  ·  Enter 保存并复制  ·  Esc 取消",
                 Foreground = Brushes.White, Background = new SolidColorBrush(Color.FromArgb(210, 24, 28, 35)),
                 Padding = new Thickness(12, 8, 12, 8), FontSize = 13, IsHitTestVisible = false,
                 TextWrapping = TextWrapping.Wrap
@@ -336,11 +428,16 @@ public static class CaptureService
             SizeChanged += (_, _) => Refresh(_toolbar.Visibility == Visibility.Visible);
             PreviewKeyDown += (_, e) =>
             {
-                if (e.Key == Key.Escape) { e.Handled = true; session.Cancel(); }
+                if (e.Key == Key.Escape) { e.Handled = true; if (_palettePopup.IsOpen) _palettePopup.IsOpen = false; else session.Cancel(); }
                 else if (e.Key == Key.Enter) { e.Handled = true; session.Accept("Collect"); }
                 else if (e.Key == Key.Z && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; session.Undo(); }
+                else if (e.Key == Key.Y && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; session.Redo(); }
+                else if (e.OriginalSource is not TextBox && Keyboard.Modifiers == ModifierKeys.None && e.Key is Key.B or Key.E or Key.M or Key.V)
+                {
+                    session.SetMode(e.Key switch { Key.B => EditMode.Pen, Key.E => EditMode.Eraser, Key.M => EditMode.Mosaic, _ => EditMode.Select });e.Handled = true;
+                }
             };
-            Closed += (_, _) => session.Cancel();
+            Closed += (_, _) => { _palettePopup.IsOpen = false;if (_toolMenuButton?.ContextMenu is ContextMenu menu) menu.IsOpen = false;session.Cancel(); };
             _surface.MouseLeftButtonDown += (_, e) =>
             {
                 Activate();
@@ -352,10 +449,13 @@ public static class CaptureService
             _surface.MouseMove += (_, _) =>
             {
                 PixelPoint point = NativeMethods.CursorPosition();
+                _surface.PointerPosition = point;
+                _surface.InvalidateVisual();
                 if (session.Dragging) session.Update(point);
                 else _surface.Cursor = session.Mode == EditMode.Select
-                    ? CursorFor(SelectionGeometry.HitTest(session.Selection, point)) : Cursors.Cross;
+                    ? CursorFor(SelectionGeometry.HitTest(session.Selection, point)) : session.Mode is EditMode.Pen or EditMode.Eraser ? Cursors.None : Cursors.Cross;
             };
+            _surface.MouseLeave += (_, _) => { _surface.PointerPosition = null; _surface.InvalidateVisual(); };
             _surface.MouseLeftButtonUp += (_, e) =>
             {
                 session.End(NativeMethods.CursorPosition());
@@ -378,23 +478,57 @@ public static class CaptureService
 
         private Border BuildToolbar()
         {
+            var buttonStyle = RoundedButtonStyle();
             var body = new StackPanel();
             var row = new WrapPanel(); body.Children.Add(row);
             AddMode("选区", EditMode.Select);
             AddMode("画笔", EditMode.Pen);
+            AddMode("箭头", EditMode.Arrow);
+            AddMode("矩形", EditMode.Rectangle);
+            AddMode("橡皮擦", EditMode.Eraser);
             AddMode("马赛克", EditMode.Mosaic);
-            AddButton("撤销", _session.Undo);
-            AddButton("收藏并复制", () => _session.Accept("Collect"));
-            AddButton("仅复制", () => _session.Accept("Copy"));
-            AddButton("另存 PNG", () => _session.Accept("Save"));
-            AddButton("重新选择", _session.Reset);
-            AddButton("取消", _session.Cancel);
-            _penOptions = new WrapPanel { Margin = new Thickness(0, 2, 0, 0), Visibility = Visibility.Collapsed };
-            body.Children.Add(_penOptions);
-            AddPen("红色", () => _session.SetPenColor(Color.FromRgb(230, 55, 55)));
-            AddPen("蓝色", () => _session.SetPenColor(Color.FromRgb(23, 105, 194)));
-            AddPen("细", () => _session.SetPenWidth(2));
-            AddPen("粗", () => _session.SetPenWidth(6));
+            _toolMenuButton = AddButton(row, "工具⌄", () =>
+            {
+                var menu = new ContextMenu { Background = new SolidColorBrush(Color.FromRgb(248, 249, 251)), Foreground = Brushes.Black, BorderBrush = Brushes.LightGray, PlacementTarget = _toolMenuButton, Placement = PlacementMode.Bottom };
+                foreach (var pair in _modeButtons)
+                {
+                    var item = new MenuItem { Header = pair.Value.ToolTip, IsCheckable = true, IsChecked = pair.Key == _session.Mode, Style = new Style(typeof(MenuItem)), Foreground = Brushes.Black, FontSize = 13 };
+                    item.Click += (_, _) => _session.SetMode(pair.Key);menu.Items.Add(item);
+                }
+                _toolMenuButton!.ContextMenu = menu;menu.IsOpen = true;
+            });
+            _toolMenuButton.Visibility = Visibility.Collapsed;_toolMenuButton.ToolTip = "选择标注工具";
+            _undoButton = AddButton(row, "撤销", _session.Undo);
+            _redoButton = AddButton(row, "重做", _session.Redo);
+            _clearButton = AddButton(row, "清空标注", _session.ClearAnnotations);
+            var penOptions = Options(EditMode.Pen);
+            foreach (var (name, color) in new[] { ("红", Color.FromRgb(230, 55, 55)), ("蓝", Color.FromRgb(23, 105, 194)),
+                ("绿", Color.FromRgb(24, 167, 91)), ("黄", Color.FromRgb(244, 196, 48)), ("白", Colors.White), ("黑", Colors.Black) })
+            {
+                var button = new Button { Width = 20, Height = 24, Padding = new Thickness(0), Margin = new Thickness(1, 2, 1, 2),
+                    Style = buttonStyle, Background = new SolidColorBrush(color), BorderBrush = Brushes.Gray,
+                    Foreground = color == Colors.White || name == "黄" ? Brushes.Black : Brushes.White, ToolTip = name + "色" };
+                button.Click += (_, _) => _session.SetPenColor(color);_colorButtons.Add(color, button);penOptions.Children.Add(button);
+            }
+            var more = MakeButton("更多色");more.ToolTip = "自定义颜色 · RGB / Hex";
+            _customColorPreview = new Border { Width = 10, Height = 10, CornerRadius = new CornerRadius(3), Margin = new Thickness(0, 0, 4, 0), BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1) };
+            var moreContent = new StackPanel { Orientation = Orientation.Horizontal };moreContent.Children.Add(_customColorPreview);moreContent.Children.Add(new TextBlock { Text = "更多色", FontSize = 11, Foreground = Brushes.Black });more.Content = moreContent;
+            more.Padding = new Thickness(4);more.MinHeight = 24;
+            more.Click += (_, _) => { _palettePopup.PlacementTarget = more;_palettePopup.Child = CreatePalette();_palettePopup.IsOpen = true; };
+            penOptions.Children.Add(more);
+            (_penSlider, _penValue) = SizeOption(penOptions, "笔宽", 1, 32, _session.SetPenWidth);
+            var eraserOptions = Options(EditMode.Eraser);
+            (_eraserSlider, _eraserValue) = SizeOption(eraserOptions, "大小", 4, 80, _session.SetEraserWidth);
+            eraserOptions.Children.Add(new TextBlock { Text = "移除标注 · 可撤销", FontSize = 11, Foreground = Brushes.Black, Margin = new Thickness(6, 6, 2, 4) });
+            var mosaicOptions = Options(EditMode.Mosaic);
+            (_mosaicSlider, _mosaicValue) = SizeOption(mosaicOptions, "块大小", 6, 32, _session.SetMosaicBlock);
+            var actions = new WrapPanel { Margin = new Thickness(0, 2, 0, 0) };body.Children.Add(actions);
+            var save = AddButton(actions, "保存并复制", () => _session.Accept("Collect"));
+            save.Background = new SolidColorBrush(Color.FromRgb(23, 105, 194));save.Foreground = Brushes.White;
+            AddButton(actions, "仅复制", () => _session.Accept("Copy"));
+            AddButton(actions, "另存 PNG", () => _session.Accept("Save"));
+            AddButton(actions, "重新选择", _session.Reset);
+            AddButton(actions, "取消", _session.Cancel);
             return new Border
             {
                 Background = new SolidColorBrush(Color.FromRgb(248, 249, 251)),
@@ -402,39 +536,126 @@ public static class CaptureService
                 BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(5),
                 Padding = new Thickness(4), Child = body, Visibility = Visibility.Collapsed
             };
-            void AddButton(string title, Action action)
+            Button AddButton(Panel panel, string title, Action action)
             {
                 var button = MakeButton(title);
-                if (title == "撤销") _undoButton = button;
-                if (title == "收藏并复制") { button.Background = new SolidColorBrush(Color.FromRgb(23, 105, 194)); button.Foreground = Brushes.White; }
                 button.Click += (_, _) => action();
-                row.Children.Add(button);
+                panel.Children.Add(button);return button;
             }
             void AddMode(string title, EditMode mode)
             {
                 var button = MakeButton(title);
+                button.ToolTip = title;
                 button.Click += (_, _) => _session.SetMode(mode);
                 _modeButtons.Add(mode, button);
                 row.Children.Add(button);
             }
-            void AddPen(string title, Action action)
+            WrapPanel Options(EditMode mode)
             {
-                var button = MakeButton(title); button.Click += (_, _) => action();
-                _penButtons.Add(title, button); _penOptions.Children.Add(button);
+                var options = new WrapPanel { Margin = new Thickness(0, 2, 0, 0), Visibility = Visibility.Collapsed };
+                body.Children.Add(options);_toolOptions.Add(mode, options);return options;
+            }
+            (Slider, TextBlock) SizeOption(Panel panel, string title, double minimum, double maximum, Action<double> changed)
+            {
+                var group = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(3, 0, 0, 0) };
+                group.Children.Add(new TextBlock { Text = title, FontSize = 11, Foreground = Brushes.Black, Width = 34, VerticalAlignment = VerticalAlignment.Center });
+                var slider = new Slider { Minimum = minimum, Maximum = maximum, Width = 76, Margin = new Thickness(2, 4, 2, 4), VerticalAlignment = VerticalAlignment.Center,
+                    SmallChange = 1, LargeChange = 4, IsSnapToTickEnabled = false, IsMoveToPointEnabled = true, Style = RoundedSliderStyle(), Focusable = false };
+                var value = new TextBlock { FontSize = 11, Foreground = Brushes.Black, Width = 40, VerticalAlignment = VerticalAlignment.Center };
+                slider.ValueChanged += (_, _) => { if (!_updatingOptions) changed(slider.Value); };
+                group.Children.Add(slider);group.Children.Add(value);panel.Children.Add(group);return (slider, value);
             }
             Button MakeButton(string title)
             {
                 var button = new Button {
-                Content = title, Style = new Style(typeof(Button)), FontSize = 13,
+                Style = buttonStyle, FontSize = 13,
                 FontFamily = new FontFamily("Segoe UI, Microsoft YaHei UI"),
                 Foreground = new SolidColorBrush(Color.FromRgb(32, 32, 32)),
                 Background = new SolidColorBrush(Color.FromRgb(245, 247, 250)),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(174, 182, 194)),
                 Margin = new Thickness(2), Padding = new Thickness(8, 7, 8, 7), MinHeight = 32
                 };
+                var text = new TextBlock { Text = title, Style = new Style(typeof(TextBlock)) };
+                text.SetBinding(TextBlock.FontSizeProperty, new System.Windows.Data.Binding("FontSize") { Source = button });
+                text.SetBinding(TextBlock.ForegroundProperty, new System.Windows.Data.Binding("Foreground") { Source = button });
+                button.Content = text;
                 _toolbarButtons.Add(button);return button;
             }
         }
+
+        private FrameworkElement CreatePalette()
+        {
+            var body = new StackPanel { Width = 238 };
+            body.Children.Add(new TextBlock { Text = "自定义颜色", FontSize = 13, Foreground = Brushes.Black, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 8) });
+            var preview = new Border { Height = 36, CornerRadius = new CornerRadius(4), BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1), Margin = new Thickness(0, 0, 0, 8) };body.Children.Add(preview);
+            var hex = new TextBox { FontSize = 13, Foreground = Brushes.Black, Background = Brushes.White, BorderBrush = Brushes.LightGray, Padding = new Thickness(6), MaxLength = 7, Margin = new Thickness(0, 8, 0, 4) };
+            var channels = new List<Slider>();bool syncing = true;
+            Color current = _session.PenColor;
+            foreach (var (title, initial) in new[] { ("R", current.R), ("G", current.G), ("B", current.B) })
+            {
+                var line = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2) };
+                line.Children.Add(new TextBlock { Text = title, Foreground = Brushes.Black, FontSize = 12, Width = 18, VerticalAlignment = VerticalAlignment.Center });
+                var slider = new Slider { Minimum = 0, Maximum = 255, Value = initial, Width = 174, SmallChange = 1, LargeChange = 16, IsMoveToPointEnabled = true, Style = RoundedSliderStyle(), VerticalAlignment = VerticalAlignment.Center };
+                var value = new TextBlock { Text = initial.ToString(), Width = 40, TextAlignment = TextAlignment.Right, Foreground = Brushes.Black, FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
+                slider.ValueChanged += (_, _) => { value.Text = Math.Round(slider.Value).ToString("0");if (!syncing) { current = Color.FromRgb((byte)Math.Round(channels[0].Value), (byte)Math.Round(channels[1].Value), (byte)Math.Round(channels[2].Value));hex.Text = Hex(current);preview.Background = new SolidColorBrush(current); } };
+                channels.Add(slider);line.Children.Add(slider);line.Children.Add(value);body.Children.Add(line);
+            }
+            preview.Background = new SolidColorBrush(current);hex.Text = Hex(current);syncing = false;
+            body.Children.Add(hex);
+            var error = new TextBlock { FontSize = 11, Foreground = Brushes.DarkRed, TextWrapping = TextWrapping.Wrap };body.Children.Add(error);
+            hex.TextChanged += (_, _) =>
+            {
+                if (syncing || !TryColor(hex.Text, out var color)) return;
+                current = color;preview.Background = new SolidColorBrush(color);syncing = true;
+                try { channels[0].Value = color.R;channels[1].Value = color.G;channels[2].Value = color.B; }finally { syncing = false; }
+                error.Text = "";
+            };
+            var apply = new Button { Content = "应用颜色", Style = RoundedButtonStyle(), Background = new SolidColorBrush(Color.FromRgb(23, 105, 194)), Foreground = Brushes.White, Padding = new Thickness(10, 6, 10, 6), Margin = new Thickness(0, 8, 0, 0) };
+            void Apply()
+            {
+                if (!TryColor(hex.Text, out var color)) { error.Text = "请输入 6 位色值，如 #2D7FE5";return; }
+                _session.SetPenColor(color);_palettePopup.IsOpen = false;
+            }
+            apply.Click += (_, _) => Apply();body.Children.Add(apply);
+            body.PreviewKeyDown += (_, e) => { if (e.Key == Key.Enter) { Apply();e.Handled = true; }else if (e.Key == Key.Escape) { _palettePopup.IsOpen = false;e.Handled = true; } };
+            return new Border { Child = body, Padding = new Thickness(12), Background = new SolidColorBrush(Color.FromRgb(248, 249, 251)), BorderBrush = new SolidColorBrush(Color.FromRgb(170, 177, 189)), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(6) };
+        }
+
+        private static Style RoundedButtonStyle()
+        {
+            var chrome = new FrameworkElementFactory(typeof(Border), "Chrome");
+            chrome.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
+            chrome.SetValue(Border.BackgroundProperty, new TemplateBindingExtension(Control.BackgroundProperty));
+            chrome.SetValue(Border.BorderBrushProperty, new TemplateBindingExtension(Control.BorderBrushProperty));
+            chrome.SetValue(Border.BorderThicknessProperty, new TemplateBindingExtension(Control.BorderThicknessProperty));
+            var content = new FrameworkElementFactory(typeof(ContentPresenter));
+            content.SetValue(ContentPresenter.ContentProperty, new TemplateBindingExtension(ContentControl.ContentProperty));
+            content.SetValue(ContentPresenter.ContentTemplateProperty, new TemplateBindingExtension(ContentControl.ContentTemplateProperty));
+            content.SetValue(ContentPresenter.RecognizesAccessKeyProperty, true);
+            content.SetValue(FrameworkElement.MarginProperty, new TemplateBindingExtension(Control.PaddingProperty));
+            content.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);content.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+            chrome.AppendChild(content);var template = new ControlTemplate(typeof(Button)) { VisualTree = chrome };
+            var hover = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };hover.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(83, 142, 200)), "Chrome"));template.Triggers.Add(hover);
+            var focus = new Trigger { Property = UIElement.IsKeyboardFocusedProperty, Value = true };focus.Setters.Add(new Setter(Border.BorderBrushProperty, Brushes.DodgerBlue, "Chrome"));focus.Setters.Add(new Setter(Border.BorderThicknessProperty, new Thickness(2), "Chrome"));template.Triggers.Add(focus);
+            var disabled = new Trigger { Property = UIElement.IsEnabledProperty, Value = false };disabled.Setters.Add(new Setter(UIElement.OpacityProperty, .42));template.Triggers.Add(disabled);
+            var pressed = new Trigger { Property = Button.IsPressedProperty, Value = true };pressed.Setters.Add(new Setter(UIElement.OpacityProperty, .7));template.Triggers.Add(pressed);
+            var style = new Style(typeof(Button));style.Setters.Add(new Setter(Control.TemplateProperty, template));style.Setters.Add(new Setter(Control.BorderThicknessProperty, new Thickness(1)));style.Setters.Add(new Setter(FrameworkElement.FocusVisualStyleProperty, null));return style;
+        }
+        private static Style RoundedSliderStyle() => (Style)System.Windows.Markup.XamlReader.Parse("""
+            <Style xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" TargetType="Slider">
+              <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Slider">
+                <Grid MinHeight="18">
+                  <Border Height="4" CornerRadius="2" Background="#D6DEE8" VerticalAlignment="Center"/>
+                  <Border Height="4" CornerRadius="2" Background="#1769C2" VerticalAlignment="Center" HorizontalAlignment="Left" Width="{Binding DecreaseRepeatButton.ActualWidth, ElementName=PART_Track}"/>
+                  <Track x:Name="PART_Track" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+                    <Track.DecreaseRepeatButton><RepeatButton Command="{x:Static Slider.DecreaseLarge}" Focusable="False"><RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Height="4" CornerRadius="2" Background="#1769C2"/></ControlTemplate></RepeatButton.Template></RepeatButton></Track.DecreaseRepeatButton>
+                    <Track.Thumb><Thumb Width="14" Height="14" Focusable="False"><Thumb.Template><ControlTemplate TargetType="Thumb"><Ellipse Fill="#1769C2" Stroke="White" StrokeThickness="1.5"/></ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
+                    <Track.IncreaseRepeatButton><RepeatButton Command="{x:Static Slider.IncreaseLarge}" Focusable="False"><RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Height="4" CornerRadius="2" Background="#D6DEE8"/></ControlTemplate></RepeatButton.Template></RepeatButton></Track.IncreaseRepeatButton>
+                  </Track>
+                </Grid>
+              </ControlTemplate></Setter.Value></Setter>
+            </Style>
+            """);
 
         public void Refresh(bool showToolbar)
         {
@@ -442,28 +663,44 @@ public static class CaptureService
             _toolbar.Visibility = showToolbar ? Visibility.Visible : Visibility.Collapsed;
             foreach (var button in _toolbarButtons)
             {
-                button.Padding = new Thickness(8, ActualWidth < 420 ? 4 : 7, 8, ActualWidth < 420 ? 4 : 7);
-                button.MinHeight = ActualWidth < 420 ? 28 : 32;
+                bool compact = ActualWidth < 420;
+                button.Padding = new Thickness(compact ? 3 : 8, compact ? 3 : 7, compact ? 3 : 8, compact ? 3 : 7);
+                button.MinHeight = compact ? 24 : 32;button.FontSize = compact ? 12 : 13;
             }
             if (_undoButton is not null) _undoButton.IsEnabled = _session.CanUndo;
-            if (_penOptions is not null) _penOptions.Visibility = _session.Mode == EditMode.Pen ? Visibility.Visible : Visibility.Collapsed;
-            foreach (var pair in _penButtons)
+            if (_redoButton is not null) _redoButton.IsEnabled = _session.CanRedo;
+            if (_clearButton is not null) _clearButton.IsEnabled = _session.CanUndo;
+            foreach (var pair in _toolOptions)
+                pair.Value.Visibility = pair.Key == _session.Mode || (pair.Key == EditMode.Pen && _session.Mode is EditMode.Arrow or EditMode.Rectangle) ? Visibility.Visible : Visibility.Collapsed;
+            _updatingOptions = true;
+            try
             {
-                bool selected = pair.Key switch { "红色" => _session.PenColor.R > 200, "蓝色" => _session.PenColor.B > 150,
-                    "细" => _session.PenWidth <= 2, "粗" => _session.PenWidth >= 6, _ => false };
-                pair.Value.Background = new SolidColorBrush(selected ? Color.FromRgb(204, 228, 255) : Color.FromRgb(245, 247, 250));
+                if (_penSlider is not null) _penSlider.Value = _session.PenWidth;
+                if (_eraserSlider is not null) _eraserSlider.Value = _session.EraserWidth;
+                if (_mosaicSlider is not null) _mosaicSlider.Value = _session.MosaicBlock;
+                if (_penValue is not null) _penValue.Text = $"{_session.PenWidth:0.#} px";
+                if (_eraserValue is not null) _eraserValue.Text = $"{_session.EraserWidth:0.#} px";
+                if (_mosaicValue is not null) _mosaicValue.Text = $"{_session.MosaicBlock} px";
             }
+            finally { _updatingOptions = false; }
+            foreach (var pair in _colorButtons) { bool selected = pair.Key.Equals(_session.PenColor);pair.Value.Content = selected ? "✓" : "";pair.Value.BorderThickness = new Thickness(selected ? 2 : 1);pair.Value.BorderBrush = selected ? Brushes.DodgerBlue : Brushes.Gray; }
+            if (_customColorPreview is not null) _customColorPreview.Background = new SolidColorBrush(_session.PenColor);
             foreach (var pair in _modeButtons)
             {
+                pair.Value.Visibility = ActualWidth < 420 && pair.Key != _session.Mode ? Visibility.Collapsed : Visibility.Visible;
                 pair.Value.Background = pair.Key == _session.Mode
                     ? new SolidColorBrush(Color.FromRgb(204, 228, 255)) : new SolidColorBrush(Color.FromRgb(245, 247, 250));
                 pair.Value.Foreground = new SolidColorBrush(Color.FromRgb(32, 32, 32));
             }
+            if (_toolMenuButton is not null) _toolMenuButton.Visibility = ActualWidth < 420 ? Visibility.Visible : Visibility.Collapsed;
             _help.Text = _session.Mode switch
             {
-                EditMode.Pen => "画笔：在选区内拖动画线  ·  Ctrl+Z 撤销  ·  Enter 收藏并复制  ·  Esc 取消",
-                EditMode.Mosaic => "马赛克：在选区内拖动矩形  ·  Ctrl+Z 撤销  ·  Enter 收藏并复制  ·  Esc 取消",
-                _ => "拖动选择截图范围  ·  选区可移动和调整大小  ·  Enter 收藏并复制  ·  Esc 取消"
+                EditMode.Pen => "画笔 B · 拖动画线 · Ctrl+Z / Ctrl+Y 撤销重做 · Enter 保存并复制 · Esc 取消",
+                EditMode.Arrow => "箭头 · 拖动起点到终点 · Enter 保存并复制 · Esc 取消",
+                EditMode.Rectangle => "矩形 · 拖动框选 · Enter 保存并复制 · Esc 取消",
+                EditMode.Eraser => "橡皮擦 E · 移除标注，恢复原图 · Ctrl+Z 可撤销 · Enter 保存并复制 · Esc 取消",
+                EditMode.Mosaic => "马赛克 M · 拖动矩形 · Ctrl+Z / Ctrl+Y 撤销重做 · Enter 保存并复制 · Esc 取消",
+                _ => "选区 V · 拖动选择，可移动或调整大小 · Enter 保存并复制 · Esc 取消"
             };
             Canvas.SetLeft(_help, 20); Canvas.SetTop(_help, 20);
             _help.MaxWidth = Math.Max(40, ActualWidth - 40);
@@ -504,6 +741,7 @@ public static class CaptureService
         private readonly PixelRect _monitor;
         private readonly BitmapSource _image;
         public double MinimumLabelTop { get; set; } = 65;
+        public PixelPoint? PointerPosition { get; set; }
 
         public CaptureSurface(CaptureSession session, PixelRect monitor)
         {
@@ -544,6 +782,13 @@ public static class CaptureService
             dc.DrawRectangle(new SolidColorBrush(Color.FromArgb(220, 24, 28, 35)), null,
                 new Rect(x - 6, y - 4, label.Width + 12, label.Height + 8));
             dc.DrawText(label, new Point(x, y));
+            if (PointerPosition is PixelPoint pointer && selected.Contains(pointer) && _session.Mode is EditMode.Pen or EditMode.Eraser)
+            {
+                double radius = (_session.Mode == EditMode.Pen ? _session.PenWidth : _session.EraserWidth) / 2;
+                var center = new Point((pointer.X - _monitor.Left) * sx, (pointer.Y - _monitor.Top) * sy);
+                dc.DrawEllipse(null, new Pen(Brushes.Black, 2), center, radius * sx, radius * sy);
+                dc.DrawEllipse(null, new Pen(Brushes.White, 1), center, radius * sx, radius * sy);
+            }
         }
     }
 

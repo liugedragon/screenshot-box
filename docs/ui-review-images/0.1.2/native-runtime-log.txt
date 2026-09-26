@@ -1,0 +1,6 @@
+HOTKEY: reserved combinations, occupation, transactional update, release passed
+CAPTURE: 20 real desktop captures, physical 2560x1440; GDI before=1, after=1
+DPI: system=120, thread awareness=2
+MONITOR: \\.\DISPLAY1 {X=0,Y=0,Width=2560,Height=1440}
+ANNOTATIONS: physical crop, baked red pen, undo pixel equality, real mosaic blocks, cancellation passed
+NATIVE VALIDATION PASSED

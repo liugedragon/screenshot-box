@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+([-.][A-Za-z0-9.-]+)?$')][string]$Version = '0.1.1',
+    [ValidatePattern('^\d+\.\d+\.\d+([-.][A-Za-z0-9.-]+)?$')][string]$Version = '0.1.2',
     [switch]$SkipBuild
 )
 $ErrorActionPreference = 'Stop'
@@ -15,13 +15,21 @@ $stage = Join-Path $artifacts ('.package-' + [Guid]::NewGuid().ToString('N'))
 $app = Join-Path $repo 'src\ScreenshotBox.App\ScreenshotBox.App.csproj'
 function Invoke-Dotnet([string[]]$Arguments) {
     # App.csproj pins win-x64; do not force that RID onto the neutral Core project.
-    # Start-Process also waits correctly when invoked through Windows/WSL interop.
+    # Quote native Windows arguments, including paths with spaces and trailing backslashes.
     $quoted = $Arguments | ForEach-Object {
         $escaped = [regex]::Replace($_, '(\\*)"', '$1$1\"')
         $escaped = [regex]::Replace($escaped, '(\\+)$', '$1$1')
         '"' + $escaped + '"'
     }
-    $process = Start-Process -FilePath $dotnet -ArgumentList ($quoted -join ' ') -NoNewWindow -Wait -PassThru
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $startInfo.FileName = $dotnet
+    $startInfo.Arguments = $quoted -join ' '
+    $startInfo.UseShellExecute = $false
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $startInfo
+    # Wait only for dotnet, not its persistent compiler-server descendants.
+    [void]$process.Start()
+    $process.WaitForExit()
     if ($process.ExitCode -ne 0) { throw "dotnet command failed ($($process.ExitCode)): $($Arguments -join ' ')" }
 }
 if ((Test-Path $destination) -or (Test-Path $zipPath)) { throw 'Version output already exists. Choose a new version or move the previous output first.' }
