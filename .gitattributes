@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.iss text eol=crlf
+# Preserve upstream bytes: recorded checksums must survive a Windows checkout.
+licenses/** -text
+models/** -text
+native/** -text
+*.ico -text
+*.docx -text

@@ -1,0 +1,25 @@
+OVERLAY large/Select: 960 DIP, toolbar width 590, left 306, bottom 701/720
+HANDLES large/Select: toolbar covers 0/8
+OVERLAY large/Pen: 960 DIP, toolbar width 590, left 306, bottom 245/720
+HANDLES large/Pen: toolbar covers 0/8
+OVERLAY large/Mosaic: 960 DIP, toolbar width 590, left 306, bottom 701/720
+HANDLES large/Mosaic: toolbar covers 0/8
+OVERLAY small/Select: 560 DIP, toolbar width 540, left 8, bottom 243/720
+HANDLES small/Select: toolbar covers 0/8
+OVERLAY small/Pen: 560 DIP, toolbar width 540, left 8, bottom 284/720
+HANDLES small/Pen: toolbar covers 0/8
+OVERLAY small/Mosaic: 560 DIP, toolbar width 540, left 8, bottom 243/720
+HANDLES small/Mosaic: toolbar covers 0/8
+OVERLAY narrow/Select: 320 DIP, toolbar width 248, left 8, bottom 264/560
+HANDLES narrow/Select: toolbar covers 0/8
+OVERLAY narrow/Pen: 320 DIP, toolbar width 248, left 8, bottom 298/560
+HANDLES narrow/Pen: toolbar covers 0/8
+OVERLAY narrow/Mosaic: 320 DIP, toolbar width 248, left 8, bottom 264/560
+HANDLES narrow/Mosaic: toolbar covers 0/8
+OVERLAY light/Select: 720 DIP, toolbar width 590, left 66, bottom 541/560
+HANDLES light/Select: toolbar covers 0/8
+OVERLAY light/Pen: 720 DIP, toolbar width 590, left 66, bottom 245/560
+HANDLES light/Pen: toolbar covers 0/8
+OVERLAY light/Mosaic: 720 DIP, toolbar width 590, left 66, bottom 541/560
+HANDLES light/Mosaic: toolbar covers 0/8
+VISUAL REVIEW EXPORT PASSED

@@ -1,0 +1,122 @@
+[
+  {
+    "file": "WPF-UI-MIT.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/wpf-ui/4.3.0/wpf-ui.4.3.0.nupkg#LICENSE.md",
+    "sha256": "efb68dbccb1be73cd78729b76f39720132126bacff8194eed934323bab6455b7"
+  },
+  {
+    "file": "WPF-UI-ThirdPartyNotices.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/wpf-ui/4.3.0/wpf-ui.4.3.0.nupkg#ThirdPartyNotices.txt",
+    "sha256": "871e788e025383423fae377a97229dafcb9254687ce917d63ebbf7b10f34c588"
+  },
+  {
+    "file": "Clipper2-Boost-1.0.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/clipper2/2.0.0/clipper2.2.0.0.nupkg#License.txt",
+    "sha256": "36266a8fd073568394cb81cdb2b124f7fdae2c64c1a7ed09db34b4d22efa2951"
+  },
+  {
+    "file": "ONNXRuntime-MIT.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.29.0/microsoft.ml.onnxruntime.1.29.0.nupkg#LICENSE",
+    "sha256": "c250d6278f0b47a6439fb7592b08b58a55eb9f535aa49a1db63211c3f982b674"
+  },
+  {
+    "file": "ONNXRuntime-ThirdPartyNotices.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.29.0/microsoft.ml.onnxruntime.1.29.0.nupkg#ThirdPartyNotices.txt",
+    "sha256": "4c5b864d8974c94b37461f38163facef79a1bb5dea461667ee9e5be6a8e73f83"
+  },
+  {
+    "file": "SkiaSharp-MIT.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/skiasharp/3.119.1/skiasharp.3.119.1.nupkg#LICENSE.txt",
+    "sha256": "89101e35a8c66fd4d6dffc1763259161d35cb564c169714ec227a768c89f2938"
+  },
+  {
+    "file": "SkiaSharp-Win32-ThirdPartyNotices.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/skiasharp.nativeassets.win32/3.119.1/skiasharp.nativeassets.win32.3.119.1.nupkg#THIRD-PARTY-NOTICES.txt",
+    "sha256": "21504c46c4c58aa64c1055bd2dcbc5f9a136b4b8c412ed3cc6740e22c5b127f5"
+  },
+  {
+    "file": "System.Numerics.Tensors-MIT.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/system.numerics.tensors/9.0.0/system.numerics.tensors.9.0.0.nupkg#LICENSE.TXT",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "file": "System.Numerics.Tensors-ThirdPartyNotices.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/system.numerics.tensors/9.0.0/system.numerics.tensors.9.0.0.nupkg#THIRD-PARTY-NOTICES.TXT",
+    "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+  },
+  {
+    "file": "Apache-2.0.txt",
+    "source": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "file": "SQLitePCLRaw-Apache-2.0.txt",
+    "source": "https://raw.githubusercontent.com/ericsink/SQLitePCL.raw/v2.1.12/LICENSE.TXT",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "file": "DotNet-MIT.txt",
+    "source": "https://raw.githubusercontent.com/dotnet/dotnet/95017c711e6afc1085133d440e42b4bd78155701/LICENSE.TXT",
+    "sha256": "ae48df11a335dc1a615f4f938b69cba73bcf4485c4f97af49b38efb0f216353b"
+  },
+  {
+    "file": "RapidOCR-Apache-2.0.txt",
+    "source": "https://raw.githubusercontent.com/RapidAI/RapidOCR/v3.9.2/LICENSE",
+    "sha256": "3e0af25fdd06aa9586ae97adb00ea927ebe5a3805ac77d2d3a81ce5f55693333"
+  },
+  {
+    "file": "PaddleOCR-Apache-2.0.txt",
+    "source": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/main/LICENSE",
+    "sha256": "3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e"
+  },
+  {
+    "file": "DotNetRuntime-MIT.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.netcore.app.runtime.win-x64/10.0.12/microsoft.netcore.app.runtime.win-x64.10.0.12.nupkg#LICENSE.TXT",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "file": "DotNetRuntime-ThirdPartyNotices.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.netcore.app.runtime.win-x64/10.0.12/microsoft.netcore.app.runtime.win-x64.10.0.12.nupkg#THIRD-PARTY-NOTICES.TXT",
+    "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+  },
+  {
+    "file": "DotNetDesktop-MIT.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.windowsdesktop.app.runtime.win-x64/10.0.12/microsoft.windowsdesktop.app.runtime.win-x64.10.0.12.nupkg#LICENSE",
+    "sha256": "a89886665765362eb77e0f8e26602c924520041d1711b2eedc136434fe4d01ab"
+  },
+  {
+    "file": "RapidOcrNet-Apache-2.0.txt",
+    "source": "https://raw.githubusercontent.com/BobLd/RapidOcrNet/708cae2fcb88720e1d891a81b5ee3e8b2bcc139e/LICENSE.txt",
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "file": "RapidOcrNet-NOTICE.txt",
+    "source": "https://raw.githubusercontent.com/BobLd/RapidOcrNet/708cae2fcb88720e1d891a81b5ee3e8b2bcc139e/NOTICE.txt",
+    "sha256": "fe492bb607c388e448b9fd64fea0c115d6b4511632aecef7f0d35f519e64d590"
+  },
+  {
+    "file": "InnoSetup-License.txt",
+    "source": "https://github.com/jrsoftware/issrc/blob/is-7_1_0/LICENSE.TXT",
+    "sha256": "2e5346868c2a18434489824e11d65c3031620f792fefc415d05f19cd441abf5c"
+  },
+  {
+    "file": "VisualCpp-Runtime-License.docx",
+    "source": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+    "sha256": "08651651a7602fc7c0e2763de0fde1ff9f868df2780597cd1775ee9d6441c783"
+  },
+  {
+    "file": "VisualCpp-Runtime-License.txt",
+    "source": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+    "sha256": "923d8b11a03c277d59f3262727abc7e422158f5243a5565d67d5c270c6b05e3c"
+  },
+  {
+    "file": "VisualStudio-Community-2022-License.docx",
+    "source": "https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Visual-Studio-2022-Community-License-EN.docx",
+    "sha256": "41a207b10c8ab91d0d2f10a854715f73dca54509581692d2fe179aa3ffcb8540"
+  },
+  {
+    "file": "VisualStudio-Community-2022-License.txt",
+    "source": "https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Visual-Studio-2022-Community-License-EN.docx",
+    "sha256": "24b187690944c166a8337208454cbc775e1a39406d6f2a986e9a34d8f1a1f259"
+  }
+]

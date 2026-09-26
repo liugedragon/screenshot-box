@@ -1,0 +1,17 @@
+.tools/
+**/bin/
+**/obj/
+dist/
+artifacts/
+.vs/
+*.user
+*.db
+*.db-*
+*.sqlite*
+data/
+test-data/
+*.onnx
+*.nupkg
+*.zip
+*.log
+!docs/*.md

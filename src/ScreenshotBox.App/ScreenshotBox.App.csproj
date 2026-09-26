@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup>
+  <OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework>
+  <UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms>
+  <ImplicitUsings>disable</ImplicitUsings><ApplicationManifest>app.manifest</ApplicationManifest>
+  <NoWarn>$(NoWarn);WFO0003</NoWarn>
+  <AssemblyName>ScreenshotBox</AssemblyName><Version>0.1.1</Version>
+  <ApplicationIcon>../../assets/screenshotbox.ico</ApplicationIcon>
+  <RuntimeIdentifier>win-x64</RuntimeIdentifier><SelfContained>true</SelfContained>
+ </PropertyGroup>
+ <ItemGroup><ProjectReference Include="../ScreenshotBox.Core/ScreenshotBox.Core.csproj" />
+ <PackageReference Include="WPF-UI" Version="4.3.0" />
+ <PackageReference Include="RapidOcrNet" Version="4.2.0" /></ItemGroup>
+ <ItemGroup><Content Include="../../models/chinese/*" Link="models/chinese/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
+</Project>

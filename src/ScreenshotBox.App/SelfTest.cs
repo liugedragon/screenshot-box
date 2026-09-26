@@ -1,0 +1,91 @@
+using System.Globalization;
+using System.Text.Json;
+namespace ScreenshotBox.App;
+internal static class SelfTest
+{
+    public static async Task RunAsync(App app)
+    {
+        app.Preferences.Theme="Light";var emptyWindow=new MainWindow(app);app.MainWindow=emptyWindow;emptyWindow.Show();await Task.Delay(450);AppearanceService.Apply("Light");SaveVisual(emptyWindow,Path.Combine(app.Store.RootPath,"ui-empty.png"));emptyWindow.DisposeRuntimeResources();emptyWindow.Close();
+        var root=app.Store.RootPath;var drawing=new DrawingVisual();
+        using(var dc=drawing.RenderOpen()){
+            dc.DrawRectangle(Brushes.White,null,new Rect(0,0,1000,600));
+            string[] lines=["课程资料 · ScreenshotBox","订单编号 AB-20260926-001","保修日期 2026-09-26","中文 English 100% A_B \"quote\""];
+            for(int i=0;i<lines.Length;i++)dc.DrawText(new FormattedText(lines[i],CultureInfo.GetCultureInfo("zh-CN"),FlowDirection.LeftToRight,new Typeface("Microsoft YaHei"),32,Brushes.Black,1),new Point(40,50+i*110));
+        }
+        var image=new RenderTargetBitmap(1000,600,96,96,PixelFormats.Pbgra32);image.Render(drawing);image.Freeze();
+        var item=await new ImageLibrary(app.Store).AddAsync(image,"合成验收资料");
+        var generation=await app.Store.BeginOcrAsync(item.Id);
+        var stopwatch=System.Diagnostics.Stopwatch.StartNew();
+        var (text,blocks)=await app.Ocr.RecognizeAsync(app.Store.ResolvePath(item.ImagePath),CancellationToken.None);
+        stopwatch.Stop();
+        await app.Store.CompleteOcrAsync(item.Id,generation,text,blocks,OcrQueue.ModelVersion);
+        var results=new Dictionary<string,object>{["text"]=text,["blocks"]=blocks,["width"]=image.PixelWidth,["height"]=image.PixelHeight,["model"]=OcrQueue.ModelVersion};
+        foreach(var query in new[]{"课程","订单","保修","AB-20260926","100%","A_B","English"})results["search:"+query]=(await app.Store.QueryAsync(query)).Any(i=>i.Id==item.Id);
+        var clipboard=false;try{await ClipboardHelper.CopyImageAsync(image);await Task.Delay(80);var read=Clipboard.GetImage();results["clipboardReadWidth"]=read?.PixelWidth??0;results["clipboardReadHeight"]=read?.PixelHeight??0;results["clipboardFormats"]=Clipboard.GetDataObject()?.GetFormats()??[];clipboard=read?.PixelWidth==1000&&read.PixelHeight==600;}catch(Exception ex){results["clipboardError"]=ex.Message;}
+        results["clipboardImage"]=clipboard;
+        results["ocrMilliseconds"]=stopwatch.ElapsedMilliseconds;
+        results["workingSetAfterOcrMiB"]=System.Diagnostics.Process.GetCurrentProcess().WorkingSet64/1048576.0;
+        await app.Store.UpdateMetadataAsync(item.Id,"合成验收资料","修改后的备注：保修凭证","学习,凭证",true);
+        results["editedNotesSearch"]=(await app.Store.QueryAsync("保修凭证")).Any(i=>i.Id==item.Id);
+        results["editedTagSearch"]=(await app.Store.QueryAsync("凭证")).Any(i=>i.Id==item.Id);
+        var missing=await new ImageLibrary(app.Store).AddAsync(image,"识别失败重试用合成图");
+        var missingPath=app.Store.ResolvePath(missing.ImagePath);File.Delete(missingPath);app.Ocr.Enqueue(missing.Id);
+        var failed=await WaitAsync(app,missing.Id,"Failed");results["missingImageFailure"]=failed.OcrStatus=="Failed";
+        ImageLibrary.WritePng(image,missingPath);app.Ocr.Enqueue(missing.Id);var retry=await WaitAsync(app,missing.Id,"Ready");results["retryReady"]=retry.OcrText.Contains("课程");
+        var race=await new ImageLibrary(app.Store).AddAsync(image,"后台识别恢复合成图");bool restoredInFlight=false;
+        void RestoreWhileSlotIsOwned(string id) {
+            if(id!=race.Id||restoredInFlight)return;
+            if(app.Store.GetAsync(id).GetAwaiter().GetResult()?.OcrStatus!="Processing")return;
+            restoredInFlight=true;
+            app.Store.SetDeletedAsync(id,true).GetAwaiter().GetResult();
+            app.Store.SetDeletedAsync(id,false).GetAwaiter().GetResult();
+            app.Ocr.Enqueue(id);
+        }
+        app.Ocr.Changed+=RestoreWhileSlotIsOwned;
+        try{app.Ocr.Enqueue(race.Id);var recovered=await WaitAsync(app,race.Id,"Ready");results["deleteRestoreDuringOcr"]=restoredInFlight&&!recovered.IsDeleted&&recovered.OcrText.Contains("课程");}
+        finally{app.Ocr.Changed-=RestoreWhileSlotIsOwned;}
+        var zip=Path.Combine(root,"self-test-backup-"+Guid.NewGuid().ToString("N")+".zip");await app.Store.BackupAsync(zip);
+        var restored=root+"-restored-"+Guid.NewGuid().ToString("N");await LibraryStore.RestoreAsync(zip,restored);
+        using(var store=new LibraryStore(restored)){await store.InitializeAsync();results["restoredSearch"]=(await store.QueryAsync("课程")).Any(i=>i.Id==item.Id);results["restoredImage"]=File.Exists(store.ResolvePath(item.ImagePath));}
+        results["runtimeLocation"]=typeof(object).Assembly.Location;
+        results["baseDirectory"]=AppContext.BaseDirectory;
+        results["network"]= "应用测试未调用网络；未隔离系统网络";
+        app.Preferences.Theme="Light";var window=new MainWindow(app);app.MainWindow=window;window.Show();await Task.Delay(1200);AppearanceService.Apply("Light");
+        var search=(TextBox)window.FindName("SearchBox");search.Text="课程";await Task.Delay(450);
+        var gallery=(ListBox)window.FindName("Gallery");gallery.SelectedIndex=0;
+        var title=(TextBox)window.FindName("TitleBox");title.Text="中文长标题：课程资料、订单编号和保修记录，保留完整内容且不破坏小窗口布局";
+        SaveVisual(window,Path.Combine(root,"ui-light.png"));
+        app.Preferences.Theme="Dark";AppearanceService.Apply("Dark");await Task.Delay(150);
+        SaveVisual(window,Path.Combine(root,"ui-dark.png"));
+        window.Width=800;window.Height=580;await Task.Delay(150);SaveVisual(window,Path.Combine(root,"ui-narrow.png"));
+        results["uiGalleryCount"]=gallery.Items.Count;
+        results["narrowDetailsCollapsed"]=((FrameworkElement)window.FindName("Details")).Visibility==Visibility.Collapsed;
+        var hotkey=new ScreenshotBox.App.Native.HotkeyService(window,()=>{});var settings=new SettingsWindow(app,hotkey);settings.Show();await Task.Delay(150);SaveVisual(settings,Path.Combine(root,"ui-settings.png"));settings.Close();hotkey.Dispose();
+        var recognized=await app.Store.GetAsync(item.Id)??item;var preview=new PreviewWindow(recognized,app.Store,"课程");preview.Show();await Task.Delay(250);SaveVisual(preview,Path.Combine(root,"ui-preview.png"));
+        var previewRoot=(DockPanel)preview.Content;var previewTools=(StackPanel)previewRoot.Children[0];
+        previewTools.Children.OfType<Button>().Single(b=>(string)b.Content=="实际大小").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));preview.UpdateLayout();
+        var previewImage=(Grid)((ScrollViewer)previewRoot.Children[1]).Content;var previewScale=(ScaleTransform)previewImage.LayoutTransform;
+        var actualWidth=previewImage.Width*previewScale.ScaleX*VisualTreeHelper.GetDpi(preview).DpiScaleX;
+        results["previewActualSizePixelWidth"]=actualWidth;results["previewActualSizeIsOneToOne"]=Math.Abs(actualWidth-image.PixelWidth)<.1;
+        preview.Close();window.Hide();
+        var interrupted=await new ImageLibrary(app.Store).AddAsync(image,"重启恢复用合成图");await app.Store.BeginOcrAsync(interrupted.Id);results["interruptedItemId"]=interrupted.Id;
+        if(Environment.GetCommandLineArgs().Contains("--idle-memory-test")){await Task.Delay(92000);results["workingSetAfterIdleMiB"]=System.Diagnostics.Process.GetCurrentProcess().WorkingSet64/1048576.0;}
+        File.WriteAllText(Path.Combine(root,"self-test.json"),JsonSerializer.Serialize(results,new JsonSerializerOptions{WriteIndented=true}));
+    }
+    private static void SaveVisual(Window window,string path)
+    {
+        window.UpdateLayout();var content=(FrameworkElement)window.Content;var bitmap=new RenderTargetBitmap((int)content.ActualWidth,(int)content.ActualHeight,96,96,PixelFormats.Pbgra32);
+        var background=new DrawingVisual();using(var dc=background.RenderOpen())dc.DrawRectangle(window.Background,null,new Rect(0,0,content.ActualWidth,content.ActualHeight));bitmap.Render(background);bitmap.Render(content);bitmap.Freeze();ImageLibrary.WritePng(bitmap,path);
+    }
+    private static async Task<ScreenshotItem> WaitAsync(App app,string id,string status)
+    {
+        var timeout=DateTime.UtcNow.AddSeconds(45);while(DateTime.UtcNow<timeout){var current=await app.Store.GetAsync(id);if(current?.OcrStatus==status)return current;await Task.Delay(100);}throw new TimeoutException("识别状态未在45秒内变为"+status);
+    }
+    public static async Task ResumeAsync(App app)
+    {
+        var pending=await app.Store.PendingAsync();foreach(var item in pending)app.Ocr.Enqueue(item.Id);
+        var recovered=new List<string>();foreach(var item in pending){var current=await WaitAsync(app,item.Id,"Ready");if(current.OcrText.Contains("课程"))recovered.Add(item.Id);}
+        var report=new { recoveredCount=recovered.Count,recoveredIds=recovered,courseSearch=(await app.Store.QueryAsync("课程")).Count,notesSearch=(await app.Store.QueryAsync("保修凭证")).Count,missingImages=(await app.Store.MissingFilesAsync()).Count };
+        File.WriteAllText(Path.Combine(app.Store.RootPath,"restart-test.json"),JsonSerializer.Serialize(report,new JsonSerializerOptions{WriteIndented=true}));
+    }
+}
