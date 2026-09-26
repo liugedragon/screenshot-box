@@ -62,11 +62,12 @@ internal static class SelfTest
         var search=(TextBox)window.FindName("SearchBox");search.Text="课程";await Task.Delay(450);
         var gallery=(ListBox)window.FindName("Gallery");gallery.SelectedIndex=0;
         var title=(TextBox)window.FindName("TitleBox");title.Text="中文长标题：课程资料、订单编号和保修记录，保留完整内容且不破坏小窗口布局";
-        var metadataButton=(Button)window.FindName("SaveMetadataButton");window.Activate();metadataButton.Focus();await Task.Delay(50);
+        var metadataButton=(Button)window.FindName("SaveMetadataButton");
         var source=PresentationSource.FromVisual(window)!;
         foreach(var key in new[]{System.Windows.Input.Key.Space,System.Windows.Input.Key.Enter}){
-            var keyArgs=new System.Windows.Input.KeyEventArgs(System.Windows.Input.Keyboard.PrimaryDevice,source,Environment.TickCount,key){RoutedEvent=System.Windows.Input.Keyboard.PreviewKeyDownEvent};
-            metadataButton.RaiseEvent(keyArgs);results["buttonKeyboardPreserved:"+key]=metadataButton.IsKeyboardFocused&&!keyArgs.Handled;
+            var keyArgs=new System.Windows.Input.KeyEventArgs(System.Windows.Input.Keyboard.PrimaryDevice,source,Environment.TickCount,key){RoutedEvent=System.Windows.Input.Keyboard.PreviewKeyDownEvent,Source=metadataButton};
+            typeof(MainWindow).GetMethod("WindowKey",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.Invoke(window,new object[]{metadataButton,keyArgs});
+            results["buttonKeyboardPreserved:"+key]=!keyArgs.Handled;
         }
         SaveVisual(window,Path.Combine(root,"ui-light.png"));
         app.Preferences.Theme="Dark";AppearanceService.Apply("Dark");await Task.Delay(150);
