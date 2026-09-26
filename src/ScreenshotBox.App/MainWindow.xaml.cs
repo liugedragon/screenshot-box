@@ -259,8 +259,8 @@ public partial class MainWindow : Window
     private void WindowKey(object sender,KeyEventArgs e)
     {
         if(e.Key==Key.F&&Keyboard.Modifiers==ModifierKeys.Control){SearchBox.Focus();SearchBox.SelectAll();e.Handled=true;}
-        else if(e.Key==Key.Space&&e.OriginalSource is not TextBox){OpenPreview(sender,e);e.Handled=true;}
-        else if(e.Key==Key.Enter&&e.OriginalSource is not TextBox){OpenItemEditor();e.Handled=true;}
+        else if(e.Key==Key.Space&&Gallery.IsKeyboardFocusWithin){OpenPreview(sender,e);e.Handled=true;}
+        else if(e.Key==Key.Enter&&Gallery.IsKeyboardFocusWithin){OpenItemEditor();e.Handled=true;}
         else if(e.Key==Key.S&&Keyboard.Modifiers==ModifierKeys.Control){SaveMetadata(sender,e);e.Handled=true;}
     }
     private void OpenPreview(object sender,RoutedEventArgs e){if(Selected==null)return;try{new PreviewWindow(Selected.Item,_app.Store,SearchBox.Text){Owner=this}.Show();}catch(Exception ex){_vm.Status="原图无法打开："+ex.Message;}}
