@@ -1,41 +1,33 @@
-# Contributing to ScreenshotBox
+# Contributing
 
-[简体中文](CONTRIBUTING.md) · English
+[English](CONTRIBUTING.md) · [简体中文](CONTRIBUTING.zh-CN.md)
 
-You do not have to write code. Reproducing a bug, trying a different display configuration, or fixing an unclear instruction all help.
+## Report a bug
 
-## Report a problem
+Check the [known limitations](docs/limitations.md), then use an [issue template](https://github.com/liugedragon/screenshot-box/issues/new/choose). Include:
 
-Check the [known limitations](docs/en/limitations.md), then choose a template in [Issues](https://github.com/liugedragon/screenshot-box/issues/new/choose). Include:
+- App and Windows versions, and whether you used the installer or ZIP.
+- Monitor count, resolution, scaling, and relative position of each display.
+- Steps to reproduce, expected and actual behavior, and the exact error message.
+- A synthetic or redacted test image where relevant.
 
-- App and Windows versions; installer or ZIP.
-- Monitor count, resolutions, and scaling for each display.
-- Steps, expected behavior, and what actually happened.
-- A synthetic or redacted image that reproduces it, plus the exact error message if any.
+Do not upload private screenshots, databases, recognized personal content, keys, or account details.
 
-Do not submit real user screenshots, databases, recognized personal content, keys, or account details. A few lines of invented text make a useful test image. Passing single-monitor automation does not rule out a real multiple-monitor bug.
+## Suggest a feature
 
-## Suggest a change
+Describe the use case, the problem, and your current workaround. Open an issue before starting a larger feature or adding a dependency. Existing plans are in [ROADMAP](ROADMAP.md).
 
-Describe what you were doing, where it failed, and your current workaround before proposing a solution. Discuss larger features or new dependencies in an issue first.
-
-Useful work includes mixed-DPI monitor checks, missing originals, Chinese directory names and backup recovery, difficult OCR samples, and documentation fixes. The [roadmap](ROADMAP.en.md) has no promised dates.
-
-## Change the code
+## Submit a change
 
 1. Fork the repository and create a branch for one focused change.
-2. Follow the [build guide](docs/en/build.md): Windows x64 and .NET SDK 10.0.401.
-3. Run `powershell -ExecutionPolicy Bypass -File scripts/build.ps1`. For capture coordinates or annotation changes, also run the [capture pixel probe](tests/ScreenshotBox.Capture.Probe/README.en.md).
-4. Open a PR explaining the trigger, new behavior, checks performed, and conditions you could not test. Use actual window images with synthetic data for UI changes.
+2. Follow the [build guide](docs/build.md) to prepare Windows x64 and .NET SDK 10.0.401.
+3. Run `powershell -ExecutionPolicy Bypass -File scripts/build.ps1`. For capture or annotation changes, also run the [capture pixel tests](tests/ScreenshotBox.Capture.Probe/README.md).
+4. Open a PR describing the problem, new behavior, checks performed, and untested conditions. Include window screenshots with synthetic data for UI changes.
 
-Keep dependency lock files. New components or models need a source, version, license, and distribution plan. Do not commit models, user data, or build outputs. Keep Chinese and English documentation in sync; flag technical translations you cannot confirm.
+Keep dependency lock files. New components or models need a source, version, license, and distribution method. Do not commit models, user data, or build outputs. Update both languages when changing documentation or UI text. New controls should follow the [design guide](docs/design.md).
 
-Tests should check real constraints: coordinates, literal Chinese queries, stale OCR tasks, and restored data. Avoid tests that repeat the implementation for a minor wording change. Do not describe programmatic checks as manual acceptance tests.
+Add regression coverage for storage, coordinate, search, or OCR state changes. Documentation-only changes need link and formatting checks.
 
-## Documentation and UI
+## License
 
-Explain the task first, then the operation. Prefer “The image is saved first; text recognition follows” to claims about an ultimate all-in-one tool. Put unimplemented features in the roadmap and mark untested conditions explicitly.
-
-Use one accent color, system fonts, and clear states. New tools should not interrupt the main capture-and-save flow. See the [design notes](docs/en/design.md).
-
-By contributing, you agree to license your contribution under this project's MIT license. Third-party material must retain its own terms.
+By contributing, you agree to release your contribution under this project's MIT license. Third-party material must retain its original license and notices.

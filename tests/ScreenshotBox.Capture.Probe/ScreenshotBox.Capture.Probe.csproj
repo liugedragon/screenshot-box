@@ -9,6 +9,7 @@
     <NoWarn>$(NoWarn);WFO0003</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../src/ScreenshotBox.App/Localization.cs" Link="Localization.cs" />
     <Compile Include="../../src/ScreenshotBox.App/Native/*.cs" Link="Native/%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

@@ -1,57 +1,62 @@
-# 架构与可以讲清的实现
+# Architecture
 
-简体中文 · [English](en/architecture.md)
+English · [简体中文](zh-CN/architecture.md)
 
-## 模块
+## Modules
 
-`ScreenshotBox.Core`：SQLite资料、搜索、OCR任务代数、备份恢复。独立于WPF，可运行真实SQLite单元测试。
+| Module | Responsibilities |
+| --- | --- |
+| `ScreenshotBox.Core` | SQLite library, search, OCR task generations, backup and restore; no WPF dependency. |
+| `ScreenshotBox.App/Native` | Win32 hotkeys, GDI desktop capture, per-monitor overlays, selections, annotations, and PNG output. |
+| `ScreenshotBox.App/Services.cs` | Originals, thumbnails, OCR queue, model lifecycle, and clipboard retries. |
+| `PreviewWindow` | Original image, text-line boxes, zoom, and pan. |
 
-`ScreenshotBox.App/Native`：Win32热键、GDI桌面冻结截图、每屏覆盖窗口、物理像素选区、标注和PNG输出。`SelectionGeometry`独立于Windows界面，可测试负坐标、反向拖动与边界。
+The main window displays an observable collection. Views handle focus, selection, and window events; Core and Services handle data operations. `SelectionGeometry` provides independent rectangle calculations.
 
-`ScreenshotBox.App/Services.cs`：图片原图/缩略图、单消费者OCR队列、CPU模型生命周期、剪贴板有限重试。主窗口通过轻量MVVM可观察列表展示真实数据，视图处理选择、焦点和窗口事件；业务数据操作在Core和Services。
+## Capture coordinates
 
-`PreviewWindow`：原图与OCR整行框在同一源像素Grid内，统一缩放，再由ScrollViewer平移。这样缩放和平移不会使高亮与图片分离。
+The virtual desktop origin can be negative. The app enumerates monitors, computes their combined physical rectangle, and freezes the desktop through GDI. Mouse positions come from `GetCursorPos`; selections and annotations use physical pixels.
 
-## 截图坐标
+Each monitor has an overlay with its own DPI-to-DIP conversion. The crop origin is `global selection origin − virtual desktop origin`; width and height are physical selection pixels. Annotation rendering subtracts the selection origin. Geometry handles reverse selection, clamped movement, and resize boundaries.
 
-Windows虚拟桌面原点不一定是(0,0)。先枚举所有屏幕，计算联合物理矩形；冻结桌面使用物理像素而非DIP。鼠标通过GetCursorPos读取物理坐标。每个显示器独立创建覆盖窗口，按所在显示器实际尺寸转换到DIP显示；不能把主屏缩放比例套在其他屏幕。
+The executable manifest declares PerMonitorV2. DPI checks must launch the exe; the `dotnet` host lacks this declaration. Multi-monitor test coverage is listed in [validation](validation.md).
 
-最终裁剪坐标是`选区全局像素坐标 - 虚拟桌面左上像素坐标`，宽高直接是选区物理像素。标注也使用同一坐标系，输出时减去选区原点。边界和反向框选归一化在纯几何模块处理。manifest声明PerMonitorV2；从exe启动，不能用缺少该manifest的dotnet宿主验证DPI。
+## Annotation and preview
 
-画笔、箭头、空心矩形、橡皮和马赛克为应用新代码，最后合成到PNG。每次标注记录自身颜色、大小与源像素位置；马赛克使用像素块平均色。橡皮重新露出原始截图像素，不用白色模拟。标注操作保存在可撤销/重做的历史中，清除也是一项操作，新编辑使重做历史失效。调色盘以RGB/Hex设置后续笔画和形状颜色，已完成标注不随当前颜色变化。
+Annotations store their color, size, and source-pixel positions. Mosaic uses block-average colors; erasing restores frozen original pixels. History includes clearing annotations, with undo and redo; new edits invalidate the redo branch. The palette changes later strokes and shapes only.
 
-## 中文搜索
+Preview puts the image and OCR line boxes in one source-pixel Grid, scales both together, then pans through a ScrollViewer. Actual size uses `1 / DpiScale`, so a 1000 px image occupies 1000 physical pixels at 125% scaling. Fit mode recalculates for the available window area and permits scales below 5% for tall images. Dragging starts only on the image.
 
-首版采用SQLite参数化`instr(lower(column),lower($q))`，覆盖标题、备注、标签和识别文字。引号、百分号、下划线不是查询语法，也不是通配符。这对两字中文可靠，不依赖英文分词。
+## Search
 
-FTS5默认unicode61不按汉字词语切分；trigram也不能直接处理长度不足3字符的全文查询。首版明确选择字面子串扫描，不宣称建立了高性能全文索引。时间排序索引和分页减少展示开销；大量资料的检索耗时应另行测量。
+Titles, notes, tags, and OCR text use parameterized `instr(lower(column), lower($q))` queries. Quotes, percent signs, and underscores remain literal; ASCII letters are case-insensitive.
 
-精确标签分类通过SQLite注册的确定性成员函数，在WHERE中与搜索/星标等条件取交集，再排序和分页。标签列表与筛选使用相同的中英文逗号、Trim和OrdinalIgnoreCase规则；标题或OCR的同词不构成标签。保留原始标签编辑文本，不自动重写。
+SQLite FTS5's default `unicode61` tokenizer does not segment Chinese words; trigram full-text queries have limits below three characters. Substring scanning therefore supports short Chinese queries. Time indexes and pagination reduce display work; larger-library query performance still needs measurement.
 
-保存原始OCR文字和对应原图行框，不在归一化时破坏位置。搜索不做繁简转换或模糊语义。高亮只标识引擎提供的整行范围，没有伪造字符级定位。
+Exact tag categories use a deterministic SQLite membership function, intersected in `WHERE` with keywords, stars, and other conditions before sorting and pagination. Tags split on Chinese or English commas and compare using Trim and `OrdinalIgnoreCase`. Original tag-editing text is preserved.
 
-## 后台任务与删除竞态
+Raw OCR text and line boxes are stored in original-image coordinates. Highlights use the engine's whole-line bounds. Search does not provide simplified/traditional conversion, pinyin, or semantic matching.
 
-图像写入成功后才建立资料记录，再进入Channel队列。队列只一个消费者，复用中文模型并限制CPU线程。OCR状态和任务代数写进SQLite。
+## OCR queue and state
 
-每次识别开始获得generation。删除/重试等状态更改改变代数，结果写回必须验证代数相等且资料未删除。这样旧任务完成不会让已删除图片重新出现。启动时把中断的Processing记录恢复成Pending重新处理。失败保留图片与错误，可重试。
+An image is written before its library record is created and sent to the Channel queue. A single consumer reuses the model with limited CPU threads. Status and task generations are persisted.
 
-## 备份恢复
+Each task starts with a generation. Deletion, retry, and related state changes advance it. Committing a result checks generation, Processing status, and active-item state; stale results are discarded. Startup changes interrupted Processing jobs back to Pending. Failed jobs retain the image and error and allow manual retry.
 
-通过SQLite BackupDatabase取得一致数据库快照，再从快照清单打包不可变原图与缩略图。图片不在OCR时被修改；回收站采用软删除，保留图片。恢复检查路径和压缩包结构，只写新空目录；不覆盖正在运行的数据库。恢复后的目录不依赖原安装目录。备份、迁移和恢复前处理未保存草稿；资料过渡状态阻止新增图片/元数据写入，迁移与恢复成功后重启使用新库。旧库保留。
+When an image is deleted and immediately restored during OCR, its old task may still own the deduplication slot. After releasing the slot, the queue checks the record again and re-enqueues it only if active and Pending. Failed jobs are not retried indefinitely.
 
-## 上游与新增代码
+## Editing and data transitions
 
-WPF UI负责成熟主题和控件；Microsoft.Data.Sqlite/SQLite负责事务数据库；RapidOcrNet负责检测、方向判断、文字识别；PaddleOCR中文移动模型提供训练权重；ONNX Runtime CPU执行模型；SkiaSharp完成OCR图像处理。
+Opening the separate editor disables that item's main details fields. Saving updates the in-memory item and saved baseline; closing retains a session draft. Exit, backup, migration, and restore resolve drafts through save, discard, or cancel.
 
-本项目新增选区/多窗口截图交互、热键事务更新、标注历史与真实RGB/Hex调色盘、图像保存、资料视图、中文检索方案、OCR任务代数、备份包协议、恢复校验及端到端测试。没有自称自行训练OCR，也未复制Eagle或ShareX源码。
+Backup uses SQLite `BackupDatabase` for a consistent snapshot and packages the immutable originals and thumbnails it references, including recycle-bin items. Restore checks paths, structure, version, integrity, and inventory before writing to a new empty directory. Migration and restore restart the app on success and retain the old library. Data transitions block new images and metadata writes.
 
-识别中删除后立即恢复还有一个队列层面的边界：旧任务仍占用去重槽时，恢复触发的入队会被合并。旧任务释放槽后再次检查当前记录；只有未删除且仍Pending的任务才重新入队。Failed不会无限重试，Deleted不会被复活。实际exe自测在Processing事件中删除、恢复并立即入队，用真实OCR验证最终Ready。
+Save-as and export write and flush a temporary file beside the destination, then replace it atomically. Failures remove temporary files and preserve the existing destination.
 
-## 编辑、预览与文件写入
+Thumbnail size, annotation settings, and the language preference are stored locally. The preference is System, Simplified Chinese, or English. System reads the first Windows display language from `GetUserPreferredUILanguages`, falling back to `GetUserDefaultUILanguage`: any `zh-*` locale uses Simplified Chinese, and other locales use English. A manual choice overrides that rule. Language is applied at startup and requires restart after switching; image text and user metadata are preserved. Global hotkeys register through Win32.
 
-同一条目在独立编辑窗打开时，主详情编辑字段暂停，避免两份可写草稿覆盖。保存成功后更新内存条目及已保存基准；关闭编辑窗仍保留未提交草稿。退出/备份/迁移/恢复前统一处理保存、放弃和取消；忙时不能继续改库。
+## Component responsibilities
 
-另存PNG与导出先写同目录临时文件，成功后替换目标，失败清理临时文件；不会先删除已有图片。预览的实际大小使用1/DpiScale，使一张1000px宽图片在125%屏上仍占1000个物理像素。适应模式按当前窗口尺寸计算，并允许长图小于5%的缩放；鼠标平移只监听图片，滚动条继续原有行为。
+WPF UI supplies themes and controls. Microsoft.Data.Sqlite/SQLite provide the transactional database. RapidOcrNet invokes detection, orientation, and recognition models; PaddleOCR supplies trained weights. ONNX Runtime executes CPU inference, and SkiaSharp processes OCR images.
 
-缩略图大小和标注颜色、笔宽、橡皮大小、马赛克块大小存入本地设置，应用重启时恢复。全局截图快捷键继续由Win32注册，不用键盘事件模拟跨应用热键。
+ScreenshotBox implements selection interactions, hotkey updates, annotation history, palette, library views, queries, job state, backup restore, and integration tests. Versions and licenses are in [third-party notices](third-party.md).

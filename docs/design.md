@@ -1,49 +1,53 @@
-# 设计参考与样式规范
+# Design references and style guide
 
-简体中文 · [English](en/design.md)
+English · [简体中文](zh-CN/design.md)
 
-记录日期：2026-09-26。先检查工作区：没有现有应用或仓库约束文件。产品首版为原生Windows桌面资料库；不是网页包装。
+## References
 
-| 官方参考 | 具体借鉴 | 边界 |
-|---|---|---|
-| [Eagle](https://eagle.cool/) 官网 home-feature-eagle.png 与 Browse 说明 | 左分类、中缩略图、右属性；保留图像比例；空格预览 | 商业产品，只借鉴布局，不使用代码、品牌、截图作为本产品资产 |
-| [ShareX Region Capture](https://getsharex.com/docs/region-capture) 官方截图与说明 | 冻结桌面后选区；八点调整；移动；紧贴选区工具栏；Enter/Esc | ShareX GPL-3.0，截图模块自主编写，不复制源码 |
-| [PowerToys](https://github.com/microsoft/PowerToys) 官方工具说明 | 设置按任务排列；快捷键冲突就地反馈；状态使用直白语言 | MIT，参考交互而非复制应用或资源 |
-| [WPF UI 4.3.0](https://github.com/lepoco/wpfui) 官方主题和控件 | Fluent主题、统一控件状态、系统字体；实用工具密度 | MIT；通过NuGet直接依赖，保留许可 |
+Official screenshots and documentation from these projects informed the layout and interactions. Dependency sources are in [third-party notices](third-party.md).
 
-## 样式
+| Reference | Design used | How it is used |
+| --- | --- | --- |
+| [Eagle](https://eagle.cool/) Browse and library interface | Left categories, center thumbnails, right properties; preserved image proportions; Space preview. | Commercial product; layout reference. |
+| [ShareX region capture](https://getsharex.com/docs/region-capture) | Frozen desktop, eight handles, selection movement, nearby toolbar, Enter/Esc. | GPL-3.0 project; interaction reference. ScreenshotBox implements its capture module. |
+| [PowerToys](https://github.com/microsoft/PowerToys) | Task-based settings, inline hotkey conflict and operation feedback. | MIT project; settings interaction reference. |
+| [WPF UI 4.3.0](https://github.com/lepoco/wpfui) | Fluent controls, themes, and states. | MIT dependency through NuGet, with its license retained. |
 
-- 系统字体Segoe UI / Microsoft YaHei UI回退，正文14 DIP、辅助12、标题20。
-- 间距4/8/12/16/24 DIP；输入和按钮约32高；矩形圆角4；不使用装饰卡片或渐变。
-- 中性背景、边框与文字；唯一主强调色为Windows蓝 #1769C2。
-- 系统/浅色/深色主题；WPF UI主题资源和原生控件焦点、悬停、禁用状态。
-- 初始1200×800 DIP；左栏176；详情300，窗口窄于1040 DIP自动收起详情；支持手动折叠。
-- 图片按比例完整显示，列表缩略图宽度可调；标题省略但详情换行；不缩小字号迁就窗口。
-- 空库：按快捷键框选截图，或拖入图片。空搜索：没有匹配的截图。
-- OCR状态：正在识别 / 可搜索 / 识别失败，可重试。尚未识别的图片标题和备注仍可查找。
-- 默认无标注；选区完成后切换画笔、箭头、矩形、橡皮或马赛克，支持撤销/重做；最终输出包含标注的PNG。
-- 自定义Ctrl/Alt/Shift加一个非修饰键，支持Alt+A；系统保留组合提前拒绝，注册冲突保留原快捷键。
+The reference projects' branding, screenshots, and prose are not used as ScreenshotBox assets.
 
-## 轻量化
+## Style
 
-原生WPF，不引入浏览器运行时、Python或GPU依赖。识别串行、CPU限线程、复用模型，空闲90秒释放模型；缩略图解码到目标尺寸，资料列表分页。自带.NET运行时和ONNX原生库，因此发行目录不是几MB；实际大小和内存以验证记录为准。
+| Element | Specification |
+| --- | --- |
+| Fonts | Segoe UI / Microsoft YaHei UI; 14 DIP body, 12 DIP secondary, 20 DIP headings. |
+| Spacing | 4 / 8 / 12 / 16 / 24 DIP. |
+| Controls | Inputs and buttons approximately 32 DIP high, 4 DIP corners; focus, hover, selected, and disabled states. |
+| Colors | Neutral backgrounds, borders, and text; primary accent `#1769C2`. |
+| Themes | System, light, and dark library themes; fixed light capture toolbar. |
+| Window | Initial 1200×800 DIP, 176 DIP navigation, 300 DIP details; details collapse below 1040 DIP or manually. |
+| Images | Preserve proportions, adjustable thumbnail width; full truncated titles remain available in details. |
+| Language | System by default: Chinese Windows display languages use Simplified Chinese, others English; optional explicit language, applied on restart. |
 
-## 0.1.2 标注交互
+Empty-library messages explain capture and import; empty searches report no matches. OCR states describe recognition, search availability, or a failure with retry. Titles and notes remain searchable before recognition completes.
 
-“保存并复制”是将图片加入资料库并放入剪贴板；“仅复制”和“另存PNG”继续独立。导航统一使用“最近保存”，“星标”保留为资料标记，避免和保存动作混淆。
+## Capture tools
 
-工具栏的主行保留模式切换、撤销/重做、保存和取消，当前模式才显示相关选项。画笔、箭头和矩形共用六个快捷颜色与1–32px线宽控件；橡皮显示4–80px大小控件；矩形马赛克显示6–32px像素块大小控件。所有大小显示具体数值，当前颜色和模式有清楚的选中状态。较窄窗口换行，极窄窗口将六种模式收进“工具”菜单，不缩小文字或截断操作。
+Save and copy adds the image to both the library and clipboard. Copy only and Save PNG as are separate actions. Stars are independent of saving.
 
-橡皮删除标注覆盖范围，重新合成底层截图像素，不能使用白色笔画模拟擦除。未标注区域使用橡皮不产生变化。每条笔画、一次马赛克、一次擦除和“清除标注”都作为一次可撤销操作；Ctrl+Z撤销、Ctrl+Y重做，无历史时对应按钮禁用，新编辑清空重做记录。最终PNG与资料库图片使用同一合成结果，OCR识别该输出图片。
+The toolbar's main row keeps modes, undo, redo, save, and cancel. Only the current tool's options appear. Pen, arrow, and rectangle share six quick colors and 1–32 px width; eraser size is 4–80 px and mosaic blocks are 6–32 px. Narrow layouts wrap; below 420 DIP, all six modes move to a Tools menu.
 
-35项合成像素探针覆盖六色、笔宽、箭头/反向矩形、马赛克两端、擦除恢复原像素、撤销/重做及清除恢复。四种窗口宽度的六模式布局另由程序驱动检查；这些证据不能替代真人操作或多显示器现场验证。
+The palette offers RGB sliders, a preview, and six-digit Hex input. Color and size changes affect later annotations; existing strokes retain their parameters. Selecting a color does not enter undo history.
 
-## 形状与自定义调色盘
+Each stroke, shape, mosaic, eraser action, and clear is one history operation. New edits clear the redo branch; unavailable history buttons are disabled. Erasing recomposites original pixels. Save and copy use the same composed image, which is also the OCR input.
 
-截图标注同时加入箭头和矩形，与画笔共用颜色及1–32px线宽。工具栏使用简单的图标、中文名称和明确的选中状态，当前工具的选项才展开；保存、复制、另存和取消保持可见，撤销/重做位置固定。
+Global hotkeys combine Ctrl/Alt/Shift with one non-modifier key. Common reserved system combinations are rejected; failed registration keeps the previous combination.
 
-六个常用色为快捷入口，另提供真正的自定义调色盘。用户可以直接选择任意颜色，看到当前颜色，并精确输入或核对色值；调色盘提供连续RGB滑条、当前颜色预览、Hex输入和应用按钮。自定义颜色用于随后画笔、箭头和矩形，已有标注保留原来的颜色。颜色选择操作自身不产生标注或进入撤销历史。
+## Editing and preview
 
-实际程序驱动验证了非预设RGB/Hex颜色应用、无效色值提示、极窄屏工具菜单、调色盘关闭后继续截图。工具偏好写入本地设置并在下次启动恢复；程序检查与证据边界记录在[实际验证记录](validation.md)。
+Main details and the separate editor share drafts, with only one writable entry point per item. Exit, backup, migration, and restore resolve unsaved edits first. Settings groups shortcuts and appearance, local data, backup and restore, and About, with a fixed operation-status area.
 
-资料库和独立编辑窗共享草稿，但同一条目只开放一个编辑入口；未保存状态显示在固定位置。退出或改库前明确处理草稿，备份纳入用户选择保存的修改。设置按快捷键外观、本地资料、备份恢复、关于分组，保留固定状态反馈，不用装饰卡片。预览工具栏支持键盘快捷键和长图适应模式，滚动条保持原有操作。
+Preview supports keyboard commands, tall-image fitting, actual pixel size, and image dragging while preserving scrollbar behavior. OCR highlights share the image's scale and pan.
+
+## Resource use
+
+WPF provides the desktop interface. OCR uses a serial CPU queue, limited threads, and a reused model; the model is released after 90 idle seconds. Thumbnails decode at display size, and results are paginated. Runtime and native libraries are bundled. Package and memory measurements are in [validation](validation.md); layout records and screenshots are in [UI inspection](ui-review.md).

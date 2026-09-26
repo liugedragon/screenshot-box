@@ -1,6 +1,6 @@
-# Local library implementation
+# ScreenshotBox.Core
 
-[简体中文](README.md) · English
+[English](README.md) · [简体中文](README.zh-CN.md)
 
 `LibraryStore` owns metadata and OCR job states. Screenshot and thumbnail files
 must already exist before `AddAsync`, use unique relative paths, and remain
@@ -11,11 +11,10 @@ immutable after insertion. Recycle-bin deletion does not delete image files.
 Version 1 uses parameterized SQLite `instr(lower(column), lower(query))` over
 title, notes, tags, and OCR text. This is literal substring search, including
 one- and two-character Chinese. Quotes, `%`, and `_` do not become SQL syntax
-or wildcards. ASCII letters are case-insensitive. It is intentionally a linear
-scan and is not advertised as FTS, fuzzy, semantic, or pinyin search.
+or wildcards. ASCII letters are case-insensitive. Queries scan records. Fuzzy, semantic, and pinyin matching are not supported.
 
 Supported filters: `all`, `favorites` (`favorite`), `trash` (`deleted`),
-`recent` (the last seven UTC days), `pending` (Pending or Processing), and `failed`.
+`recent` (the preceding seven days, UTC), `pending` (Pending or Processing), and `failed`.
 Pagination sorts the entire filtered result by UTC date (newest by default, or
 oldest with `oldestFirst`), then ID ascending, before applying `limit`/`offset`.
 The maximum per-query limit is 1,000,000; the UI should use result pages. Item JSON
@@ -26,7 +25,7 @@ with the text query and other filters before pagination. SQLite runs a determini
 registered member function; no `LIKE` pattern is used. Both this function and
 `GetTagsAsync` split English/Chinese commas, trim whitespace, and compare tags using
 .NET ordinal case-insensitive rules. Percent, underscore, and quotes are literal.
-The original tag metadata is preserved rather than silently rewriting editor text.
+The original tag metadata is preserved without changing editor text.
 Title or OCR matches alone never qualify an item for a tag classification.
 
 ## OCR durability
@@ -51,6 +50,4 @@ unsupported schema versions, and SQLite integrity failures. Existing libraries
 are never merged or overwritten. Run `InitializeAsync` on the restored library
 before use to create standard subdirectories and recover interrupted OCR jobs.
 
-The module tests exercise actual SQLite, filesystem, ZIP, restart, and OCR-race
-behavior. UI screenshot correctness, OCR recognition quality, and multi-monitor
-behavior require separate Windows integration testing.
+Tests use SQLite, filesystem operations, and ZIP archives to cover queries, restart, and OCR state. Run the [build script](../../scripts/build.ps1) to execute them. Windows integration checks are in [validation](../../docs/validation.md).

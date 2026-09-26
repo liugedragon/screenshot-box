@@ -1,21 +1,20 @@
-# 后续计划
+# Roadmap
 
-简体中文 · [English](ROADMAP.en.md)
+English · [简体中文](ROADMAP.zh-CN.md)
 
-这些是维护方向，不是发布日期承诺。已交付内容见 [0.1.2](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.2)，当前缺口见[限制](docs/limitations.md)。
+Released features are listed in the [release notes](https://github.com/liugedragon/screenshot-box/releases); current issues are in [known limitations](docs/limitations.md). The following work is pending, with no fixed release dates.
 
-## 先补实测与稳定性
+## Testing and stability
 
-- 混合 DPI 双屏、负坐标、跨屏框选及插拔屏幕的完整真人流程。
-- 在常见应用中粘贴图片，在无开发 SDK 的新电脑物理断网跑通整个流程。
-- 用真实反馈修复快捷键、窗口焦点、识别失败和恢复问题。
-- 测量冷启动、OCR 初始化后的内存和大资料库检索耗时，再决定优化方式。
+- Mixed-DPI monitors, negative coordinates, cross-monitor selections, and display connection changes.
+- Image pasting into common applications and offline checks on a clean PC without a development SDK.
+- Shortcut, focus, recognition, and recovery fixes based on bug reports.
+- Measurements of cold starts, OCR memory use, and larger-library search times.
 
-## 根据反馈考虑
+## Feature candidates
 
-- 英文界面。现在双语的是文档，软件界面仍以中文为主。
-- 文字标注、实色遮盖，以及保存后的编辑副本。
-- 更容易看懂的识别失败提示和诊断导出，默认不包含用户内容。
-- 有测试证据的中文检索加速方案，继续保留原文和文字框对应关系。
+- Text annotations, solid masking, and editing a copy after saving.
+- Diagnostic exports that exclude user content.
+- Faster Chinese queries while retaining original text and bounding-box mappings.
 
-录屏、云同步、翻译和语义搜索暂不放进近期范围。建议功能时，请带上使用场景和现有做法，而不是只列一个名称。
+Recording, cloud sync, translation, and semantic search are outside the near-term plan. Submit feature suggestions through [Issues](https://github.com/liugedragon/screenshot-box/issues/new/choose).

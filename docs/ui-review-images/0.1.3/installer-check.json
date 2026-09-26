@@ -1,0 +1,67 @@
+{
+  "version": "0.1.3",
+  "packageStage": "release candidate before documentation synchronization",
+  "candidateSetupSha256": "d6ff581ca18d42d927572117b25bc83c5b8ed5160fc5bbb99d51dda44952b063",
+  "checksumScope": "This identifies the tested candidate, not the final release download.",
+  "startedUtc": "2026-09-26T14:47:54.2232841Z",
+  "completedUtc": "2026-09-26T14:48:36.8726870Z",
+  "customInstallPath": "Chinese characters and spaces",
+  "installExit": 0,
+  "installedBinaryHashesMatched": true,
+  "verifiedBinaryCount": 497,
+  "shortcutExists": true,
+  "testEnvironment": {
+    "path": "Windows system directories only",
+    "dotnetRoot": "nonexistent directory",
+    "proxy": "unavailable",
+    "systemNetworkPhysicallyIsolated": false,
+    "runtimeLoadedFromInstallDirectory": true
+  },
+  "languageChecks": [
+    {
+      "policy": "System",
+      "effectiveLanguage": "zh-CN",
+      "checks": 43,
+      "passed": true
+    },
+    {
+      "checks": 43,
+      "passed": true,
+      "policy": "en-US",
+      "effectiveLanguage": "en-US"
+    },
+    {
+      "checks": 43,
+      "passed": true,
+      "policy": "zh-CN",
+      "effectiveLanguage": "zh-CN"
+    }
+  ],
+  "systemRun": {
+    "selfTestExit": 0,
+    "ocrMilliseconds": 556,
+    "workingSetAfterOcrMiB": 363.03515625,
+    "imageWidth": 1000,
+    "imageHeight": 600,
+    "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+    "lineCount": 4
+  },
+  "resumeExit": 0,
+  "resume": {
+    "recoveredCount": 1,
+    "courseSearch": 4,
+    "notesSearch": 2,
+    "missingImages": 0
+  },
+  "uninstallExit": 0,
+  "preservation": {
+    "databaseHashUnchanged": true,
+    "allImageHashesPreserved": true,
+    "originalCount": 5,
+    "thumbnailCount": 5,
+    "extraUserFilePreserved": true,
+    "uninstallRegistrationRemoved": true,
+    "installedExecutableRemoved": true
+  },
+  "recordScope": "Summary of synthetic-data installation checks. Absolute paths, task identifiers, unrelated processes and per-file hashes are omitted."
+}

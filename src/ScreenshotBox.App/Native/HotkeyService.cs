@@ -28,7 +28,7 @@ public sealed class HotkeyService : IDisposable
         _trigger = trigger ?? throw new ArgumentNullException(nameof(trigger));
         owner.Dispatcher.VerifyAccess();
         _window = new WindowInteropHelper(owner).EnsureHandle();
-        _source = HwndSource.FromHwnd(_window) ?? throw new InvalidOperationException("窗口尚未初始化。");
+        _source = HwndSource.FromHwnd(_window) ?? throw new InvalidOperationException(L.T("窗口尚未初始化。", "The window has not been initialized."));
         _source.AddHook(OnMessage);
     }
 
@@ -46,8 +46,8 @@ public sealed class HotkeyService : IDisposable
         {
             int code = Marshal.GetLastWin32Error();
             error = code == 1409
-                ? "这个快捷键已被系统或其他应用占用，请换一个组合。原快捷键仍然有效。"
-                : $"无法注册快捷键：{new Win32Exception(code).Message}。原快捷键仍然有效。";
+                ? L.T("这个快捷键已被系统或其他应用占用，请换一个组合。原快捷键仍然有效。", "This shortcut is already registered by Windows or another app. Choose another combination. Your current shortcut stays active.")
+                : L.F("无法注册快捷键：{0}。原快捷键仍然有效。", "Could not register the shortcut: {0}. Your current shortcut stays active.",new Win32Exception(code).Message);
             return false;
         }
         int previous = _registration;
@@ -63,7 +63,7 @@ public sealed class HotkeyService : IDisposable
         modifiers = 0;
         virtualKey = 0;
         canonical = "";
-        error = "请输入组合快捷键，例如 Ctrl+Alt+S 或 Alt+A。";
+        error = L.T("请输入组合快捷键，例如 Ctrl+Alt+S 或 Alt+A。", "Enter a key combination, such as Ctrl+Alt+S or Alt+A.");
         if (string.IsNullOrWhiteSpace(text)) return false;
         string[] parts = text.Split('+', StringSplitOptions.TrimEntries);
         string? keyPart = null;
@@ -80,15 +80,15 @@ public sealed class HotkeyService : IDisposable
             };
             if (modifier != 0)
             {
-                if ((modifiers & modifier) != 0) { error = "修饰键重复了。"; return false; }
+                if ((modifiers & modifier) != 0) { error = L.T("修饰键重复了。", "A modifier key was entered more than once."); return false; }
                 modifiers |= modifier;
             }
             else if (keyPart is null) keyPart = part;
-            else { error = "一个快捷键只能包含一个主键。"; return false; }
+            else { error = L.T("一个快捷键只能包含一个主键。", "A shortcut can contain only one non-modifier key."); return false; }
         }
         if ((modifiers & 8) != 0)
         {
-            error = "Win 组合键通常用于 Windows 系统功能，请改用 Ctrl、Alt 或 Shift 的组合。";
+            error = L.T("Win 组合键通常用于 Windows 系统功能，请改用 Ctrl、Alt 或 Shift 的组合。", "Windows key combinations are reserved for system features. Use Ctrl, Alt or Shift instead.");
             return false;
         }
         if (modifiers == 0 || keyPart is null) return false;
@@ -124,7 +124,7 @@ public sealed class HotkeyService : IDisposable
             };
             if (!names.TryGetValue(normalizedKey, out var named))
             {
-                error = "主键支持字母、数字、F1–F24，以及 Space、Tab、Enter、方向键等常用按键。";
+                error = L.T("主键支持字母、数字、F1–F24，以及 Space、Tab、Enter、方向键等常用按键。", "Use a letter, digit, F1–F24, or a common key such as Space, Tab, Enter or an arrow key.");
                 return false;
             }
             virtualKey = named.Key;
@@ -136,7 +136,7 @@ public sealed class HotkeyService : IDisposable
             || (modifiers & 2) != 0 && virtualKey == 27
             || virtualKey == 0x7B)
         {
-            error = "这个组合用于系统操作，请选择其他快捷键。";
+            error = L.T("这个组合用于系统操作，请选择其他快捷键。", "This combination is reserved for Windows. Choose another shortcut.");
             return false;
         }
         var pieces = new List<string>();

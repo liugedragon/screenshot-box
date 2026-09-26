@@ -1,119 +1,151 @@
-# 实际验证记录
+# Test record
 
-简体中文 · [English](en/validation.md)
+English · [简体中文](zh-CN/validation.md)
 
-2026-09-26。Windows11 x64（内核10.0.26340），i7-14650HX；单屏2560×1440、125%缩放。SDK10.0.401，随应用运行时10.0.12；所有OCR为CPU。
+## 0.1.3 · 2026-09-26
 
-## 自动测试
+Environment: Windows 11 x64, one 2560 × 1440 display at 125% scaling; SDK 10.0.401, bundled runtime 10.0.12, CPU OCR. The App Release build completed with 0 warnings and 0 errors.
 
-初始0.1.0在Windows .NET10真实运行32项，32通过，0失败、0跳过，约1秒。记录：本机构建目录 `artifacts/test-results/core-final.trx`；测试源码位于 `tests/ScreenshotBox.Core.Tests`。
+### Application integration
 
-0.1.1新增“最近收藏先筛选再排序/分页”的回归测试：15条旧资料与6条近期资料，分页大小2，分别验证最早排序两页、最新排序、查询组合及删除排除。Core测试实际再次运行33项全部通过，0失败、0跳过，约2秒；这条记录仅代表核心模块，不提前宣称迭代UI验收通过。
+The built `ScreenshotBox.exe` ran directly with separate synthetic libraries under three language policies:
 
-覆盖：两字/一字中文包含检索、中英混排、引号/%/_字面查询、元数据修改与检索更新、持久化重开、分页与全库最早排序、跨页标签、软删除与恢复、generation阻止过时/删除后OCR写回、处理状态恢复、备份原图/分类/文字、新目录恢复、恶意压缩路径与错误包、反向选区、负坐标、跨屏几何、移动边界、调整点越过锚点。
+| Policy | Effective UI | Result | First OCR |
+| --- | --- | --- | ---: |
+| System | Simplified Chinese on the test computer | 43 checks passed | 595 ms |
+| English | English | 43 checks passed | 566 ms |
+| 简体中文 | Simplified Chinese | 43 checks passed | 589 ms |
 
-## Windows原生集成探针
+The checks cover language-setting persistence, localized resources and application errors, legacy settings without a language, unknown-setting fallback, manual overrides, System-policy persistence, and the three-choice language control. Existing checks for Chinese OCR, search, metadata, clipboard readback, retry, backup/restore, atomic overwrite, edit drafts, and preview sizing passed in each run. User-supplied titles, notes, tags, and recognized text remain in their original language.
 
-独立有PerMonitorV2 manifest的exe运行，不使用dotnet宿主替代DPI验证。
+System-language mapping is parameterized: `zh-CN`, `zh-TW`, `zh-HK`, and `zh-Hant` select Simplified Chinese; `en-US`, `fr-FR`, `ja-JP`, `de-DE`, and `ko-KR` select English. Windows on the test machine has a Chinese display language; other operating-system languages were not installed or switched during testing.
 
-- 热键：Alt+A形式、多修饰键、数字D1/NumPad、系统保留组合、占用拒绝、失败保留原注册、释放后注册通过。
-- 真实桌面连续采集20次2560×1440：GDI句柄1→1。
-- 物理200×160裁剪尺寸、画笔烘焙、撤销后逐像素等同原图、真实12×12马赛克、取消不生成图片通过。
-- 当前DPI120，线程awareness=2（PerMonitor）。只对当前单屏做实机验证。
+Public reports: [System](ui-review-images/0.1.3/system-self-test.json), [English](ui-review-images/0.1.3/en-self-test.json), [Simplified Chinese](ui-review-images/0.1.3/zh-self-test.json). To run the same integration checks from a built or extracted application directory, create a fresh test-library path for each language:
 
-这些是对真实Windows接口及应用逻辑的程序化验证，没有把它们写成手动鼠标验收。日志在本机 `.tools/native-validation/probe.out.txt`。
-
-## 完整exe集成验证
-
-直接启动ScreenshotBox.exe，使用隔离合成资料目录，不包含用户截图。
-
-合成原图1000×600：
-
-```
-课程资料 · ScreenshotBox
-订单编号 AB-20260926-001
-保修日期 2026-09-26
-中文 English 100% A_B "quote"
+```powershell
+$testData = Join-Path $env:TEMP ("ScreenshotBox-test-" + [guid]::NewGuid().ToString("N"))
+.\ScreenshotBox.exe --self-test --language en-US --data-dir $testData
 ```
 
-锁定中文模型输出四行真实文字，含原图行框与平均字符置信信息。实际查询“课程”“订单”“保修”、编号片段、English、100%、A_B均成功。修改备注/标签后立即可检索。原图缺失产生Failed，重新提供原图后重试Ready通过。
+Use `System` or `zh-CN` instead of `en-US` for the other policies. The command-line language override is available only in test mode; normal use selects the language in Settings.
 
-剪贴板写入后读回Bitmap，尺寸1000×600通过；空闲内存测试曾出现一次即时读回不一致，增加延迟观测后再次通过。尚未用常见外部应用实际粘贴，不把读回当成外部应用兼容验证。
+### English capture layout
 
-备份到新目录后图片存在、文字搜索成功。第一进程故意留下Processing任务，第二次独立exe启动自动恢复并完成；原有备注仍可查到、原图缺失数为0。
+Six tools at 320/560/720/960 DIP produced 24 English toolbar samples. Every toolbar stayed within the window, all labels fitted, and no resize-handle centers were obscured. See the [layout log](ui-review-images/0.1.3/layout-log.txt) and [UI check record](ui-review.md).
 
-浅色、深色、800×580小窗、中文长标题实际创建WPF窗口并渲染客户端检查。图片预览的真实OCR整行高亮可见；缩放和平移共用原图像素容器。背景对比问题经视觉检查发现并修复，继承锁定WPF UI明确的默认模板。
+### Candidate installation and uninstall
 
-另一个隔离WPF探针验证：100次OCR事件合并一次刷新；未保存输入不会被刷新覆盖；切换选择保留每张资料草稿；900DIP小窗口详情可编辑保存；截图隐藏所有本应用窗口，取消恢复原可见窗口。日志 `.tools/editor-validation/probe.out.txt`。
+The 0.1.3 release candidate installed to a chosen path containing Chinese characters and spaces, with exit code 0. Directory registration and the Start menu shortcut were correct; all 497 installed exe/dll/onnx hashes matched the distribution.
 
-用户看到的SQLiteProvider启动错误已复现并修复：Core显式初始化SQLitePCL bundle，不依赖反射自动发现。修复后的exe冷启动和上述集成测试通过。
+The installed executable passed 43 checks under each of System, English, and Simplified Chinese. In the System run, the effective language was Chinese, OCR took 556 ms, and working set after OCR was 363.0 MiB. A second independent process recovered one interrupted task, returned four “课程” results and two note-query results, and found no missing originals.
 
-## 轻量化实际测量
+The process used Windows-only PATH, a nonexistent DOTNET_ROOT, and an unavailable proxy; the runtime loaded from the installation directory. System networking was not physically isolated.
 
-上述合成图片在本机含首次模型加载的OCR约0.6秒。这不是普遍准确率或所有图像速度保证。一个集成测试进程识别后工作集约301MiB，空闲90秒释放模型后约237MiB，包含WPF和运行库。未宣称是十几MB内存工具。
+Uninstall exited with code 0. The executable and uninstall registration were removed. The database hash, five originals, five thumbnails, and an extra user file remained unchanged.
 
-初始0.1.0 ZIP为108,968,831字节，安装包为83,286,837字节。包内同时提供.NET、中文模型、ONNX原生库和已校验的微软C++运行库；33个原生PE文件全部为x64，无Linux/macOS原生库，所有发布文件哈希与模型哈希通过。8个CRT文件分别通过Microsoft Corporation Authenticode签名验证。
+The [installation summary](ui-review-images/0.1.3/installer-check.json) identifies the tested candidate by its SHA-256. It excludes local absolute paths and task identifiers. This record precedes documentation synchronization into the final package; final download checksums are provided with the release assets. Hardware and manual-test limitations remain listed below.
 
-## 初始0.1.0真实安装与卸载
+## 0.1.2 · 2026-09-26
 
-先检查HKCU/HKLM及32位视图的项目AppId，未发现既有安装；确认没有ScreenshotBox进程。初始安装包SHA-256为 `3ad3b6858d9b83e1462c07edb0e5acaabb83e6a7d4fe40eea3b0d9144d5692d6`，初始ZIP为 `601c35fb9d44859f51ad27c937a403313357437e41eb1993d66ac530d9cf789e`，验证后保持两者原样，不以迭代版本覆盖。
+Environment: Windows 11 x64 (kernel 10.0.26340), i7-14650HX, one 2560 × 1440 display at 125% scaling; .NET SDK 10.0.401, bundled runtime 10.0.12, CPU OCR.
 
-使用真实安装包执行当前用户静默安装，目录为 `E:\github\screenshot-box\artifacts\installer-validation-0.1.0\安装位置 空格\截图资料盒`。安装退出0，注册的安装位置与指定中文/空格目录一致，开始菜单快捷方式存在；没有管理员提权与重启。这里验证的是安装引擎接受自定义位置，没有把静默安装说成手动点击目录页验收。
+This record separates core tests, synthetic-pixel tests, programmatic Windows integration checks, and installation checks. UI checks create WPF windows, invoke controls, and inspect client-area images. A complete manual input pass and other outstanding scenarios are listed at the end. Test images are synthetic.
 
-直接运行安装后的ScreenshotBox.exe，传入 `--self-test --data-dir` 指向另一个中文隔离目录。进程退出0，OCR、全部七种真实文字查询、备注/标签修改查询、剪贴板图片读回、缺图失败、补图重试、新目录备份恢复均通过。System.Private.CoreLib的实际加载位置位于该自选安装目录，未使用dotnet宿主运行应用。第二次独立安装后exe启动恢复Processing任务成功，资料没有缺失。
+### Automated tests
 
-随后运行该安装生成的真实 `unins000.exe`，退出0。可执行文件和卸载注册被删除；外部合成资料库的3张原图与3张缩略图均保留，卸载前后library.db的SHA-256完全相同；提前放在安装目录内、未归安装程序所有的中文资料标记文件仍存在。这证明卸载按安装文件清单移除应用，不递归删除用户额外资料。
+| Suite | Result | Coverage |
+| --- | --- | --- |
+| Core / SQLite | 42 passed, 0 failed, 0 skipped | Chinese short terms and literal symbols, exact tags, search updates, persistence, pagination after filtering, delete/restore, OCR races, backup/restore, selection geometry |
+| Capture pixel probe | 35 passed, 0 failed | Positive/negative desktop origins, cropping, six colors, 7.5/32 px widths, arrows, reversed rectangles, 6/32 px mosaic, erasing, undo/redo, clear, and history branching |
+| App Release build | 0 warnings, 0 errors | Locked restore and Windows application build |
 
-完整日志和结构化结果在本机 `artifacts/installer-validation-0.1.0/install.log`、`uninstall.log`、`result.json`；合成截图、自测报告和恢复资料库也保留在那里，不包含用户真实截图。静默安装、安装后exe自测与卸载验证通过，仍不能替代下面列出的干净机器、真实混合DPI与外部应用粘贴验证。
+Exact-tag tests cover exclusion of matching title/OCR words, `%`, `_`, quotes, Chinese/English commas, whitespace, case, edits followed by restart, and combinations with keywords, stars, sorting, and pagination. OCR task tests check that stale results and results for deleted images cannot be written back.
 
-## 0.1.1最终发行程序验收
+The [Windows CI run](https://github.com/liugedragon/screenshot-box/actions/runs/36243627343) passed 42 Core tests and 35 pixel checks at commit `9d01e0a`. The current workflow is [windows.yml](../.github/workflows/windows.yml).
 
-直接执行 `artifacts/ScreenshotBox-0.1.1-win-x64/ScreenshotBox.exe`，数据目录含中文，使用隔离合成资料。测试进程PATH只包含Windows System32，DOTNET_ROOT指向不存在的目录，代理指向不可用的127.0.0.1:9；没有隔离系统网络，因此不将这一条件写成物理断网。实际运行时从发行目录中的System.Private.CoreLib.dll加载。
+To reproduce from the repository root on Windows:
 
-进程退出0，七种文字查询、1000×600剪贴板图片读回、备注/标签更新、原图缺失与重试、新目录备份恢复、小窗口详情折叠全部通过。新增真实队列回归：Processing中删除、恢复、立即再入队，最终正常Ready，没有丢失任务；125%真实DPI下“实际大小”的1000像素图片物理宽度为1000像素。第二次并发启动440毫秒退出0，首进程继续运行，没有创建第二资料库。
+```powershell
+.\scripts\build.ps1 -Configuration Release
+dotnet restore tests/ScreenshotBox.Capture.Probe/ScreenshotBox.Capture.Probe.csproj --locked-mode
+dotnet run --project tests/ScreenshotBox.Capture.Probe/ScreenshotBox.Capture.Probe.csproj --configuration Release --no-restore
+```
 
-再由另一独立发行exe进程启动，恢复上次遗留的1项Processing任务，中文“课程”检索4项、原备注检索1项、原图缺失0。结构化证据保留在本机构建目录 `artifacts/release-verification-0.1.1.json` 和 `artifacts/发行目录验收-0.1.1/restart-test.json`。
+The [pixel probe documentation](../tests/ScreenshotBox.Capture.Probe/README.md) describes its method. It uses in-memory synthetic patterns only. Desktop capture, hotkeys, toolbar layout, and the clipboard are covered by the integration checks below.
 
-这次包含多窗口截图与合成图像的验收进程，首次OCR627毫秒，识别后工作集360.3MiB，空闲90秒后281.1MiB；与上一轮窗口数量不同，不作为日常空库内存指标。另启动**常规模式**新空资料库，真实托盘与热键启用，6秒后工作集148.3MiB，私有内存94.4MiB，OCR模型尚未加载。记录 `artifacts/startup-memory-0.1.1.json`。因此本项目是原生、无浏览器/Python/GPU依赖的软件，但目前并非几十MB运行内存的小工具。
+### Windows integration checks
 
-完整界面审查与迭代见 [界面实测与自评](ui-review.md)，合成资料图片随源码与发行文档提供；不包含用户真实截图。
+- Twenty consecutive 2560 × 1440 desktop captures kept the GDI handle count at 1→1. DPI was 120, with thread DPI awareness 2 (PerMonitorV2). Desktop images remained in memory.
+- Hotkey checks covered Alt+A, multiple modifiers, number keys, common reserved system combinations, occupied global hotkeys, preserving the old registration on update failure, and registering again after release.
+- A 200 × 160 physical-pixel crop, compositing annotations, undo restoring original pixels, mosaic, and cancellation without output passed.
+- Six tools at four widths (320/560/720/960 DIP) produced 24 samples. Every toolbar stayed within the window; each sample obscured 0/8 resize-handle centers.
+- Control checks applied a 13.25 px width, RGB `#7F3FBF`, and Hex `#8247CB`; checked invalid-Hex feedback and the six-tool menu; and simulated a display-settings callback that canceled capture and removed its subscription.
 
-## 0.1.2 源码与候选程序验证
+Public logs: [native runtime](ui-review-images/0.1.2/native-runtime-log.txt), [layout and controls](ui-review-images/0.1.2/validation-log.txt). Images and layout corrections are in the [UI check record](ui-review.md).
 
-同日迭代统一使用“保存”表述，增加箭头、空心矩形、RGB/Hex自定义调色盘、1–32px笔宽、4–80px橡皮、6–32px马赛克块、撤销/重做和可撤销清除；资料编辑增加未保存提示与单一编辑入口，预览增加复制/导出、长图适应和键盘操作。
+### Distribution and installation
 
-完整App Release实际编译0警告、0错误；Core真实SQLite测试42项全部通过，0失败、0跳过，约2秒。新增精确标签成员测试覆盖标题/OCR同词排除、百分号/下划线/引号、英文及Unicode大小写、中英文逗号、空白、删除、元数据修改/重启，以及与搜索/星标取交集后分页。证据在本机 `artifacts/core-tests-0.1.2/core-tests-0.1.2.trx`。
+The final installer installed to a chosen path containing Chinese characters and spaces. It exited with code 0; directory registration and the Start menu shortcut were correct. All 497 installed exe/dll/onnx files matched the distribution.
 
-直接执行候选构建目录中的App exe，隔离合成资料位于 `artifacts/ui-validation-0.1.2-205412`。实际加载同目录System.Private.CoreLib.dll，全部报告布尔检查为true：624毫秒CPU中文OCR得到四行真实文字，七种关键词查询通过，1000×600剪贴板图片读回、备注/标签更新、缺图失败与重试、识别中删除/恢复竞态、备份与新目录恢复均通过。该时间只是一张1000×600合成图片的一次运行，不代表各种图片的性能或准确率。此次多窗口检查后工作集357.45MiB，不当作日常空库内存指标。
+The installed `ScreenshotBox.exe` ran directly with an isolated synthetic library. The test process had a Windows-only PATH, a nonexistent DOTNET_ROOT, and an unavailable proxy. Its runtime loaded from the installation directory. System networking was not isolated.
 
-新增程序化回归检查通过：覆盖PNG/导出目标成功；目标被文件锁占用时失败且原有图片逐字节保留；独立编辑窗字段编辑、关窗草稿保留、保存后dirty清除；同一条目不同时开放两个元数据编辑入口；UI标签使用精确成员筛选。125%屏下实际大小的1000px图片物理宽度1000px；20000px长图能适应窗口，窗口变大/变小后继续适应。完整自测证据为该目录中的 `self-test.json`。
+All 29 boolean checks passed, with process exit code 0:
 
-35项独立合成像素探针通过，覆盖虚拟原点(0,0)和负坐标、六种笔色、7.5px/32px笔宽、箭头、反向空心矩形、6px/32px马赛克平均色、橡皮恢复四种标注、撤销/重做、清除恢复与新动作使重做失效。它不调用真实桌面采集、文件、剪贴板、热键或遮罩窗口；已纳入Windows CI，与42项Core测试一起运行。
+- A 1000 × 600 Chinese image produced four text lines, source-image line boxes, and confidence values. First OCR took 684 ms.
+- Seven queries passed: “课程”, “订单”, “保修”, `AB-20260926`, `English`, `100%`, and `A_B`. Edited notes and tags became searchable.
+- Clipboard image readback measured 1000 × 600.
+- Recognition failed with a missing original and became searchable after replacement and retry. Deleting, restoring, and requeuing during OCR passed.
+- Backup/restore retained images, categories, and text. A second independent process recovered one interrupted task, returned four “课程” results and one original-note result, and found no missing originals.
+- PNG and image-export overwrite passed. A locked target retained the old file byte-for-byte; the temporary file was cleaned up.
+- Separate-editor drafts, saved state, exclusive editing, and exact tag filtering passed.
+- At 125% scaling, actual-size mode displayed a 1000 px image at 1000 physical pixels. A 20000 px tall image fitted the window and recalculated on resize.
+- Invoking the WPF window's key handler with the Save button as its event source confirmed that preview shortcuts did not intercept Space or Enter.
 
-本轮冻结源码还重新检查了20次真实2560×1440桌面采集，GDI句柄1→1；PerMonitorV2=2、125%缩放、热键占用时保留旧注册、系统保留组合拒绝与释放后重新注册均通过。最新运行日志随实图提供在 `docs/ui-review-images/0.1.2/native-runtime-log.txt`。
+Uninstall exited with code 0. The executable and uninstall registration were removed. The database SHA-256, five original images, five thumbnails, and an extra user file in the installation directory remained unchanged.
 
-原生窗口程序驱动检查了六工具×四窗口宽度共24个工具栏样本，边界断言均通过、遮挡调整点均0/8；只代表这24个窗口/选区样本，没有穷尽任意选区位置与所有显示器拓扑。实际滑条13.25px写入会话、RGB滑条应用#7F3FBF、Hex应用#8247CB、无效Hex保留调色盘并提示、关闭调色盘后继续截图、极窄屏菜单六工具可选择均通过。程序模拟DisplaySettingsChanged后取消截图并解除事件订阅通过；没有真实拔插显示器。窗口和像素证据在本机 `artifacts/ui-review-0.1.2` 与 `.tools/visual-review/probe.out.txt`，公开实图记录见[界面实测与自评](ui-review.md)。
+Package checks covered 617 files, 33 native x64 libraries, and eight Microsoft CRT signatures. Chinese model and dictionary hashes matched their sources. Published 0.1.2 files:
 
-这部分是候选源码与构建程序的实测，不提前称作0.1.2最终安装包验收。所有图片为隔离合成资料，窗口事件由程序驱动，不冒称真人完整键鼠流程。0.1.0/0.1.1章节与原包校验值继续保留。
+| File | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ZIP | 111,799,384 | `43a934744867e7857dcd0fc432c058d03b376be96b08579d3552d14148b84a57` |
+| Installer | 85,945,228 | `78affe92730737e5908effc010b4fad1318dad434b6c8ec37cc3976f6c4a747e` |
 
-## 0.1.2 发行程序、真实安装与公开CI
+Downloads and checksum files are on the [0.1.2 release page](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.2). Complete installation logs and structured results are local build records at `artifacts/installer-shipping-validation-0.1.2/result.json`; these files are not committed to the source repository.
 
-独立GitHub Windows 2025环境在提交9d01e0a上完成锁文件恢复、App构建、42项Core测试和35项标注像素探针，整项CI成功：[实际运行记录](https://github.com/liugedragon/screenshot-box/actions/runs/36243627343)。修正构建脚本只等待dotnet进程本身，避免常驻编译服务器令已通过的构建继续等待超时。
+The executable's self-test can run with a fresh test-library path and writes `self-test.json`. A subsequent independent launch resumes the interrupted task and writes `restart-test.json`:
 
-实际运行新setup，将应用安装到中文且有空格的自选目录 `artifacts/installer-validation-0.1.2/安装位置 空格/截图资料盒`。安装退出0，目录注册与快捷方式正确，497个exe/dll/onnx与发行目录逐项一致；未关闭用户正在打开的0.1.1便携程序。实际自测使用独立.Tests单实例通道和合成资料目录，与正常资料库分开。
+```powershell
+$testData = Join-Path $env:TEMP ("ScreenshotBox-test-" + [guid]::NewGuid().ToString("N"))
+.\ScreenshotBox.exe --self-test --data-dir $testData
+.\ScreenshotBox.exe --resume-ocr-test --data-dir $testData
+```
 
-安装后的exe直接启动，PATH仅Windows目录、DOTNET_ROOT指向不存在位置、网络代理不可用，运行时实际从安装目录加载。自测退出0，27项布尔检查全部true（末轮新增按钮空格/回车处理检查后共29项），包含真实中文OCR（这次864ms）、七词搜索、文字框预览、复制读回、缺图重试、删除恢复、备份恢复、原子覆盖保护、独立窗编辑与标签分类、20000px长图适应及实际像素大小。之后新的独立exe进程恢复1项中断识别，课程检索4项、保修备注1项、缺图0。
+### Memory observations
 
-实际卸载退出0：软件exe和卸载注册已移除，资料库数据库SHA-256保持不变，5张原图与5张缩略图逐项哈希保持不变，安装目录内额外用户标记文件也保留。证据 `artifacts/installer-validation-0.1.2/result.json` 与安装/卸载日志。安装后的各页检查仍由程序驱动，不把静默安装写成手工点击安装向导验收。
+The 0.1.2 multi-window integration process used 361.3 MiB of working set after OCR. A 0.1.1 empty library in normal mode, with tray and hotkey enabled but no loaded model, used 148.3 MiB of working set and 94.4 MiB of private memory six seconds after startup. The 0.1.1 multi-window test used 360.3 MiB after OCR and 281.1 MiB after releasing the model following 90 idle seconds. These are measurements on one machine with different window counts and model states.
 
-发行目录617项文件哈希、33个原生x64库和8个微软CRT签名通过；中文模型与字典来源哈希一致，无未使用拉丁识别模型或其他平台原生库。发行包随后仅同步最终验证文档，所有497个二进制与已经安装验收的版本保持一致。发行文件的最终SHA-256以包旁校验文件及GitHub发行附件为准，避免文档内嵌自身包哈希形成循环。0.1.0/0.1.1原包保持原样。
+## History
 
-## 尚未验证
+### 0.1.1
 
-- 实际双屏混合DPI、主屏左/上方负坐标屏幕、跨屏鼠标框选、外接屏变化。
-- 常见应用真实粘贴、纯键鼠完整用户流程、多轮长时间使用。
-- 物理断网及完全没有SDK的新Windows环境：当前自带运行时exe已验证从同目录加载运行时，但本机仍装有开发工具，不能冒称干净机器验证。
-- 所有系统缩放比例、所有显示器拓扑、海量图库性能。
-- 设置中目录选择/迁移/重启的手工完整流程。底层新目录恢复已通过自动测试。
+- All 33 Core tests passed; added regression coverage for filtering recent items before sorting and pagination.
+- Distribution checks covered Chinese OCR, seven queries, clipboard readback, delete/restore races, backup/restore, and actual pixel sizing.
+- A second concurrent launch exited after 440 ms while the first process continued. An independent launch recovered one interrupted task with no missing originals.
+- Fixed SQLiteProvider cold start by explicitly initializing the SQLitePCL bundle in Core.
 
-发布前追加键盘焦点修正：资料库空格预览和回车详情只在图片列表获得焦点时触发，避免拦截按钮正常按键；程序以实际保存按钮为事件来源调用窗口WPF按键处理器，确认两键未被窗口截获，不将其当作系统真实键盘输入测试。
+### 0.1.0
+
+- All 32 Core tests passed, with no failures or skips.
+- Current-user silent installation, a custom Chinese path, installed-program integration checks, and uninstall passed. Uninstall preserved the database, three originals, three thumbnails, and an extra user file.
+- ZIP: 108,968,831 bytes; SHA-256 `601c35fb9d44859f51ad27c937a403313357437e41eb1993d66ac530d9cf789e`.
+- Installer: 83,286,837 bytes; SHA-256 `3ad3b6858d9b83e1462c07edb0e5acaabb83e6a7d4fe40eea3b0d9144d5692d6`.
+
+## Outstanding checks
+
+- Actual mixed-DPI dual displays, screens left of or above the primary display, cross-screen mouse selection, and physical display connection/disconnection.
+- Pasting into common external applications, a complete manual mouse/keyboard pass, and prolonged use.
+- A fresh Windows machine with no development SDK and a physically disconnected network.
+- More scaling factors and monitor layouts, and large-library performance.
+- The complete manual flow for folder selection, migration, confirmation dialogs, and restart in Settings.
+
+Clipboard readback, geometry tests, simulated display callbacks, and bundled-runtime checks cover their respective components; they do not include the hardware and user workflows listed above.

@@ -1,17 +1,35 @@
-# 已知限制（0.1.2）
+# Known limitations
 
-简体中文 · [English](en/limitations.md)
+English · [简体中文](zh-CN/limitations.md)
 
-- 本机仅单块2560×1440、125%缩放显示器。双屏、混合DPI、外接屏变化和跨屏鼠标实机流程未验证。
-- Windows交互工具在当前WSL工作区初始化失败，手工按键/鼠标完整流程及外部常见应用真实粘贴尚未验证。原生集成探针和Windows自动测试不能替代这些项目。
-- 物理断网、无任何开发SDK的新Windows环境完整流程尚未验证；发布exe实际从随包运行时加载，应用源代码不调用网络。
-- 第一版关键词搜索是字面子串扫描，不是全文语义检索；大规模资料库响应性能尚未测量。
-- OCR为中文/英文移动模型，低分辨率、手写、复杂背景及倾斜文档可能失败。高亮是整行矩形范围。
-- 标注支持可调画笔、箭头、空心矩形、橡皮和马赛克，以及RGB/Hex调色盘、撤销/重做；没有文字标注、实色遮盖或保存后再次编辑。马赛克不提供安全脱敏保证。
-- 回收站只有软删除/恢复，不永久清空；备份包含回收站，磁盘空间需用户留意。
-- 发行运行时和原生OCR库占据大部分包体；原生WPF避免浏览器运行时，但自带运行时发行包不是几MB工具。
-- OCR模型按需初始化，首次截图识别有加载延迟。关闭窗口进入托盘，彻底退出从托盘菜单操作。
-- 不提供数据加密、数字签名、自动更新、云同步、账户系统。
+ScreenshotBox is currently a preview release. Recorded checks are in the [test record](validation.md).
 
+## Features
 
-0.1.2的程序驱动测试验证了真实OCR、剪贴板读回、精确标签、草稿状态、长图适应及标注像素。RGB/Hex调色盘、工具菜单和不同窗口宽度的检查由程序操作并查看实际窗口截图完成；没有把这些测试当作真人鼠标键盘、多屏或物理断网验收。发布前的具体结果与边界见[实际验证记录](validation.md)。
+- The app provides English and Simplified Chinese interfaces. System mode follows the Windows display language at startup. Language changes require a restart; system errors and Windows file dialogs may retain the operating system's language. Other display-language packs have not been tested on hardware.
+
+- Search uses literal substring matching. Semantic search is not available, and large-library performance has not been measured.
+- OCR uses a Chinese/English mobile model. Low-resolution text, handwriting, complex backgrounds, and tilted text may be inaccurate. Highlights cover entire text lines.
+- Annotations do not yet support text labels, solid redaction, or editing after saving. Mosaic does not guarantee secure redaction; erasing it during capture restores the original image.
+- The recycle bin supports deletion and restore, but not permanent emptying. Backups include recycled items.
+- Data encryption, application code signing, automatic updates, cloud sync, and accounts are not available.
+
+## Size and runtime
+
+The 0.1.2 installer is 85,945,228 bytes (about 82.0 MiB); the ZIP is 111,799,384 bytes (about 106.6 MiB). They include .NET, Chinese OCR models, ONNX, and related native libraries.
+
+OCR models load on demand, adding a delay to the first recognition. On the 0.1.1 test machine, an empty library used about 148.3 MiB of working set six seconds after startup. A multi-window recognition test used about 360.3 MiB, falling to 281.1 MiB after releasing the model following 90 idle seconds. Usage varies with images, open windows, and model state.
+
+Closing the main window leaves the app in the tray. Use the tray menu to quit. Uninstall preserves the library; delete unwanted data separately.
+
+## Unverified scenarios
+
+Hardware checks currently use one 2560 × 1440 display at 125% scaling. The following scenarios have not completed hardware or manual testing:
+
+- Dual displays, mixed DPI, cross-screen mouse selection, and physical display connection/disconnection.
+- Pasting into common external applications, a complete manual mouse/keyboard pass, and prolonged use.
+- A fresh Windows computer with no development SDK and a physically disconnected network.
+- More scaling factors and monitor layouts.
+- The complete manual Settings flow for directory migration, backup/restore, and restart.
+
+The distribution has been checked loading its bundled runtime. Programmatic tests cover Chinese OCR, restore to a new directory, and clipboard readback.

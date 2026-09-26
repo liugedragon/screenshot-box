@@ -1,35 +1,37 @@
-[简体中文](../storage.md) | English
+# Local library, search, and backup
 
-# Local library, search and backup
+[English](../storage.md) · [简体中文](../zh-CN/storage.md)
 
-The library is a user folder separate from the installation directory. It contains `library.db`, originals in `images/` and thumbnails in `thumbnails/`. Images use unique IDs as filenames. The database record is added only after the image write succeeds. Originals and thumbnails are not rewritten after import. Moving an item to the recycle bin changes its status without deleting its files.
+## Files
 
-## Search
+The library is separate from the installation folder. It contains `library.db`, originals in `images/`, and thumbnails in `thumbnails/`. Images use unique IDs as filenames; a database record is added after the files are written. Originals and thumbnails remain immutable after insertion. The recycle bin uses soft deletion and retains image files.
 
-The first release uses parameterized SQLite literal-substring queries across titles, notes, tags and OCR text. One- and two-character Chinese queries work. Quotes, percent signs and underscores are ordinary characters. English letters are matched without case sensitivity.
+## Search and categories
 
-This approach scans records. It does not provide a full-text index, fuzzy matching, pinyin or semantic search. Results default to newest first; oldest-first sorting and pagination are also available. Sorting applies to the full matching library before retrieving a page, rather than reversing only the most recent page. The tag list comes from the entire undeleted library, independently of the current result page.
+Parameterized SQLite substring queries search titles, notes, tags, and OCR text, including one- and two-character Chinese terms. Quotes, percent signs, and underscores are ordinary characters; ASCII letters are case-insensitive. Queries scan records. Fuzzy, pinyin, and semantic matching are not supported.
 
-Tag categories use separate, exact membership filtering: split on Chinese or English commas, trim surrounding spaces and compare without English case sensitivity. Tag navigation uses those same rules. Percent signs, underscores and quotes remain literal. A matching word in a title or OCR text does not count as a tag. Category, keyword, starred and other conditions are intersected in the database before sorting and pagination. The original tag-editing text is preserved rather than automatically rewritten.
+Results default to newest first, with oldest-first sorting and pagination. Sorting applies to the entire matching set before retrieving a page. Recently saved filters by UTC creation time for the preceding seven days, then sorts and paginates.
 
-Recently saved first filters undeleted records to the preceding seven days by UTC creation time, then sorts and paginates. It does not retrieve an arbitrary library page and discard older images afterward, which could omit recent items.
+Tags come from all active items. Categories match whole tags by splitting Chinese or English commas, trimming, and comparing with `OrdinalIgnoreCase`; symbols remain literal. Categories, keywords, stars, and other filters intersect in the database before sorting and pagination. Original tag-editing text is preserved. Words in titles or OCR text do not assign tags.
 
-## OCR tasks and restart
+## OCR jobs
 
-Images are saved before background recognition begins. Each task receives a generation number. Only a valid record with the matching generation and processing state can accept its result. Deletion, restoration or a new recognition task invalidates old results. On restart, interrupted tasks return to pending status and can be queued again.
+Images are saved before background recognition. A task receives a generation, and its result can update only an active Processing record with the same generation. Deletion, restoration, or newer jobs invalidate stale results.
 
-## Backup and restore
+Startup resets interrupted Processing jobs to Pending for requeueing. Failed jobs retain the image and error for manual retry. Queue behavior is detailed in [architecture](../architecture.md).
 
-SQLite's backup API creates a complete snapshot, including the originals, thumbnails and recycle-bin records referenced by it. Copying an active database file alone is insufficient. The archive does not include changes made after the snapshot.
+## Backup
 
-Missing originals cause backup to fail. It neither leaves an apparently successful but incomplete ZIP nor overwrites an existing backup. Archives contain the user's screenshots and are not sent to a server.
+SQLite's backup API creates a consistent snapshot. The ZIP contains the originals, thumbnails, and recycle-bin records it references; changes after the snapshot are excluded. Backup resolves unsaved editing drafts first.
 
-Restore first validates the format version, database integrity, file inventory and relative paths, then writes to a new empty directory. It rejects path traversal, duplicate entries, missing images and unsupported backup versions. It does not merge with or overwrite an existing library. Initializing the restored library recovers pending recognition tasks.
+Missing referenced files cause failure without creating an incomplete ZIP or replacing an existing destination. Archives contain user data and are saved to the chosen location.
 
-## Verification scope
+## Restore
 
-Automated tests use real SQLite, image bytes, ZIP archives and filesystem operations. Coverage includes short Chinese words and special characters, editing and saving, restart, OCR races, backups made during concurrent changes, byte-for-byte restoration, missing files and unsafe archive paths. Tag tests cover exact membership, symbols, case, mixed comma separators, restart and pagination after intersection with keyword and starred filters.
+Restore checks format version, SQLite integrity, inventory, and relative paths, then installs into a new empty directory. Validation rejects traversal, drive and alternate-stream paths, duplicate entries, unlisted files, missing images, and unsupported versions. Existing libraries are not merged or overwritten.
 
-Capture-geometry tests cover reverse selection, negative coordinates, clamped movement, resizing past an anchor, rectangle intersection and all eight resize handles.
+Initializing a restored library creates standard subdirectories and recovers interrupted OCR jobs. The app restarts on the new library and retains the original.
 
-Mixed-DPI monitors, clipboard interaction with other Windows applications, recognition accuracy and first launch on a clean computer still need hardware testing. Passing automated tests does not mean those scenarios have been verified.
+## Tests
+
+Core tests cover SQLite queries and updates, short Chinese terms and symbols, sorting and pagination, tag categories, OCR state races, backup during concurrent edits, restored byte equality, missing files, and unsafe archive paths. Commands are in [build](../build.md); version results are in [validation](../validation.md).

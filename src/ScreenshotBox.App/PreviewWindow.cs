@@ -16,18 +16,18 @@ public sealed class PreviewWindow : Window
     public PreviewWindow(ScreenshotItem item,LibraryStore store,string query)
     {
         query=query.Trim();
-        Title=string.IsNullOrWhiteSpace(item.Title)?"图片预览":item.Title;Width=1000;Height=750;MinWidth=600;MinHeight=420;
+        Title=string.IsNullOrWhiteSpace(item.Title)?L.T("图片预览", "Image preview"):item.Title;Width=1000;Height=750;MinWidth=600;MinHeight=420;
         SetResourceReference(BackgroundProperty,"SbBackground");SetResourceReference(ForegroundProperty,"SbText");
         _image=ImageLibrary.Load(store.ResolvePath(item.ImagePath));
         var root=new DockPanel();root.SetResourceReference(Panel.BackgroundProperty,"SbBackground");
         var tools=new WrapPanel{Margin=new(8,4,8,4)};DockPanel.SetDock(tools,Dock.Top);root.Children.Add(tools);
-        AddButton(tools,"适应窗口",Fit,"Ctrl+0");AddButton(tools,"实际大小",()=>Zoom(1/VisualTreeHelper.GetDpi(this).DpiScaleX),"Ctrl+1");
-        AddButton(tools,"−",()=>Zoom(_scale.ScaleX/1.25),"缩小");AddButton(tools,"＋",()=>Zoom(_scale.ScaleX*1.25),"放大");
-        AddButton(tools,"复制图片",async()=>await CopyAsync(),"Ctrl+C");
-        AddButton(tools,"导出图片",()=>{
-            var dialog=new SaveFileDialog{Filter="PNG 图片|*.png",FileName="截图.png"};
+        AddButton(tools,L.T("适应窗口", "Fit to window"),Fit,"Ctrl+0");AddButton(tools,L.T("实际大小", "Actual size"),()=>Zoom(1/VisualTreeHelper.GetDpi(this).DpiScaleX),"Ctrl+1");
+        AddButton(tools,"−",()=>Zoom(_scale.ScaleX/1.25),L.T("缩小", "Zoom out"));AddButton(tools,"＋",()=>Zoom(_scale.ScaleX*1.25),L.T("放大", "Zoom in"));
+        AddButton(tools,L.T("复制图片", "Copy image"),async()=>await CopyAsync(),"Ctrl+C");
+        AddButton(tools,L.T("导出图片", "Export image"),()=>{
+            var dialog=new SaveFileDialog{Filter=L.T("PNG 图片|*.png", "PNG image|*.png"),FileName=L.T("截图.png", "Screenshot.png")};
             if(dialog.ShowDialog(this)!=true)return;
-            try{ImageLibrary.ExportAtomic(store.ResolvePath(item.ImagePath),dialog.FileName);_label.Text="图片已导出";}catch(Exception ex){_label.Text="导出失败："+ex.Message;}
+            try{ImageLibrary.ExportAtomic(store.ResolvePath(item.ImagePath),dialog.FileName);_label.Text=L.T("图片已导出", "Image exported");}catch(Exception ex){_label.Text=L.T("导出失败：", "Export failed: ")+L.Error(ex);}
         });tools.Children.Add(_label);_label.SetResourceReference(TextBlock.ForegroundProperty,"SbMuted");
         _content.Width=_image.PixelWidth;_content.Height=_image.PixelHeight;_content.LayoutTransform=_scale;
         _content.Children.Add(new Image{Source=_image,Stretch=Stretch.Fill});
@@ -53,9 +53,9 @@ public sealed class PreviewWindow : Window
         _content.MouseUp+=(_,_)=>EndPan();_content.LostMouseCapture+=(_,_)=>{_pan=null;_content.Cursor=null;};
     }
     private void EndPan(){_pan=null;_content.ReleaseMouseCapture();_content.Cursor=null;}
-    private async Task CopyAsync(){try{await ClipboardHelper.CopyImageAsync(_image);_label.Text="图片已复制";}catch(Exception ex){_label.Text="复制失败："+ex.Message;}}
+    private async Task CopyAsync(){try{await ClipboardHelper.CopyImageAsync(_image);_label.Text=L.T("图片已复制", "Image copied");}catch(Exception ex){_label.Text=L.T("复制失败：", "Copy failed: ")+L.Error(ex);}}
     private void Zoom(double factor,bool fit=false){_fitMode=fit;factor=Math.Clamp(factor,.0001,8);_scale.ScaleX=_scale.ScaleY=factor;UpdateZoomLabel();}
-    private void UpdateZoomLabel()=>_label.Text=$"{_scale.ScaleX*VisualTreeHelper.GetDpi(this).DpiScaleX:P0} · Ctrl+滚轮缩放，拖动图片平移";
+    private void UpdateZoomLabel()=>_label.Text=L.F("{0:P0} · Ctrl+滚轮缩放，拖动图片平移", "{0:P0} · Ctrl+wheel to zoom; drag the image to pan",_scale.ScaleX*VisualTreeHelper.GetDpi(this).DpiScaleX);
     protected override void OnDpiChanged(DpiScale oldDpi,DpiScale newDpi){base.OnDpiChanged(oldDpi,newDpi);if(_fitMode)Dispatcher.BeginInvoke(Fit);else UpdateZoomLabel();}
     private void Fit(){Zoom(Math.Min(1/VisualTreeHelper.GetDpi(this).DpiScaleX,Math.Min(Math.Max(1,_scroll.ViewportWidth-24)/_image.PixelWidth,Math.Max(1,_scroll.ViewportHeight-24)/_image.PixelHeight)),true);_scroll.ScrollToHorizontalOffset(0);_scroll.ScrollToVerticalOffset(0);}
     private static void AddButton(Panel panel,string label,Action action,string? tip=null){var b=new Button{Content=label,ToolTip=tip};b.Click+=(_,_)=>action();panel.Children.Add(b);}

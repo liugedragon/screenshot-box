@@ -1,30 +1,80 @@
-# 使用说明
+# User guide
 
-简体中文 · [English](en/usage.md)
+English · [简体中文](zh-CN/usage.md)
 
-1. 运行setup.exe选择安装目录；或解压完整发行目录，双击ScreenshotBox.exe。首次启动建立本地资料库。设置的“更改保存位置并迁移资料”可选保存目录；非空目录会建立专用资料库子目录，迁移完成后自动重启。旧目录保留，不自动删除。
-2. 按Ctrl+Alt+S拖出矩形；松开后拖动八个调整点，或在“选区”模式拖动选区。工具栏支持画笔、箭头、矩形、橡皮和马赛克。
-3. Enter或“保存并复制”将图片写入资料库并复制；“仅复制”不进入资料库；“另存PNG”指定位置；Esc取消，不生成图片或资料。输出图片包含标注，文字识别在后台处理。
-4. 点击托盘打开资料库。“正在识别”的截图标题和备注仍能搜索，识别完成后图片文字可搜索；截图后回到原应用，不等待识别。
-5. 选中缩略图后编辑标题、备注、标签或星标，点击“保存修改”或按Ctrl+S。未保存时有明确提示，小窗口可用“详情”或Enter打开独立编辑窗；同一资料的主窗字段同时暂停编辑。关闭编辑窗仍保留本次会话草稿；彻底退出、备份或改库前提示保存、放弃或取消。
-6. Ctrl+F定位搜索框，搜索标题、备注、标签和识别文字。左侧标签按完整成员分类，能和搜索词组合；标题或OCR里出现同词不会自动归入该标签。中英文逗号都可以分隔标签，两侧空格忽略、英文大小写视为同一标签。
-7. 空格或双击缩略图预览原图，匹配OCR文字的整行框以橙色显示。Ctrl+滚轮缩放，拖动图片平移；Ctrl+C复制图片、Ctrl+0适应窗口、Ctrl+1实际大小，Esc关闭预览。适应模式随窗口大小变化，支持导入的长图；平移不会拦截滚动条。
-8. 设置可录制新的Ctrl/Alt/Shift组合键，例如Alt+A；占用或系统保留快捷键会被拒绝，原快捷键继续有效。缩略图大小、当前标注颜色、笔宽、橡皮大小与马赛克块大小会保留到下次启动。
-9. 设置可打开当前资料文件夹、备份到新的ZIP、恢复到新的资料库子目录。迁移和恢复成功后自动重启；资料处理中设置不能中途关闭，操作失败会显示原因。原库不被覆盖，卸载软件不删除用户资料库。
-10. 主窗口关闭后仍在托盘等待快捷键；彻底退出使用托盘右键“退出”。
+## Install and configure
 
-## 标注与调色盘
+Run the installer and choose a folder, or extract the complete ZIP and open `ScreenshotBox.exe`. The app creates a local library on first launch.
 
-当前工具才展开颜色或大小选项，保存、复制、另存和取消保持可见。极窄窗口使用“工具”菜单切换，全部六种模式仍可选。
+The installation and library folders are separate. In Settings, change the save location to move images, recognized text, and categories. A dedicated subfolder is created if the destination is not empty. The app restarts after migration and retains the original folder.
 
-- 画笔、箭头、空心矩形：六色快捷入口为红、蓝、绿、黄、白、黑；1–32px线宽可连续调节。打开自定义调色盘，用RGB滑条或六位Hex色值选色，再点击“应用颜色”或按Enter。已有标注保留各自颜色与宽度；无效色值有提示。调色盘打开时Esc先关闭调色盘，之后再按Esc才取消截图。
-- 橡皮：4–80px擦除范围，只擦掉标注并恢复截图原有像素，不涂成白色；对画笔、箭头、矩形和马赛克都适用。
-- 马赛克：6–32px像素块大小，数值越大视觉像素化越明显。
-- Ctrl+Z撤销、Ctrl+Y重做；新标注后重做历史清空。“清除标注”恢复整个原图，也可以撤销。
-- B切画笔、E切橡皮、M切马赛克、V切选区模式；颜色输入框中不把这些字母作为模式快捷键。
+Settings offers system, light, and dark themes. Language defaults to System: Chinese Windows display languages use Simplified Chinese; other display languages use English. Choose **System**, **简体中文**, or **English** and restart to apply changes. Changing the language does not change the OCR models; the bundled models continue to recognize Chinese and English text.
 
-识别失败时图片仍在资料库，选择“重新识别”可重试；设置中“检查原图和识别错误”给出原因。原图被外部删除时缩略图可能仍可浏览，预览与导出会报告失败，请从备份恢复。另存和导出先写临时文件、成功后再替换；写入失败不会先删除已有目标图。
+## Capture
 
-马赛克是视觉像素化，不适合不可泄露的敏感文字，不提供安全脱敏保证。发行应用未数字签名，Windows可能显示发布者未知。完整验证边界见[实际验证记录](validation.md)。
+1. Press `Ctrl+Alt+S` and drag a selection.
+2. Resize it with eight handles. In Selection mode, drag inside to move it.
+3. Add pen strokes, arrows, rectangles, erasing, or mosaic if needed.
+4. Press `Enter` or choose Save and copy. The image is saved to the library and clipboard, then you return to your previous app.
 
-快捷键冲突检查针对常见系统保留组合与Windows全局热键注册。应用内部自行处理、未注册为全局热键的按键不能全部检测；若某个组合与常用软件操作重叠，请换一个。
+Copy only does not create a library entry. Save PNG as lets you choose a file path. `Esc` cancels without creating an image or entry. The output includes annotations; OCR runs in the background.
+
+Settings can record a combination of `Ctrl`, `Alt`, or `Shift` and one non-modifier key, such as `Alt+A`. The app checks common reserved system combinations and Windows global hotkey registration. Failed registration keeps your previous hotkey active. Shortcuts handled internally by another app without global registration may still overlap; choose a different combination in that case.
+
+## Annotation and colors
+
+The toolbar shows options for the current tool. On narrow screens, the Tools menu contains all six modes.
+
+| Tool | Options |
+| --- | --- |
+| Pen, arrow, outline rectangle | Red, blue, green, yellow, white, and black; 1–32 px line width. |
+| Palette | RGB sliders, a six-digit Hex value, and preview; choose Apply color or press `Enter`. |
+| Eraser | 4–80 px; removes annotations and restores the original pixels, including mosaic areas. |
+| Mosaic | 6–32 px blocks; larger blocks produce more visible pixelation. |
+
+Existing annotations retain their own colors and sizes. Invalid color values show an error. When the palette is open, `Esc` closes it first; press it again to cancel capture.
+
+- `Ctrl+Z`: undo. `Ctrl+Y`: redo. A new annotation clears redo history.
+- Clear annotations restores the original and can be undone.
+- `B`: pen. `E`: eraser. `M`: mosaic. `V`: selection. In the color field these letters remain text input.
+
+Annotation color, pen width, eraser size, mosaic size, and library thumbnail size persist after restart. Mosaic is visual pixelation and should not be used for information that must remain confidential.
+
+## Import, organize, and search
+
+Open the library from the tray. Drop PNG/JPEG files into it or choose Import for a batch. Failed imports show a reason for each file.
+
+Select a thumbnail to edit its title, notes, tags, or star. Choose Save changes or press `Ctrl+S`. Unsaved edits are marked. In a narrow window, choose Details or press `Enter` to open a separate editor; that item's fields in the main window are disabled while it is open. Closing the editor keeps its draft for the session. Before quitting, backing up, migrating, or restoring, choose save, discard, or cancel for outstanding edits.
+
+Press `Ctrl+F` to search titles, notes, tags, and OCR text. Images still being recognized can already be found by title and notes; image text becomes searchable when recognition completes. Search matches literal substrings, including short Chinese terms. Quotes, percent signs, and underscores are ordinary text.
+
+Separate tags with English or Chinese commas. Sidebar categories match whole tags and can be combined with a keyword. A word in a title or OCR result does not assign that tag. Surrounding spaces and English letter case do not affect category matching.
+
+Deleted images go to the recycle bin and can be restored.
+
+## Preview, copy, and export
+
+Select an image and press `Space`, or double-click it. Matching OCR lines have orange outlines.
+
+| Action | Shortcut |
+| --- | --- |
+| Zoom | `Ctrl` + mouse wheel |
+| Pan | Drag the image |
+| Copy image | `Ctrl+C` |
+| Fit to window | `Ctrl+0` |
+| Actual pixel size | `Ctrl+1` |
+| Close preview | `Esc` |
+
+Preview supports tall images; fit mode follows window resizing. Details offers recognized-text copying and image export.
+
+A failed OCR task keeps the image; choose Recognize again to retry. Settings can check originals and recognition errors. If an original is deleted outside the app, its thumbnail may remain visible, but preview and export report an error; restore from backup. A failed save-as or export preserves the existing destination file.
+
+## Back up, restore, and quit
+
+Settings can open the library folder, create a ZIP backup, or restore into a new library directory. A backup contains images, text, categories, and recycle-bin records; protect any private information it contains.
+
+Restore retains the old library and restarts the app on success. Data operations pause during backup, migration, or restore; errors appear in Settings.
+
+Closing the main window leaves the app in the tray. Use Quit from the tray menu to exit completely. Uninstalling preserves settings and the library.
+
+The app and installer are unsigned; Windows may show an unknown publisher. See [validation](validation.md) and [known limitations](limitations.md).

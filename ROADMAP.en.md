@@ -1,21 +1,20 @@
 # Roadmap
 
-[简体中文](ROADMAP.md) · English
+[English](ROADMAP.md) · [简体中文](ROADMAP.zh-CN.md)
 
-These are maintenance priorities, not release-date promises. Delivered features are in [0.1.2](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.2); current gaps are in [limitations](docs/en/limitations.md).
+Released features are listed in the [release notes](https://github.com/liugedragon/screenshot-box/releases); current issues are in [known limitations](docs/limitations.md). The following work is pending, with no fixed release dates.
 
-## Testing and stability first
+## Testing and stability
 
-- Manual checks with mixed-DPI monitors, negative coordinates, selections across displays, and monitor connection changes.
-- Image pasting into common apps and a complete physically offline run on a clean PC without a development SDK.
-- Fix shortcut, focus, recognition failure, and recovery problems reported in actual use.
-- Measure cold starts, memory after OCR initialization, and larger-library query times before choosing optimizations.
+- Mixed-DPI monitors, negative coordinates, cross-monitor selections, and display connection changes.
+- Image pasting into common applications and offline checks on a clean PC without a development SDK.
+- Shortcut, focus, recognition, and recovery fixes based on bug reports.
+- Measurements of cold starts, OCR memory use, and larger-library search times.
 
-## Candidates based on feedback
+## Feature candidates
 
-- An English UI. Documentation is bilingual; the UI is still primarily Chinese.
 - Text annotations, solid masking, and editing a copy after saving.
-- Clearer recognition errors and diagnostic exports that exclude user content by default.
-- A measured way to accelerate Chinese queries while retaining original text and bounding-box mappings.
+- Diagnostic exports that exclude user content.
+- Faster Chinese queries while retaining original text and bounding-box mappings.
 
-Recording, cloud sync, translation, and semantic search are outside the near-term scope. Feature suggestions should include a use case and current workaround, not just a name.
+Recording, cloud sync, translation, and semantic search are outside the near-term plan. Submit feature suggestions through [Issues](https://github.com/liugedragon/screenshot-box/issues/new/choose).

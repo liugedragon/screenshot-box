@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+([-.][A-Za-z0-9.-]+)?$')][string]$Version = '0.1.2',
+    [ValidatePattern('^\d+\.\d+\.\d+([-.][A-Za-z0-9.-]+)?$')][string]$Version = '0.1.3',
     [switch]$SkipBuild
 )
 $ErrorActionPreference = 'Stop'
@@ -83,13 +83,14 @@ try {
     }
     Copy-Item (Join-Path $repo 'licenses') $stage -Recurse
     Copy-Item (Join-Path $repo 'installer') $stage -Recurse
-    foreach ($relative in @('README.md', 'LICENSE')) {
+    foreach ($relative in @('README.md', 'README.zh-CN.md', 'README.en.md', 'CONTRIBUTING.md', 'CONTRIBUTING.zh-CN.md', 'CONTRIBUTING.en.md', 'ROADMAP.md', 'ROADMAP.zh-CN.md', 'ROADMAP.en.md', 'LICENSE')) {
         $source = Join-Path $repo $relative
         if (Test-Path $source) { Copy-Item $source $stage }
     }
+    Copy-Item (Join-Path $repo 'assets') $stage -Recurse
     New-Item -ItemType Directory -Path (Join-Path $stage 'docs') -Force | Out-Null
     $docsRoot = Join-Path $repo 'docs'
-    Get-ChildItem $docsRoot -Recurse -File | Where-Object { $_.Extension -in @('.md', '.png', '.txt') } | ForEach-Object {
+    Get-ChildItem $docsRoot -Recurse -File | Where-Object { $_.Extension -in @('.md', '.png', '.txt', '.json') } | ForEach-Object {
         $relative = $_.FullName.Substring($docsRoot.Length + 1)
         $destinationFile = Join-Path (Join-Path $stage 'docs') $relative
         New-Item -ItemType Directory -Path (Split-Path -Parent $destinationFile) -Force | Out-Null

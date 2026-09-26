@@ -1,97 +1,73 @@
-# 界面实测与自评
+# UI check record
 
-简体中文 · [English](en/ui-review.md)
+English · [简体中文](zh-CN/ui-review.md)
 
-2026-09-26 在 Windows 上启动实际 WPF 窗口，导出实际客户区并逐张查看图片。屏幕实际为 2560 × 1440、125% 缩放。资料编辑和截图工具栏使用临时资料库与合成课程安排图片；截图背景不是用户桌面，也不是新增产品功能。异常仅记入验证日志。
+## 0.1.3 · 2026-09-26
 
-## 截图工具栏与资料详情：多轮查看与修正
+Environment: Windows 11 x64, one 2560 × 1440 display at 125% scaling. The checks use synthetic library data and programmatic WPF controls, followed by client-area image inspection.
 
-首轮看到了具体问题，而不只是确认程序能够启动：
-
-| 发现 | 修正 | 实看结果与证据 |
+| Area | Check | Images |
 | --- | --- | --- |
-| 深色主题会让截图栏的普通动作按钮变黑，但模式按钮仍为浅色，视觉不一致。 | 截图栏使用自身固定的浅色按钮配色；收藏并复制使用蓝色，当前模式使用浅蓝底；另有明确的取消按钮。 | [修改前](ui-review-images/before/capture-large-select.png)与[修改后](ui-review-images/capture-large-select.png)。主题变化不会再混入黑色按钮。 |
-| 原来只有固定红色画笔，没有颜色或粗细选择。 | 画笔模式展开红色、蓝色、细、粗；每条笔画保存自己的颜色与宽度；添加 Ctrl+Z 撤销。 | [实际红细笔与蓝粗笔](ui-review-images/capture-large-pen.png)。模式、颜色、粗细的选中状态可辨；无可撤销笔画时撤销禁用。 |
-| 第二轮中，画笔选项展开时工具栏仍使用旧高度定位，实际底部到达 741 DIP，超出 720 DIP 窗口。 | 展开和模式变化后立即重新测量；底部没有空间时重新定位，并让长按钮按可用宽度换行。 | 最新 12 个遮罩布局全部通过边界断言；[320 DIP 窄窗口](ui-review-images/capture-narrow-pen.png)也没有截断颜色或粗细按钮。 |
-| 极窄窗口换行后，工具栏可能遮住选区中间的调整点。 | 小于 420 DIP 时缩减按钮垂直空白，保留中文全称与所有操作。 | 320、560、720、960 DIP 四种宽度、三种模式的样本中，工具栏遮挡调整点均为 0/8；尺寸与 Enter、Esc、Ctrl+Z 提示仍可见。见[布局日志](ui-review-images/validation-log.txt)。 |
-| 编辑弹窗预览占用较大，小窗初始只露出标题；滚动条靠近正文边缘。 | 预览常规高度缩到 140 DIP，短窗口缩到 90 DIP；正文右侧留 12 DIP；页脚固定显示 Ctrl+S 保存。 | [修改前的小窗](ui-review-images/before/editor-light-small.png)与[修改后的深色小窗](ui-review-images/editor-dark-small.png)。标题和备注可编辑，剩余字段通过滚动访问，保存按钮始终可见。 |
+| Language settings | System, 简体中文, and English are available. System uses the Windows display language: Chinese selects Simplified Chinese, and other languages select English. Applying a change restarts the app. | [English Settings](ui-review-images/0.1.3/en-settings.png), [System on Chinese Windows](ui-review-images/0.1.3/system-zh-settings.png). |
+| Library | Navigation, action buttons, state labels, and details switch language. User titles, tags, notes, and OCR text retain their original contents. Narrow windows retain capture, import, and details actions. | [English library](ui-review-images/0.1.3/en-library.png), [narrow English window](ui-review-images/0.1.3/en-narrow.png), [Chinese library](ui-review-images/0.1.3/zh-library.png). |
+| Details | English field labels, unsaved status, and the fixed save footer remain readable in the small editor. | [Small English editor](ui-review-images/0.1.3/en-editor-small.png). |
+| Capture and palette | English tool names, hints, parameter labels, and save actions fit the compact toolbar. RGB/Hex controls and Apply use the selected UI language. | [320 DIP pen toolbar](ui-review-images/0.1.3/en-capture-narrow.png), [English palette](ui-review-images/0.1.3/en-palette.png). |
 
-最终实际查看了 18 张图片：编辑页深浅两种主题，各含常规页、文字识别页、最小尺寸页；截图栏包含四种宽度下的选区、画笔、马赛克状态。
+English layout checks covered six tools at four widths (320/560/720/960 DIP). All 24 samples had in-bounds toolbars, fitted labels, and no obscured resize-handle centers; see the [layout log](ui-review-images/0.1.3/layout-log.txt). The language selector's three choices and selected policy are also checked by the [application integration tests](validation.md#013--2026-09-26).
 
-- [浅色详情](ui-review-images/editor-light.png)、[深色详情](ui-review-images/editor-dark.png)：长中文标题换行，标题、备注、标签、星标层次清楚，文字没有白底白字问题。
-- [浅色识别页](ui-review-images/editor-light-ocr.png)、[深色识别页](ui-review-images/editor-dark-ocr.png)：复制文字、重新识别、预览、导出均显示完整，长识别文本可滚动，保存页脚保持可见。
-- [马赛克实际状态](ui-review-images/capture-small-mosaic.png)：文字内容变成真实像素块；此前红色与蓝色笔画保留，当前模式明确。
-- [浅色主题截图栏](ui-review-images/capture-light-mosaic.png)：中文长按钮完整，没有受应用主题变化影响。
+Images show built application windows. The checks do not include a full manual language-change/restart flow or installing other Windows display-language packs. System errors and Windows file dialogs may use the operating system's language. Other layout and hardware limits remain below.
 
-## 主窗口与设置页的联合审查
+## 0.1.2 · 2026-09-26
 
-主窗口与设置页由主代理另行实际启动、导出并查看；本页编写者也实际查看了最新六张图片。发现并修正了以下问题：
+Environment: Windows 11 x64, one 2560 × 1440 display at 125% scaling. Checks launch WPF windows, invoke controls, export client areas, and inspect the images. An isolated library and synthetic course images are used. A complete manual input pass, mixed-DPI hardware, and physical display changes remain untested.
 
-1. 空库仍展示整块禁用详情表单。改为选择截图的提示，先引导截图或导入。
-2. 导航缺少明确的当前分类提示。增加明确的中性蓝色选中状态。
-3. 摘要中换行与高度造成内容挤压。统一换行显示、限制为两行并省略。
-4. 深色设置页下拉框出现白底白字。补上真实下拉框模板和主题前景、背景、边框资源。
-5. 详情滚动条贴近正文。正文保留 12 DIP 空间。
-6. 深色分类的蓝色文字偏暗。保持同一强调色，使用更明亮的蓝色文字以提高选中项对比。
-7. “实际大小”原来按DIP显示，在125%系统缩放时会放大原图。改为按当前窗口DPI转换，一张1000像素图片在实际大小模式下的物理宽度实测为1000像素。
+### Library, details, and Settings
 
-最新证据：[空资料库](ui-review-images/ui-empty.png)、[浅色主窗口](ui-review-images/ui-light.png)、[深色主窗口](ui-review-images/ui-dark.png)、[窄主窗口](ui-review-images/ui-narrow.png)、[设置页](ui-review-images/ui-settings.png)、[原图预览与文字高亮](ui-review-images/ui-preview.png)。实际可见：空库同时给出截图入口和选中资料提示，导航选中统一为蓝色；浅色和深色输入框可读；长标题在详情区换行，卡片摘要保持两行；窄主窗保留“详情”入口；原图高亮没有遮掉正文。主窗口卡片字号偏小，缩略图主要用于辨认，正文阅读仍需打开预览。
-
-设置页截图同时检查了主题选择值与当前颜色的一致性；最终探针已同步合成偏好与深色主题。本节不把代码检查或编辑探针当作主窗口验收。
-
-## 0.1.0 / 0.1.1 历史功能验证与自评边界
-
-视觉之外，隔离编辑验证通过了未保存草稿、100 次识别事件合并为一次刷新、切换条目保留各自草稿、窄窗编辑实际写入数据库、截图隐藏自身所有窗口、取消后恢复原有可见窗口。原生验证检查真实桌面连续采集、快捷键冲突时保留旧注册、取消无产物、涂鸦和马赛克写入导出像素、撤销恢复原像素；新增红蓝画笔和粗细也验证导出像素。
-
-目前仍有清楚的限制：
-
-- 编辑预览是缩略图，细小文字不适合在预览里阅读，应使用“预览原图”。短窗口需滚动访问全部字段。
-- 极窄屏幕没有足够空间容纳完整工具栏时，工具栏会出现在选区内部，覆盖部分待截内容；最终导出不会包含工具栏。在本轮样本中，八个调整点保持可见。并未声称所有任意选区位置都无遮挡。
-- 工具栏以清楚、紧凑为目标，按钮形状仍较朴素；它没有完整复制 QQ 的全部截图能力。当前画笔仅两色、两档粗细，马赛克是矩形块。
-- 当前实际硬件只有单显示器。负坐标、反向框选和跨锚点调整有几何测试覆盖；跨不同 DPI 的多屏硬件仍需后续现场验证。
-
-自评：现在常规使用路径、深浅色可读性和小窗编辑已达到可交付状态。工具栏不是只通过代码检查：真实查看发现了混合配色、展开高度裁切和窄屏调整点遮挡，并在迭代后重新导出、查看、检查边界。仍应保留以上多屏和极窄选区限制，后续再依据真实使用反馈改善。
-
-## 0.1.2 标注工具与调色盘追加复查
-
-上面的两色、两档画笔描述属于 0.1.1 的历史验收。0.1.2 已改为六个常用色和真实自定义颜色；新增箭头、矩形、橡皮擦、重做与可撤销清空，所有原生操作文案使用“保存”。
-
-| 工具或操作 | 当前实际行为 | 验证证据 |
+| Issue | Change | Image or result |
 | --- | --- | --- |
-| 画笔、箭头、矩形 | 红 `#E63737`、蓝 `#1769C2`、绿 `#18A75B`、黄 `#F4C430`、白与黑；共享 1–32 物理像素连续笔宽，每条标注保留自己的颜色和宽度。 | [画笔与参数](ui-review-images/0.1.2/capture-large-pen.png)、[箭头](ui-review-images/0.1.2/capture-large-arrow.png)、[反向矩形](ui-review-images/0.1.2/capture-large-rectangle.png)。像素探针验证六色、7.5/32 px 笔宽、箭头头部、反向矩形边线和未填充的内部。 |
-| 更多颜色 | 在同一截图会话打开圆角调色盘，R/G/B 连续滑条、色值输入、预览与应用均实际工作，不是预制颜色的假入口。 | [实际调色盘](ui-review-images/0.1.2/palette-large.png)。滑条产生 `#7F3FBF` 并应用，输入 `#8247CB` 并应用；无效色值保持调色盘打开。应用后关闭调色盘而不中断截图。 |
-| 橡皮擦 | 4–80 物理像素连续大小；沿路径恢复冻结原图，只移除标注。可以擦画笔、箭头、矩形与马赛克；不是涂白。 | [擦除实际状态](ui-review-images/0.1.2/capture-large-eraser.png)。像素探针逐像素比较中心原图 RGB、周围像素、撤销与重做；含桌面原点 `(-320,-140)`。边缘正常抗锯齿。 |
-| 马赛克 | 6–32 物理像素块大小滑条；每个已完成矩形保存当时的块大小。 | [24 px 实际状态](ui-review-images/0.1.2/capture-large-mosaic.png)。探针验证 6/32 px 的完整块和边缘不足整块的独立平均值。 |
-| 撤销、重做、清空 | Ctrl+Z、Ctrl+Y；擦除与清空均可撤销、重做；撤销后新标注使旧重做分支失效。 | [可复现像素探针](https://github.com/liugedragon/screenshot-box/blob/main/tests/ScreenshotBox.Capture.Probe/README.md)在 Windows 真实运行结果为 **35 项通过、0 项失败**。不是把 UI 可点击等同于像素正确。 |
-| 小屏工具区 | 只展开当前工具参数；320 DIP 时保留当前工具、真实六工具菜单、历史与保存操作。 | [窄屏画笔](ui-review-images/0.1.2/capture-narrow-pen.png)、[窄屏橡皮](ui-review-images/0.1.2/capture-narrow-eraser.png)、[真实工具菜单](ui-review-images/0.1.2/tools-menu-narrow.png)。程序化选择菜单中的画笔会改变真实截图会话模式。 |
+| A 90 DIP sort box truncated Chinese options; long tags displaced tools. | Increased the sort box to 112 DIP, allocated remaining space to a truncated heading, and bounded tags with complete tooltips. | [Light library](ui-review-images/0.1.2/ui-light.png), [narrow window](ui-review-images/0.1.2/ui-narrow.png). |
+| Save and collect wording was mixed. | Capture uses “保存并复制” (Save and copy), the category uses “最近保存” (Recently saved), and metadata uses “保存修改” (Save changes). | [Empty library](ui-review-images/0.1.2/ui-empty.png), [dark library](ui-review-images/0.1.2/ui-dark.png). |
+| Main details and the separate editor could overwrite each other's edits; drafts had no visible state. | One editing entry per image, an unsaved indicator, drafts retained on close, and updated state after saving. | [Editor](ui-review-images/0.1.2/ui-editor-dark.png), [small editor](ui-review-images/0.1.2/ui-editor-small.png); draft and database checks passed. |
+| Tag navigation used keyword search, admitting untagged images with the word in OCR. | Exact tag-member filtering before keywords, sorting, and pagination. | UI tag check and Core regressions passed. |
+| Preview intercepted scrollbar clicks; a 5% minimum prevented fitting tall images. | Pan only from the image, fit tall images to the current window, and convert actual size using current DPI. Added copy, export, and Ctrl+C/0/1. | [Original with line highlights](ui-review-images/0.1.2/ui-preview.png); a 20000 px image fitted on resize, and a 1000 px original occupied 1000 physical pixels. |
+| Settings status scrolled out of view. | Grouped settings, with fixed bottom status and Done button. | [Top](ui-review-images/0.1.2/ui-settings.png), [bottom](ui-review-images/0.1.2/ui-settings-bottom.png), [small light window](ui-review-images/0.1.2/ui-settings-small-light.png). |
+| Thumbnail size and tool parameters were not saved promptly. | Debounced thumbnail persistence, tool preferences saved after capture/on exit, and loaded at startup. | Preference persistence paths checked. |
+| Preview shortcuts could intercept buttons' Space and Enter. | Limit shortcuts to the image list and exclude button event sources. | Window key-handler checks with the Save button as source passed. |
 
-本轮重新运行实际窗口并保留 27 张原生界面图：四种宽度下六种工具状态共 24 张，加两张调色盘和一张工具菜单。逐图查看了六工具、调色盘和窄窗口的关键状态。四种宽度为 320、560、720、960 DIP，24 个样本均无操作栏溢出，均未遮住八个调整点的中心，见[布局与交互日志](ui-review-images/0.1.2/validation-log.txt)。本轮资料编辑页最终样式由整应用验收另行导出，不用上一轮旧编辑截图替代。
+[Diagnostics](ui-review-images/0.1.2/ui-diagnostic.png) shows missing originals, recognition failures, and model information. Short editors scroll to all fields; narrow library windows collapse details and offer a separate editor.
 
-复查并非一次通过：新增工具后，极窄窗口遮住两个中间调整点。将工具改为当前工具加菜单后，仍发现全局文字样式覆盖了紧凑按钮字号；为按钮文字显式绑定自身字号后，所有操作在选区中间点上方完整显示。圆形滑块第一版只显示滑块、未显示轨道，实际看图发现后补上明确细轨道，并重新运行调色盘、参数与菜单验证。操作栏使用统一圆角、选中、悬停、焦点和禁用状态；主要保存按钮用蓝色，其余颜色用于用户自己的标注。
+Image-export checks also found omitted root-layout margins in client-area snapshots. Settings and editor images were regenerated after correcting the export bounds.
 
-另外，实际滑条将 13.25 px 笔宽写入截图会话；笔刷大小圈按各显示器的物理坐标转换显示，不写入导出图。工具参数在本次运行期间保留，并提供偏好配置/读取接口供主窗口启动加载和保存 JSON。显示器设置变化时取消旧截图且解除事件订阅，已用程序化回调验证；没有实际插拔双屏测试。
+### Capture tools and palette
 
-最后用当前 0.1.2 源码重新编译并运行原生运行探针：热键保留组合拒绝、占用冲突、更新失败保留旧快捷键、释放均通过；连续 **20 次真实 2560 × 1440 桌面采集，GDI 句柄 1→1**；实际系统缩放 125%，线程 DPI awareness 为 2（PerMonitorV2）。桌面图像只在内存验证，未保存或公开。裁剪、颜色粗细写入导出像素、撤销、真实马赛克块与取消也通过，见[运行日志](ui-review-images/0.1.2/native-runtime-log.txt)。纯像素探针则只使用合成图案、不捕获桌面、不写剪贴板，社区可独立复现。
+| Tool | Parameters and behavior | Images |
+| --- | --- | --- |
+| Pen, arrow, rectangle | Red `#E63737`, blue `#1769C2`, green `#18A75B`, yellow `#F4C430`, white, and black; 1–32 physical-pixel width. Each annotation keeps its own color and width. | [Pen](ui-review-images/0.1.2/capture-large-pen.png), [arrow](ui-review-images/0.1.2/capture-large-arrow.png), [rectangle](ui-review-images/0.1.2/capture-large-rectangle.png) |
+| Palette | RGB sliders, Hex input, color preview, and Apply. Invalid input keeps it open with feedback. | [Palette](ui-review-images/0.1.2/palette-large.png), [light window](ui-review-images/0.1.2/palette-light.png) |
+| Eraser | 4–80 physical-pixel size; restores source pixels along a path, removing pen, arrow, rectangle, or mosaic. | [Eraser](ui-review-images/0.1.2/capture-large-eraser.png) |
+| Mosaic | 6–32 physical-pixel blocks; each region keeps its parameters. | [Mosaic](ui-review-images/0.1.2/capture-large-mosaic.png) |
+| History | Ctrl+Z undo, Ctrl+Y redo, undoable clear; new annotations replace the previous redo branch. | [Selection toolbar](ui-review-images/0.1.2/capture-large-select.png) |
+| Narrow windows | Below 420 DIP, show the current tool plus a menu and only the active parameters. | [Pen](ui-review-images/0.1.2/capture-narrow-pen.png), [eraser](ui-review-images/0.1.2/capture-narrow-eraser.png), [tool menu](ui-review-images/0.1.2/tools-menu-narrow.png) |
 
-本轮仍保留前述边界：只有单屏硬件现场验证；任意尺寸和位置的所有选区没有穷尽；空间不足时工具栏可位于选区内部，但导出仅含原图与已确认标注，不含工具栏、调色盘或大小圈。橡皮擦恢复原内容，因此擦掉马赛克也会恢复此前遮挡的原图，这是有意设计的“移除标注”。
+There are 27 retained tool images: six tools at four widths produce 24 states, plus two palette views and one menu. All 24 samples at 320/560/720/960 DIP stayed within toolbar bounds and obscured no resize-handle centers. See the [layout and control log](ui-review-images/0.1.2/validation-log.txt). Control checks applied a 13.25 px width, RGB `#7F3FBF`, and Hex `#8247CB`.
 
-## 0.1.2 全应用逐页复查与修正
+Inspection led to three corrections: a narrow toolbar covering two handles, global text styles overriding compact button sizes, and a slider without a visible track. The toolbar has independent light styling with consistent selected, hover, focus, and disabled states. Blue marks the primary save action.
 
-主代理实际运行冻结版本，使用隔离合成资料，查看资料库深浅色、窄窗口、详情常规/最小尺寸、设置顶部/底部/浅色小窗、原图高亮和诊断页。最终证据来自 `artifacts/ui-validation-0.1.2-205412`，已复制到本目录下的公开图片；均为真实WPF客户区渲染，不是界面设计稿。测试用图最初没有包含根布局外边距，导致设置和编辑页的右下边缘被裁去；修正导出范围后重新运行、重新看图，确认不是把裁切图当作软件布局结果。
+The [synthetic pixel probe](../tests/ScreenshotBox.Capture.Probe/README.md) passed all 35 annotation-output checks. Twenty desktop captures kept GDI handles at 1→1. Hotkey conflicts, cropping, undo, and cancellation are recorded in the [native runtime log](ui-review-images/0.1.2/native-runtime-log.txt).
 
-| 具体问题 | 最终修正与证据 |
+### Current layout limits
+
+Thumbnails identify images; small text needs the original preview. Short editors require scrolling. When space is limited, the capture toolbar may sit inside the selection. Export excludes the toolbar, palette, and brush-size ring. The 24 layout samples do not exhaust every selection position and display arrangement. See [outstanding checks](validation.md#outstanding-checks).
+
+## 0.1.0 / 0.1.1 history
+
+| Issue | Change and historical images |
 | --- | --- |
-| 排序框90 DIP不足以显示完整中文，长标签也会挤掉右侧工具。 | 排序框改112 DIP，页标题占剩余宽度并省略，标签有边界和完整提示。[浅色资料库](ui-review-images/0.1.2/ui-light.png)、[窄资料库](ui-review-images/0.1.2/ui-narrow.png)。 |
-| “收藏”与“保存”混用，资料修改和截图保存语义不清。 | 新截图用“保存并复制”，分类用“最近保存”，元数据用“保存修改”；版本号显示当前实际程序集版本。 |
-| 同一图片的主详情和独立编辑窗可以覆盖彼此的修改，草稿没有状态提示。 | 独立窗打开时暂停该图片的主编辑字段，显示未保存状态；独立窗关闭保留会话草稿，保存后清除dirty。程序修改独立窗标题/备注、关闭、再保存后数据库检查通过。[详情](ui-review-images/0.1.2/ui-editor-dark.png)、[小详情窗](ui-review-images/0.1.2/ui-editor-small.png)。 |
-| 标签导航只是填入搜索词，未打标签但OCR同词的图也进入分类。 | 改为SQLite中先精确筛选标签成员，再与关键词/排序/分页组合；实际UI标签筛选检查通过。 |
-| 覆盖另存先删除旧PNG，写入失败会丢失已有文件。 | 在目标旁完整写入临时文件、刷盘后替换；真实文件锁使替换失败时旧图逐字节保持不变，临时文件清理通过。 |
-| 预览抓住所有点击，会拦截滚动条；最低5%缩放无法适应很长的图。 | 只在图片区域开始平移，失去捕获清除状态；20000px长图能适应，窗口变大、变小后比例实际重新计算。实际大小按当前DPI显示；新增复制/导出及Ctrl+C/0/1。[原图与整行高亮](ui-review-images/0.1.2/ui-preview.png)。 |
-| 设置堆在一个长面板，操作状态会滚出视野；恢复成功后还要手动退出。 | 按用途分组，固定底部状态与“完成”，迁移/恢复成功自动重启；关闭保护与异步失败处理已实现。[深色顶部](ui-review-images/0.1.2/ui-settings.png)、[滚动底部](ui-review-images/0.1.2/ui-settings-bottom.png)、[浅色最小窗](ui-review-images/0.1.2/ui-settings-small-light.png)。 |
-| 缩略图大小只在进入设置时保存，标注参数每次重置。 | 缩略图变更延迟保存，截图结束和正常退出保存工具偏好，重启加载；测试模式不会写入用户偏好文件。 |
+| The dark app theme mixed light and dark capture buttons. | Added independent light toolbar colors. [Before](ui-review-images/before/capture-large-select.png), [after](ui-review-images/capture-large-select.png). |
+| Expanding pen parameters placed the toolbar outside the window or over handles. | Remeasured and repositioned it, with less spacing in narrow windows. All 12 four-width/three-mode samples passed. [Narrow pen](ui-review-images/capture-narrow-pen.png), [historical log](ui-review-images/validation-log.txt). |
+| The preview occupied too much of short editors. | Preview height became 140 DIP normally and 90 DIP in short windows, with a fixed save footer. [Before](ui-review-images/before/editor-light-small.png), [after](ui-review-images/editor-dark-small.png). |
+| Empty libraries showed a large disabled details form; navigation selection was unclear. | Added selection guidance and consistent selected states. [Empty](ui-review-images/ui-empty.png), [light](ui-review-images/ui-light.png), [dark](ui-review-images/ui-dark.png). |
+| Dark Settings had white text on white; detail scrollbars touched content. | Corrected theme resources and added 12 DIP right spacing. [Settings](ui-review-images/ui-settings.png), [dark editor](ui-review-images/editor-dark.png). |
+| Actual size used DIP, enlarging images at 125% scaling. | Converted using current-window DPI; a 1000 px image occupied 1000 physical pixels. [Preview](ui-review-images/ui-preview.png). |
 
-[诊断页](ui-review-images/0.1.2/ui-diagnostic.png)显示该次合成资料库的真实检查结果，没有预置用户资料、假统计或联网内容。退出、备份和改库前会处理未保存草稿，批量写入期间冻结编辑，保存完成再次确认没有遗留草稿；对应确认对话框的真人流程仍在待实测清单中。
-
-自评：布局已经统一为克制的Windows资料库，图片是主角，深浅色可读，小窗通过收起详情和滚动保留功能。主窗导航及部分操作仍以文字为主，调色盘目前是六色加RGB/Hex，并非完整绘图软件；编辑小窗需要滚动，极窄截图区域可能把工具栏放到选区内。上述取舍保持了操作可理解与功能真实，没有用装饰遮盖缺失功能。尚未验证的混合DPI多屏、外部应用粘贴、物理断网新机器与完整真人键鼠流程继续保留，不写为通过。
-
-发布前再修正键盘焦点：空格预览、回车详情仅在图片列表内触发，按钮自己的空格/回车不再被抢走。新增实际WPF窗口中保存按钮来源的路由处理器检查，属于程序化组件验证。
+Those versions had two pen colors and two widths. Current 0.1.2 parameters are listed above. Historical images retain their original version's interface.

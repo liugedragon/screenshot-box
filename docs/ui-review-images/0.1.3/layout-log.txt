@@ -1,0 +1,25 @@
+﻿Select 320 DIP toolbar=283x96, handles=0, labels-fit=True
+Pen 320 DIP toolbar=283x152, handles=0, labels-fit=True
+Arrow 320 DIP toolbar=283x152, handles=0, labels-fit=True
+Rectangle 320 DIP toolbar=283x152, handles=0, labels-fit=True
+Eraser 320 DIP toolbar=283x148, handles=0, labels-fit=True
+Mosaic 320 DIP toolbar=283x124, handles=0, labels-fit=True
+Select 560 DIP toolbar=519x87, handles=0, labels-fit=True
+Pen 560 DIP toolbar=519x125, handles=0, labels-fit=True
+Arrow 560 DIP toolbar=519x125, handles=0, labels-fit=True
+Rectangle 560 DIP toolbar=519x125, handles=0, labels-fit=True
+Eraser 560 DIP toolbar=519x115, handles=0, labels-fit=True
+Mosaic 560 DIP toolbar=519x115, handles=0, labels-fit=True
+Select 720 DIP toolbar=519x87, handles=0, labels-fit=True
+Pen 720 DIP toolbar=519x125, handles=0, labels-fit=True
+Arrow 720 DIP toolbar=519x125, handles=0, labels-fit=True
+Rectangle 720 DIP toolbar=519x125, handles=0, labels-fit=True
+Eraser 720 DIP toolbar=519x115, handles=0, labels-fit=True
+Mosaic 720 DIP toolbar=519x115, handles=0, labels-fit=True
+Select 960 DIP toolbar=519x87, handles=0, labels-fit=True
+Pen 960 DIP toolbar=519x125, handles=0, labels-fit=True
+Arrow 960 DIP toolbar=519x125, handles=0, labels-fit=True
+Rectangle 960 DIP toolbar=519x125, handles=0, labels-fit=True
+Eraser 960 DIP toolbar=519x115, handles=0, labels-fit=True
+Mosaic 960 DIP toolbar=519x115, handles=0, labels-fit=True
+ENGLISH OVERLAY: 24 cases passed

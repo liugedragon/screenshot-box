@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
-  - name: 使用说明 / User guide
+  - name: User guide / 使用说明
     url: https://github.com/liugedragon/screenshot-box/blob/main/docs/usage.md
-    about: 快捷键、保存位置、备份恢复；页面顶部可切换英文。 / Shortcuts, library location, and backups; English link at the top.
-  - name: 已知限制 / Known limitations
+    about: Shortcuts, library location, and backups; Chinese link at the top. / 快捷键、保存位置、备份恢复；页面顶部可切换中文。
+  - name: Known limitations / 已知限制
     url: https://github.com/liugedragon/screenshot-box/blob/main/docs/limitations.md
-    about: 先看当前功能边界和未验证条件。 / Check current limits and unverified conditions.
+    about: Current limits and untested configurations. / 当前功能限制和未验证条件。

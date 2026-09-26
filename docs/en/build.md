@@ -1,39 +1,39 @@
-# Build on Windows
+# Build from source
 
-[简体中文](../build.md) | English
+[English](../build.md) · [简体中文](../zh-CN/build.md)
 
-Use Windows x64 and .NET SDK **10.0.401**. Windows 11 is the primary development and test target. Run commands from the repository root.
+## Requirements
+
+- Windows x64; Windows 11 is the primary development and test environment.
+- .NET SDK **10.0.401**.
+- Windows PowerShell 5.1 or PowerShell 7.
+
+Run from the repository root:
 
 ```powershell
-pwsh -File scripts/fetch-models.ps1
-pwsh -File scripts/build.ps1
-pwsh -File scripts/package.ps1 -Version 0.1.2
+powershell -ExecutionPolicy Bypass -File scripts/fetch-models.ps1
+powershell -ExecutionPolicy Bypass -File scripts/build.ps1
+powershell -ExecutionPolicy Bypass -File scripts/package.ps1 -Version 0.1.3
 ```
 
-The scripts also work with Windows PowerShell 5.1. They use `.tools/dotnet/dotnet.exe` if present, otherwise the installed SDK. [`global.json`](../../global.json) pins the SDK patch range. Each project's `packages.lock.json` locks direct and transitive dependencies; restore uses `--locked-mode`. Do not delete lock files or upgrade dependencies blindly to work around a build failure.
+Scripts prefer `.tools/dotnet/dotnet.exe`, otherwise the installed SDK. [`global.json`](../../global.json) pins the SDK patch range. Each project's `packages.lock.json` pins direct and transitive dependencies; restore uses `--locked-mode`.
 
 ## Models and publishing
 
-[`fetch-models.ps1`](../../scripts/fetch-models.ps1) downloads the Chinese recognition model and dictionary during development. It verifies each file's size and SHA-256 before replacing it. The pinned URLs and hashes are in [`models/chinese/sources.json`](../../models/chinese/sources.json).
+[`fetch-models.ps1`](../../scripts/fetch-models.ps1) downloads the Chinese recognition model and dictionary during development. It checks byte counts and SHA-256 before replacing files. Sources and hashes are in [`models/chinese/sources.json`](../../models/chinese/sources.json).
 
-The released app reads the adjacent `models` directory. It does not download models or need a network connection for OCR.
-
-Publishing is self-contained for **win-x64 CPU**. Single-file publishing and trimming are disabled: WPF resources, ONNX Runtime, and SkiaSharp need their complete dependencies. The ZIP includes the .NET runtime, Chinese mobile recognition model, detection model, and text-line orientation model. Keep the full directory together; copying only the executable will not work.
-
-See [distribution and installation](distribution.md) for building an installer, changing installation paths, and package contents.
+The released app reads its adjacent `models` directory; OCR needs no connection. Publishing targets **win-x64 CPU**, with the .NET runtime and detection, orientation, and Chinese recognition models. WPF resources, ONNX Runtime, and SkiaSharp require the complete directory, so single-file publishing and trimming are disabled. See [packaging and installation](../distribution.md) for installer builds.
 
 ## Tests
 
-[`build.ps1`](../../scripts/build.ps1) restores locked dependencies, builds the app, and runs the Core tests, including storage, search, and rectangle geometry checks. The separate synthetic capture/annotation probe is also run by [Windows CI](../../.github/workflows/windows.yml); its standalone project and instructions are in [`tests/ScreenshotBox.Capture.Probe`](../../tests/ScreenshotBox.Capture.Probe).
+[`build.ps1`](../../scripts/build.ps1) restores locked dependencies, builds the app, and runs Core tests. Capture annotations use a separate [synthetic pixel test project](../../tests/ScreenshotBox.Capture.Probe/README.md). [Windows CI](../../.github/workflows/windows.yml) runs both.
 
-The release executable has an integration self-test. It uses synthetic content rather than importing real user screenshots:
+The release executable provides an integration self-test using synthetic data and a separate directory:
 
 ```powershell
-.\artifacts\ScreenshotBox-0.1.2-win-x64\ScreenshotBox.exe --self-test --data-dir E:\temp\ScreenshotBox验收
+.\artifacts\ScreenshotBox-0.1.3-win-x64\ScreenshotBox.exe --self-test --data-dir E:\temp\ScreenshotBox-test
 ```
 
-Read `self-test.json` in that data directory after it finishes. It covers real Chinese OCR, line boxes in original-image pixels, two-character Chinese words and symbol queries, image clipboard readback, and reopening data after restoring a backup into a new directory.
+Results are written to `self-test.json` in that directory. Checks include Chinese OCR, source-pixel line boxes, literal Chinese searches, clipboard readback, and backup restore. External-app pasting, multi-monitor dragging, and physically offline operation need separate checks; see the [validation record](../validation.md).
 
-This self-test does **not** replace pasting into common external applications, dragging across real monitors, or testing with the network physically disconnected. See the [validation record](validation.md).
-
-The installer and portable ZIP preserve user data. Uninstall does not delete the library. Build tools and generated outputs are excluded from Git.
+Models, build tools, and generated files are excluded by `.gitignore`.

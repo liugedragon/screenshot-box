@@ -51,7 +51,7 @@ public static class CaptureService
     public static async Task<CaptureResult?> CaptureAsync()
     {
         var dispatcher = Application.Current?.Dispatcher
-            ?? throw new InvalidOperationException("请从桌面应用调用截图。");
+            ?? throw new InvalidOperationException(L.T("请从桌面应用调用截图。", "Capture must be started from the desktop app."));
         dispatcher.VerifyAccess();
         if (_active) return null;
         _active = true;
@@ -61,7 +61,7 @@ public static class CaptureService
             NativeMethods.DwmFlush();
             var monitors = System.Windows.Forms.Screen.AllScreens.Select(screen =>
                 new PixelRect(screen.Bounds.Left, screen.Bounds.Top, screen.Bounds.Width, screen.Bounds.Height)).ToArray();
-            if (monitors.Length == 0) throw new InvalidOperationException("没有发现可截图的显示器。");
+            if (monitors.Length == 0) throw new InvalidOperationException(L.T("没有发现可截图的显示器。", "No display is available for capture."));
             int left = monitors.Min(m => m.Left), top = monitors.Min(m => m.Top);
             var desktop = new PixelRect(left, top, monitors.Max(m => m.Right) - left, monitors.Max(m => m.Bottom) - top);
             BitmapSource bitmap = NativeMethods.CaptureDesktop(desktop);
@@ -404,7 +404,7 @@ public static class CaptureService
             ShowInTaskbar = false;
             Topmost = true;
             Background = Brushes.Black;
-            Title = "截图选区";
+            Title = L.T("截图选区", "Capture region");
             // Win32 sets the actual physical bounds after the WPF handle has been created.
             Left = 0; Top = 0; Width = 100; Height = 100;
             var root = new Grid { ClipToBounds = true };
@@ -416,7 +416,7 @@ public static class CaptureService
             _floating.Children.Add(_toolbar);
             _help = new TextBlock
             {
-                Text = "拖动选择截图范围  ·  Enter 保存并复制  ·  Esc 取消",
+                Text = L.T("拖动选择截图范围  ·  Enter 保存并复制  ·  Esc 取消", "Drag to select a region · Enter to save and copy · Esc to cancel"),
                 Foreground = Brushes.White, Background = new SolidColorBrush(Color.FromArgb(210, 24, 28, 35)),
                 Padding = new Thickness(12, 8, 12, 8), FontSize = 13, IsHitTestVisible = false,
                 TextWrapping = TextWrapping.Wrap
@@ -481,13 +481,13 @@ public static class CaptureService
             var buttonStyle = RoundedButtonStyle();
             var body = new StackPanel();
             var row = new WrapPanel(); body.Children.Add(row);
-            AddMode("选区", EditMode.Select);
-            AddMode("画笔", EditMode.Pen);
-            AddMode("箭头", EditMode.Arrow);
-            AddMode("矩形", EditMode.Rectangle);
-            AddMode("橡皮擦", EditMode.Eraser);
-            AddMode("马赛克", EditMode.Mosaic);
-            _toolMenuButton = AddButton(row, "工具⌄", () =>
+            AddMode(L.T("选区", "Select"), EditMode.Select);
+            AddMode(L.T("画笔", "Pen"), EditMode.Pen);
+            AddMode(L.T("箭头", "Arrow"), EditMode.Arrow);
+            AddMode(L.T("矩形", "Rectangle"), EditMode.Rectangle);
+            AddMode(L.T("橡皮擦", "Eraser"), EditMode.Eraser);
+            AddMode(L.T("马赛克", "Mosaic"), EditMode.Mosaic);
+            _toolMenuButton = AddButton(row, L.T("工具⌄", "Tools⌄"), () =>
             {
                 var menu = new ContextMenu { Background = new SolidColorBrush(Color.FromRgb(248, 249, 251)), Foreground = Brushes.Black, BorderBrush = Brushes.LightGray, PlacementTarget = _toolMenuButton, Placement = PlacementMode.Bottom };
                 foreach (var pair in _modeButtons)
@@ -497,38 +497,38 @@ public static class CaptureService
                 }
                 _toolMenuButton!.ContextMenu = menu;menu.IsOpen = true;
             });
-            _toolMenuButton.Visibility = Visibility.Collapsed;_toolMenuButton.ToolTip = "选择标注工具";
-            _undoButton = AddButton(row, "撤销", _session.Undo);
-            _redoButton = AddButton(row, "重做", _session.Redo);
-            _clearButton = AddButton(row, "清空标注", _session.ClearAnnotations);
+            _toolMenuButton.Visibility = Visibility.Collapsed;_toolMenuButton.ToolTip = L.T("选择标注工具", "Choose an annotation tool");
+            _undoButton = AddButton(row, L.T("撤销", "Undo"), _session.Undo);
+            _redoButton = AddButton(row, L.T("重做", "Redo"), _session.Redo);
+            _clearButton = AddButton(row, L.T("清空标注", "Clear"), _session.ClearAnnotations);
             var penOptions = Options(EditMode.Pen);
-            foreach (var (name, color) in new[] { ("红", Color.FromRgb(230, 55, 55)), ("蓝", Color.FromRgb(23, 105, 194)),
-                ("绿", Color.FromRgb(24, 167, 91)), ("黄", Color.FromRgb(244, 196, 48)), ("白", Colors.White), ("黑", Colors.Black) })
+            foreach (var (name, color) in new[] { (L.T("红", "Red"), Color.FromRgb(230, 55, 55)), (L.T("蓝", "Blue"), Color.FromRgb(23, 105, 194)),
+                (L.T("绿", "Green"), Color.FromRgb(24, 167, 91)), (L.T("黄", "Yellow"), Color.FromRgb(244, 196, 48)), (L.T("白", "White"), Colors.White), (L.T("黑", "Black"), Colors.Black) })
             {
                 var button = new Button { Width = 20, Height = 24, Padding = new Thickness(0), Margin = new Thickness(1, 2, 1, 2),
                     Style = buttonStyle, Background = new SolidColorBrush(color), BorderBrush = Brushes.Gray,
-                    Foreground = color == Colors.White || name == "黄" ? Brushes.Black : Brushes.White, ToolTip = name + "色" };
+                    Foreground = color == Colors.White || color == Color.FromRgb(244, 196, 48) ? Brushes.Black : Brushes.White, ToolTip = L.F("{0}色", "{0}",name) };
                 button.Click += (_, _) => _session.SetPenColor(color);_colorButtons.Add(color, button);penOptions.Children.Add(button);
             }
-            var more = MakeButton("更多色");more.ToolTip = "自定义颜色 · RGB / Hex";
+            var more = MakeButton(L.T("更多色", "More"));more.ToolTip = L.T("自定义颜色 · RGB / Hex", "Custom color · RGB / Hex");
             _customColorPreview = new Border { Width = 10, Height = 10, CornerRadius = new CornerRadius(3), Margin = new Thickness(0, 0, 4, 0), BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1) };
-            var moreContent = new StackPanel { Orientation = Orientation.Horizontal };moreContent.Children.Add(_customColorPreview);moreContent.Children.Add(new TextBlock { Text = "更多色", FontSize = 11, Foreground = Brushes.Black });more.Content = moreContent;
+            var moreContent = new StackPanel { Orientation = Orientation.Horizontal };moreContent.Children.Add(_customColorPreview);moreContent.Children.Add(new TextBlock { Text = L.T("更多色", "More"), FontSize = 11, Foreground = Brushes.Black });more.Content = moreContent;
             more.Padding = new Thickness(4);more.MinHeight = 24;
             more.Click += (_, _) => { _palettePopup.PlacementTarget = more;_palettePopup.Child = CreatePalette();_palettePopup.IsOpen = true; };
             penOptions.Children.Add(more);
-            (_penSlider, _penValue) = SizeOption(penOptions, "笔宽", 1, 32, _session.SetPenWidth);
+            (_penSlider, _penValue) = SizeOption(penOptions, L.T("笔宽", "Width"), 1, 32, _session.SetPenWidth);
             var eraserOptions = Options(EditMode.Eraser);
-            (_eraserSlider, _eraserValue) = SizeOption(eraserOptions, "大小", 4, 80, _session.SetEraserWidth);
-            eraserOptions.Children.Add(new TextBlock { Text = "移除标注 · 可撤销", FontSize = 11, Foreground = Brushes.Black, Margin = new Thickness(6, 6, 2, 4) });
+            (_eraserSlider, _eraserValue) = SizeOption(eraserOptions, L.T("大小", "Size"), 4, 80, _session.SetEraserWidth);
+            eraserOptions.Children.Add(new TextBlock { Text = L.T("移除标注 · 可撤销", "Remove annotations · Undo available"), FontSize = 11, Foreground = Brushes.Black, Margin = new Thickness(6, 6, 2, 4) });
             var mosaicOptions = Options(EditMode.Mosaic);
-            (_mosaicSlider, _mosaicValue) = SizeOption(mosaicOptions, "块大小", 6, 32, _session.SetMosaicBlock);
+            (_mosaicSlider, _mosaicValue) = SizeOption(mosaicOptions, L.T("块大小", "Block"), 6, 32, _session.SetMosaicBlock);
             var actions = new WrapPanel { Margin = new Thickness(0, 2, 0, 0) };body.Children.Add(actions);
-            var save = AddButton(actions, "保存并复制", () => _session.Accept("Collect"));
+            var save = AddButton(actions, L.T("保存并复制", "Save and copy"), () => _session.Accept("Collect"));
             save.Background = new SolidColorBrush(Color.FromRgb(23, 105, 194));save.Foreground = Brushes.White;
-            AddButton(actions, "仅复制", () => _session.Accept("Copy"));
-            AddButton(actions, "另存 PNG", () => _session.Accept("Save"));
-            AddButton(actions, "重新选择", _session.Reset);
-            AddButton(actions, "取消", _session.Cancel);
+            AddButton(actions, L.T("仅复制", "Copy only"), () => _session.Accept("Copy"));
+            AddButton(actions, L.T("另存 PNG", "Save PNG"), () => _session.Accept("Save"));
+            AddButton(actions, L.T("重新选择", "Reselect"), _session.Reset);
+            AddButton(actions, L.T("取消", "Cancel"), _session.Cancel);
             return new Border
             {
                 Background = new SolidColorBrush(Color.FromRgb(248, 249, 251)),
@@ -558,7 +558,7 @@ public static class CaptureService
             (Slider, TextBlock) SizeOption(Panel panel, string title, double minimum, double maximum, Action<double> changed)
             {
                 var group = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(3, 0, 0, 0) };
-                group.Children.Add(new TextBlock { Text = title, FontSize = 11, Foreground = Brushes.Black, Width = 34, VerticalAlignment = VerticalAlignment.Center });
+                group.Children.Add(new TextBlock { Text = title, FontSize = 11, Foreground = Brushes.Black, MinWidth = 34, Margin = new Thickness(0,0,4,0), VerticalAlignment = VerticalAlignment.Center });
                 var slider = new Slider { Minimum = minimum, Maximum = maximum, Width = 76, Margin = new Thickness(2, 4, 2, 4), VerticalAlignment = VerticalAlignment.Center,
                     SmallChange = 1, LargeChange = 4, IsSnapToTickEnabled = false, IsMoveToPointEnabled = true, Style = RoundedSliderStyle(), Focusable = false };
                 var value = new TextBlock { FontSize = 11, Foreground = Brushes.Black, Width = 40, VerticalAlignment = VerticalAlignment.Center };
@@ -586,7 +586,7 @@ public static class CaptureService
         private FrameworkElement CreatePalette()
         {
             var body = new StackPanel { Width = 238 };
-            body.Children.Add(new TextBlock { Text = "自定义颜色", FontSize = 13, Foreground = Brushes.Black, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 8) });
+            body.Children.Add(new TextBlock { Text = L.T("自定义颜色", "Custom color"), FontSize = 13, Foreground = Brushes.Black, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 8) });
             var preview = new Border { Height = 36, CornerRadius = new CornerRadius(4), BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1), Margin = new Thickness(0, 0, 0, 8) };body.Children.Add(preview);
             var hex = new TextBox { FontSize = 13, Foreground = Brushes.Black, Background = Brushes.White, BorderBrush = Brushes.LightGray, Padding = new Thickness(6), MaxLength = 7, Margin = new Thickness(0, 8, 0, 4) };
             var channels = new List<Slider>();bool syncing = true;
@@ -610,10 +610,10 @@ public static class CaptureService
                 try { channels[0].Value = color.R;channels[1].Value = color.G;channels[2].Value = color.B; }finally { syncing = false; }
                 error.Text = "";
             };
-            var apply = new Button { Content = "应用颜色", Style = RoundedButtonStyle(), Background = new SolidColorBrush(Color.FromRgb(23, 105, 194)), Foreground = Brushes.White, Padding = new Thickness(10, 6, 10, 6), Margin = new Thickness(0, 8, 0, 0) };
+            var apply = new Button { Content = L.T("应用颜色", "Apply color"), Style = RoundedButtonStyle(), Background = new SolidColorBrush(Color.FromRgb(23, 105, 194)), Foreground = Brushes.White, Padding = new Thickness(10, 6, 10, 6), Margin = new Thickness(0, 8, 0, 0) };
             void Apply()
             {
-                if (!TryColor(hex.Text, out var color)) { error.Text = "请输入 6 位色值，如 #2D7FE5";return; }
+                if (!TryColor(hex.Text, out var color)) { error.Text = L.T("请输入 6 位色值，如 #2D7FE5", "Enter a 6-digit color, such as #2D7FE5");return; }
                 _session.SetPenColor(color);_palettePopup.IsOpen = false;
             }
             apply.Click += (_, _) => Apply();body.Children.Add(apply);
@@ -695,12 +695,12 @@ public static class CaptureService
             if (_toolMenuButton is not null) _toolMenuButton.Visibility = ActualWidth < 420 ? Visibility.Visible : Visibility.Collapsed;
             _help.Text = _session.Mode switch
             {
-                EditMode.Pen => "画笔 B · 拖动画线 · Ctrl+Z / Ctrl+Y 撤销重做 · Enter 保存并复制 · Esc 取消",
-                EditMode.Arrow => "箭头 · 拖动起点到终点 · Enter 保存并复制 · Esc 取消",
-                EditMode.Rectangle => "矩形 · 拖动框选 · Enter 保存并复制 · Esc 取消",
-                EditMode.Eraser => "橡皮擦 E · 移除标注，恢复原图 · Ctrl+Z 可撤销 · Enter 保存并复制 · Esc 取消",
-                EditMode.Mosaic => "马赛克 M · 拖动矩形 · Ctrl+Z / Ctrl+Y 撤销重做 · Enter 保存并复制 · Esc 取消",
-                _ => "选区 V · 拖动选择，可移动或调整大小 · Enter 保存并复制 · Esc 取消"
+                EditMode.Pen => L.T("画笔 B · 拖动画线 · Ctrl+Z / Ctrl+Y 撤销重做 · Enter 保存并复制 · Esc 取消", "Pen B · Drag to draw · Ctrl+Z / Ctrl+Y to undo / redo · Enter to save and copy · Esc to cancel"),
+                EditMode.Arrow => L.T("箭头 · 拖动起点到终点 · Enter 保存并复制 · Esc 取消", "Arrow · Drag from start to end · Enter to save and copy · Esc to cancel"),
+                EditMode.Rectangle => L.T("矩形 · 拖动框选 · Enter 保存并复制 · Esc 取消", "Rectangle · Drag to draw · Enter to save and copy · Esc to cancel"),
+                EditMode.Eraser => L.T("橡皮擦 E · 移除标注，恢复原图 · Ctrl+Z 可撤销 · Enter 保存并复制 · Esc 取消", "Eraser E · Remove annotations and restore the image · Ctrl+Z to undo · Enter to save and copy · Esc to cancel"),
+                EditMode.Mosaic => L.T("马赛克 M · 拖动矩形 · Ctrl+Z / Ctrl+Y 撤销重做 · Enter 保存并复制 · Esc 取消", "Mosaic M · Drag a rectangle · Ctrl+Z / Ctrl+Y to undo / redo · Enter to save and copy · Esc to cancel"),
+                _ => L.T("选区 V · 拖动选择，可移动或调整大小 · Enter 保存并复制 · Esc 取消", "Select V · Drag to select, move or resize · Enter to save and copy · Esc to cancel")
             };
             Canvas.SetLeft(_help, 20); Canvas.SetTop(_help, 20);
             _help.MaxWidth = Math.Max(40, ActualWidth - 40);

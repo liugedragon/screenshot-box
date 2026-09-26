@@ -1,45 +1,37 @@
-# 本地资料库、搜索与备份
+# Local library, search, and backup
 
-简体中文 · [English](en/storage.md)
+English · [简体中文](zh-CN/storage.md)
 
-资料库是独立于安装目录的用户文件夹，包含 `library.db`、`images/` 原图和
-`thumbnails/` 缩略图。截图以唯一ID命名，写入成功后再添加数据库记录；原图
-和缩略图在添加后不改写。移动到回收站只更新状态，不删除图片。
+## Files
 
-## 搜索
+The library is separate from the installation folder. It contains `library.db`, originals in `images/`, and thumbnails in `thumbnails/`. Images use unique IDs as filenames; a database record is added after the files are written. Originals and thumbnails remain immutable after insertion. The recycle bin uses soft deletion and retains image files.
 
-首版使用参数化的 SQLite 字面子串查询，查标题、备注、标签和识别文字。
-一字、两字中文都可搜索；引号、百分号和下划线只按普通文字处理。
-英文字母不区分大小写。此方案需要扫描记录，不宣称全文索引、模糊匹配、
-拼音或语义搜索。结果默认按时间倒序，支持按最早时间排序与分页；排序先作用于整个资料库，再取结果页，不会只把最近一页倒过来。标签列表从整个未删除资料库读取，与当前结果页无关。
+## Search and categories
 
-标签分类使用独立的精确成员筛选：中英文逗号分隔、去掉标签两侧空格、忽略英文大小写；与标签列表使用相同规则。百分号、下划线和引号仍是普通字符，标题或OCR里出现同词不会被算进该标签。分类筛选、关键词、星标等条件先在数据库中取交集，再排序和分页。原始标签编辑文本保留，不自动重写。
+Parameterized SQLite substring queries search titles, notes, tags, and OCR text, including one- and two-character Chinese terms. Quotes, percent signs, and underscores are ordinary characters; ASCII letters are case-insensitive. Queries scan records. Fuzzy, pinyin, and semantic matching are not supported.
 
-“最近保存”在数据库中先按UTC创建时间筛选最近七天的未删除资料，再排序和分页；不会先取全库某一页，再丢弃旧图片而漏掉真正的近期截图。
+Results default to newest first, with oldest-first sorting and pagination. Sorting applies to the entire matching set before retrieving a page. Recently saved filters by UTC creation time for the preceding seven days, then sorts and paginates.
 
-## 识别任务与重启
+Tags come from all active items. Categories match whole tags by splitting Chinese or English commas, trimming, and comparing with `OrdinalIgnoreCase`; symbols remain literal. Categories, keywords, stars, and other filters intersect in the database before sorting and pagination. Original tag-editing text is preserved. Words in titles or OCR text do not assign tags.
 
-图片先保存，文字识别在后台执行。每次任务取得一个版本号，只有对应版本
-且仍处于识别中的有效记录可以接收结果。删除、恢复或新的识别任务会使旧
-结果失效。程序重新启动时，中断的任务回到待识别状态，可以重新排队。
+## OCR jobs
 
-## 备份与恢复
+Images are saved before background recognition. A task receives a generation, and its result can update only an active Processing record with the same generation. Deletion, restoration, or newer jobs invalidate stale results.
 
-备份通过 SQLite 的备份API建立完整快照，包含快照引用的原图、缩略图和
-回收站记录，不能只复制正在使用的数据库文件。备份中不会包含快照之后
-的修改。原图缺失时备份失败，不产生看似成功的不完整ZIP，也不覆盖已有
-备份文件。备份内容包含用户截图，不会发送到服务器。
+Startup resets interrupted Processing jobs to Pending for requeueing. Failed jobs retain the image and error for manual retry. Queue behavior is detailed in [architecture](architecture.md).
 
-恢复先校验版本、数据库完整性、文件清单和相对路径，再放入新的空目录。
-拒绝路径越界、重复文件、缺失图片和不支持的备份版本。恢复不会合并或
-覆盖已有资料库。恢复后初始化资料库，以恢复待识别任务。
+## Backup
 
-## 验证范围
+SQLite's backup API creates a consistent snapshot. The ZIP contains the originals, thumbnails, and recycle-bin records it references; changes after the snapshot are excluded. Backup resolves unsaved editing drafts first.
 
-自动测试实际使用 SQLite、图片字节、ZIP和文件系统，覆盖短词中文与特殊
-字符、编辑与保存、重启、识别竞态、并发修改期间的备份、恢复后的字节
-一致性、缺失文件和危险归档路径；标签分类测试覆盖整词成员、符号、大小写、混合逗号、重启，以及与关键词/星标交集的分页。截图几何测试覆盖反向框选、负坐标、
-移动夹紧、把手越过锚点、矩形交集和八个调整把手。
+Missing referenced files cause failure without creating an incomplete ZIP or replacing an existing destination. Archives contain user data and are saved to the chosen location.
 
-多显示器不同缩放、剪贴板与其他Windows应用交互、识别准确率及干净电脑
-首次运行仍须实机测试，自动测试通过不等于这些项目均已完成验证。
+## Restore
+
+Restore checks format version, SQLite integrity, inventory, and relative paths, then installs into a new empty directory. Validation rejects traversal, drive and alternate-stream paths, duplicate entries, unlisted files, missing images, and unsupported versions. Existing libraries are not merged or overwritten.
+
+Initializing a restored library creates standard subdirectories and recovers interrupted OCR jobs. The app restarts on the new library and retains the original.
+
+## Tests
+
+Core tests cover SQLite queries and updates, short Chinese terms and symbols, sorting and pagination, tag categories, OCR state races, backup during concurrent edits, restored byte equality, missing files, and unsafe archive paths. Commands are in [build](build.md); version results are in [validation](validation.md).

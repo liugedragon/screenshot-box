@@ -8,6 +8,7 @@ public sealed class Settings
 {
     public string Shortcut { get; set; } = "Ctrl+Alt+S";
     public string Theme { get; set; } = "System";
+    public string Language { get; set; } = "System";
     public double ThumbnailSize { get; set; } = 220;
     public string DataDirectory { get; set; } = "";
     public string AnnotationColor { get; set; } = "#FF3B30";
@@ -15,8 +16,10 @@ public sealed class Settings
     public double EraserWidth { get; set; } = 20;
     public int MosaicSize { get; set; } = 12;
     private static string PathName => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ScreenshotBox", "settings.json");
-    public static Settings Load() { try { return JsonSerializer.Deserialize<Settings>(File.ReadAllText(PathName)) ?? new(); } catch { return new(); } }
-    public void Save() { if(Application.Current is App { IsTesting:true })return; Directory.CreateDirectory(Path.GetDirectoryName(PathName)!); var temporary = PathName + ".tmp"; File.WriteAllText(temporary, JsonSerializer.Serialize(this)); File.Move(temporary, PathName, true); }
+    public static Settings Load() => LoadFrom(PathName);
+    internal static Settings LoadFrom(string path) { try { return JsonSerializer.Deserialize<Settings>(File.ReadAllText(path)) ?? new(); } catch { return new(); } }
+    public void Save() { if(Application.Current is App { IsTesting:true })return; SaveTo(PathName); }
+    internal void SaveTo(string path) { Directory.CreateDirectory(Path.GetDirectoryName(path)!); var temporary=path+".tmp"; try { File.WriteAllText(temporary,JsonSerializer.Serialize(this)); File.Move(temporary,path,true); } finally { if(File.Exists(temporary))File.Delete(temporary); } }
 }
 
 public sealed class ImageLibrary(LibraryStore store)
@@ -155,6 +158,6 @@ public static class ClipboardHelper
         for (int attempt=0;attempt<5;attempt++) {
             try { Clipboard.SetImage(image); return; } catch (System.Runtime.InteropServices.ExternalException ex) { last=ex; await Task.Delay(80*(attempt+1)); }
         }
-        throw new IOException("剪贴板暂时被其他应用占用。", last);
+        throw new IOException(L.T("剪贴板暂时被其他应用占用。", "The clipboard is in use by another application."), last);
     }
 }

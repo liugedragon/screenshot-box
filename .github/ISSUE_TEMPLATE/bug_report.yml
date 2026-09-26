@@ -1,47 +1,47 @@
-name: 问题反馈 / Bug report
-description: 操作遇到错误、结果不符合预期。 / Something failed or behaved unexpectedly.
+name: Bug report / 问题反馈
+description: Something failed or behaved unexpectedly. / 操作遇到错误、结果不符合预期。
 title: "[Bug] "
 body:
   - type: markdown
     attributes:
       value: |
-        谢谢你帮忙复现问题。请使用合成或脱敏资料，不要上传真实截图、数据库、账号或密钥。
-        Thanks for helping reproduce a problem. Use synthetic or redacted data; do not upload private screenshots, databases, accounts, or keys.
+        Use synthetic or redacted examples. Do not upload private screenshots, databases, accounts, or keys.
+        请使用合成或脱敏样例，不要上传私人截图、数据库、账号或密钥。
   - type: input
     id: version
     attributes:
-      label: 应用版本与来源 / App version and package
-      placeholder: 0.1.2，安装包 / installer
+      label: App version and package / 应用版本与来源
+      placeholder: 0.1.3, installer / 安装包
     validations:
       required: true
   - type: input
     id: windows
     attributes:
-      label: Windows 版本 / Windows version
+      label: Windows version / Windows 版本
       placeholder: Windows 11 24H2 x64
     validations:
       required: true
   - type: textarea
     id: displays
     attributes:
-      label: 显示器与缩放 / Displays and scaling
-      description: 每块屏幕的分辨率、缩放、相对位置。 / Resolution, scaling, and relative position of each monitor.
-      placeholder: "主屏 2560×1440 125%；左侧副屏 1920×1080 100%。 / Main 2560×1440 at 125%, left monitor 1920×1080 at 100%."
+      label: Displays and scaling / 显示器与缩放
+      description: Resolution, scaling, and relative position of each monitor. / 每块屏幕的分辨率、缩放、相对位置。
+      placeholder: "Main 2560×1440 at 125%, left monitor 1920×1080 at 100%. / 主屏 2560×1440 125%；左侧副屏 1920×1080 100%。"
   - type: textarea
     id: steps
     attributes:
-      label: 复现步骤 / Steps to reproduce
+      label: Steps to reproduce / 复现步骤
       placeholder: "1. ...\n2. ...\n3. ..."
     validations:
       required: true
   - type: textarea
     id: result
     attributes:
-      label: 预期和实际结果 / Expected and actual behavior
+      label: Expected and actual behavior / 预期和实际结果
     validations:
       required: true
   - type: textarea
     id: evidence
     attributes:
-      label: 错误原文或合成样例 / Error text or synthetic example
-      description: 可选。不要包含个人内容；请注明真人操作还是程序测试。 / Optional. Exclude personal data and say whether this was manual or programmatic testing.
+      label: Error text or synthetic example / 错误原文或合成样例
+      description: Optional. Remove personal information. / 可选。请移除个人内容。

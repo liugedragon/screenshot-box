@@ -1,27 +1,27 @@
-<Window x:Class="ScreenshotBox.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" Title="截图资料盒 · ScreenshotBox" Foreground="{DynamicResource SbText}" Width="1200" Height="800" MinWidth="760" MinHeight="540" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14" Background="{DynamicResource SbBackground}" AllowDrop="True" Drop="FilesDropped" SizeChanged="WindowSized" PreviewKeyDown="WindowKey">
+<Window x:Class="ScreenshotBox.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" Title="{DynamicResource Ui.WindowTitle}" Foreground="{DynamicResource SbText}" Width="1200" Height="800" MinWidth="760" MinHeight="540" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14" Background="{DynamicResource SbBackground}" AllowDrop="True" Drop="FilesDropped" SizeChanged="WindowSized" PreviewKeyDown="WindowKey">
  <Window.Resources><Style x:Key="NavigationButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource DefaultUiButtonStyle}"><Setter Property="Appearance" Value="Secondary"/><Setter Property="Background" Value="{DynamicResource SbBackground}"/><Setter Property="Foreground" Value="{DynamicResource SbText}"/><Setter Property="MouseOverBackground" Value="{DynamicResource SbSelection}"/><Setter Property="BorderThickness" Value="0"/><Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="HorizontalContentAlignment" Value="Left"/><Setter Property="Margin" Value="0,2"/><Setter Property="Padding" Value="12,8"/><Setter Property="MinHeight" Value="36"/></Style></Window.Resources>
  <Grid Background="{DynamicResource SbBackground}"><Grid.ColumnDefinitions><ColumnDefinition Width="176"/><ColumnDefinition Width="*"/><ColumnDefinition x:Name="DetailColumn" Width="300"/></Grid.ColumnDefinitions>
  <DockPanel Margin="12,16,12,12">
-  <StackPanel x:Name="NavigationPanel" DockPanel.Dock="Top"><TextBlock Text="截图资料盒" FontSize="20" FontWeight="SemiBold" Margin="8,0,0,24"/>
-   <ui:Button Content="全部截图" Tag="all" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}" Background="{DynamicResource SbSelection}" Foreground="{DynamicResource SbAccentText}"/>
-   <ui:Button Content="最近保存" Tag="recent" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
-   <ui:Button Content="星标" Tag="favorites" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
-   <ui:Button Content="标签" Tag="tags" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
-   <ui:Button Content="回收站" Tag="trash" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
+  <StackPanel x:Name="NavigationPanel" DockPanel.Dock="Top"><TextBlock Text="{DynamicResource Ui.AppName}" FontSize="20" FontWeight="SemiBold" Margin="8,0,0,24"/>
+   <ui:Button Content="{DynamicResource Ui.All}" Tag="all" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}" Background="{DynamicResource SbSelection}" Foreground="{DynamicResource SbAccentText}"/>
+   <ui:Button Content="{DynamicResource Ui.Recent}" Tag="recent" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
+   <ui:Button Content="{DynamicResource Ui.Starred}" Tag="favorites" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
+   <ui:Button Content="{DynamicResource Ui.Tags}" Tag="tags" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
+   <ui:Button Content="{DynamicResource Ui.Trash}" Tag="trash" Click="ChangeFilter" Style="{StaticResource NavigationButtonStyle}"/>
   </StackPanel>
   <StackPanel DockPanel.Dock="Bottom"><TextBlock x:Name="ShortcutLabel" FontSize="12" Foreground="{DynamicResource SbMuted}" Margin="8,12" TextWrapping="Wrap"/>
-   <ui:Button Content="设置" Click="SettingsClicked" HorizontalContentAlignment="Left"/></StackPanel>
+   <ui:Button Content="{DynamicResource Ui.Settings}" Click="SettingsClicked" HorizontalContentAlignment="Left"/></StackPanel>
   <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel x:Name="TagsPanel" Margin="4,12"/></ScrollViewer>
  </DockPanel>
  <Grid Grid.Column="1" Margin="8,16,16,12"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-   <ui:TextBox x:Name="SearchBox" PlaceholderText="搜索标题、备注、标签和图片文字" ToolTip="搜索标题、备注、标签和图片文字" TextChanged="SearchChanged" Margin="0,4,8,8" VerticalContentAlignment="Center"/>
-   <StackPanel Grid.Column="1" Orientation="Horizontal"><ui:Button Content="新截图" Appearance="Primary" Click="CaptureClicked"/><ui:Button Content="导入" Click="ImportClicked"/></StackPanel>
+   <ui:TextBox x:Name="SearchBox" PlaceholderText="{DynamicResource Ui.Search}" ToolTip="{DynamicResource Ui.Search}" TextChanged="SearchChanged" Margin="0,4,8,8" VerticalContentAlignment="Center"/>
+   <StackPanel Grid.Column="1" Orientation="Horizontal"><ui:Button Content="{DynamicResource Ui.Capture}" Appearance="Primary" Click="CaptureClicked"/><ui:Button Content="{DynamicResource Ui.Import}" Click="ImportClicked"/></StackPanel>
   </Grid>
-  <Grid Grid.Row="1" Margin="0,4,0,12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="SectionTitle" Text="全部截图" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
-   <StackPanel Grid.Column="1" Orientation="Horizontal"><ComboBox x:Name="SortBox" SelectedIndex="0" SelectionChanged="SortChanged" Width="112" Margin="8,0"><ComboBoxItem Content="最新优先"/><ComboBoxItem Content="最早优先"/></ComboBox>
-    <Slider Width="86" Minimum="160" Maximum="320" Value="{Binding ThumbnailSize, Mode=TwoWay}" ToolTip="缩略图大小" VerticalAlignment="Center"/>
-    <ui:Button Content="详情" Click="ToggleDetails" Margin="8,0,0,0"/></StackPanel>
+  <Grid Grid.Row="1" Margin="0,4,0,12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="SectionTitle" Text="{DynamicResource Ui.All}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+   <StackPanel Grid.Column="1" Orientation="Horizontal"><ComboBox x:Name="SortBox" SelectedIndex="0" SelectionChanged="SortChanged" Width="128" Margin="8,0"><ComboBoxItem Content="{DynamicResource Ui.Newest}"/><ComboBoxItem Content="{DynamicResource Ui.Oldest}"/></ComboBox>
+    <Slider Width="86" Minimum="160" Maximum="320" Value="{Binding ThumbnailSize, Mode=TwoWay}" ToolTip="{DynamicResource Ui.ThumbnailSize}" VerticalAlignment="Center"/>
+    <ui:Button Content="{DynamicResource Ui.Details}" Click="ToggleDetails" Margin="8,0,0,0"/></StackPanel>
   </Grid>
   <Grid Grid.Row="2"><ListBox x:Name="Gallery" ItemsSource="{Binding Items}" SelectionChanged="SelectionChanged" MouseDoubleClick="OpenPreview" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0" Background="Transparent">
    <ListBox.ItemsPanel><ItemsPanelTemplate><WrapPanel IsItemsHost="True"/></ItemsPanelTemplate></ListBox.ItemsPanel>
@@ -32,19 +32,19 @@
     <TextBlock Text="{Binding Status}" FontSize="12" Foreground="{DynamicResource SbMuted}" TextWrapping="Wrap" Margin="0,4,0,0"/>
     <TextBlock Text="{Binding Summary}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" LineHeight="16" MaxHeight="32" Margin="0,4,0,0"/>
    </StackPanel></DataTemplate></ListBox.ItemTemplate>
-  </ListBox><StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock x:Name="EmptyText" Text="按快捷键框选截图，或拖入图片。" TextWrapping="Wrap"/><TextBlock Text="PNG / JPEG · 本地保存" Foreground="{DynamicResource SbMuted}" FontSize="12" Margin="0,8,0,0"/></StackPanel></Grid>
-  <DockPanel Grid.Row="3" Margin="0,12,0,0"><ui:Button x:Name="MoreButton" DockPanel.Dock="Right" Content="加载更多" Click="LoadMore" Visibility="Collapsed"/><TextBlock Text="{Binding Status}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource SbMuted}" VerticalAlignment="Center"/></DockPanel>
+  </ListBox><StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock x:Name="EmptyText" Text="{DynamicResource Ui.Empty}" TextWrapping="Wrap"/><TextBlock Text="{DynamicResource Ui.LocalImages}" Foreground="{DynamicResource SbMuted}" FontSize="12" Margin="0,8,0,0"/></StackPanel></Grid>
+  <DockPanel Grid.Row="3" Margin="0,12,0,0"><ui:Button x:Name="MoreButton" DockPanel.Dock="Right" Content="{DynamicResource Ui.LoadMore}" Click="LoadMore" Visibility="Collapsed"/><TextBlock Text="{Binding Status}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource SbMuted}" VerticalAlignment="Center"/></DockPanel>
  </Grid>
- <Border x:Name="Details" Grid.Column="2" BorderBrush="{DynamicResource SbStroke}" BorderThickness="1,0,0,0" Padding="16"><Grid><TextBlock x:Name="DetailEmptyText" Text="选择一张截图查看资料" Foreground="{DynamicResource SbMuted}" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"/><ScrollViewer x:Name="DetailsScroll" VerticalScrollBarVisibility="Auto" Visibility="Collapsed"><StackPanel x:Name="DetailContents" IsEnabled="False" Margin="0,0,12,0">
-  <TextBlock Text="资料详情" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+ <Border x:Name="Details" Grid.Column="2" BorderBrush="{DynamicResource SbStroke}" BorderThickness="1,0,0,0" Padding="16"><Grid><TextBlock x:Name="DetailEmptyText" Text="{DynamicResource Ui.SelectImage}" Foreground="{DynamicResource SbMuted}" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"/><ScrollViewer x:Name="DetailsScroll" VerticalScrollBarVisibility="Auto" Visibility="Collapsed"><StackPanel x:Name="DetailContents" IsEnabled="False" Margin="0,0,12,0">
+  <TextBlock Text="{DynamicResource Ui.ItemDetails}" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
   <TextBlock x:Name="MetadataStatus" FontSize="12" Foreground="{DynamicResource SbMuted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
   <StackPanel x:Name="MetadataFields">
-  <TextBlock Text="标题" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="TitleBox" TextWrapping="Wrap" MaxLength="1000"/>
-  <TextBlock Text="备注" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="NotesBox" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="84" MaxLength="20000"/>
-  <TextBlock Text="标签（逗号分隔）" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="TagBox" MaxLength="2000"/>
-  <CheckBox x:Name="FavoriteBox" Content="星标" Margin="0,0,0,8"/><ui:Button x:Name="SaveMetadataButton" Content="保存修改" Click="SaveMetadata"/></StackPanel>
-  <WrapPanel><ui:Button Content="预览" Click="OpenPreview"/><ui:Button Content="导出图片" Click="ExportClicked"/><ui:Button x:Name="DeleteButton" Content="移入回收站" Click="DeleteClicked"/></WrapPanel>
-  <Separator Margin="0,16"/><TextBlock x:Name="OcrStatusLabel" TextWrapping="Wrap"/><WrapPanel><ui:Button x:Name="CopyTextButton" Content="复制文字" Click="CopyTextClicked"/><ui:Button Content="重新识别" Click="RetryClicked"/></WrapPanel>
+  <TextBlock Text="{DynamicResource Ui.Title}" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="TitleBox" TextWrapping="Wrap" MaxLength="1000"/>
+  <TextBlock Text="{DynamicResource Ui.Notes}" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="NotesBox" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="84" MaxLength="20000"/>
+  <TextBlock Text="{DynamicResource Ui.TagLabel}" FontSize="12" Foreground="{DynamicResource SbMuted}"/><ui:TextBox x:Name="TagBox" MaxLength="2000"/>
+  <CheckBox x:Name="FavoriteBox" Content="{DynamicResource Ui.Starred}" Margin="0,0,0,8"/><ui:Button x:Name="SaveMetadataButton" Content="{DynamicResource Ui.SaveChanges}" Click="SaveMetadata"/></StackPanel>
+  <WrapPanel><ui:Button Content="{DynamicResource Ui.Preview}" Click="OpenPreview"/><ui:Button Content="{DynamicResource Ui.ExportImage}" Click="ExportClicked"/><ui:Button x:Name="DeleteButton" Content="{DynamicResource Ui.Delete}" Click="DeleteClicked"/></WrapPanel>
+  <Separator Margin="0,16"/><TextBlock x:Name="OcrStatusLabel" TextWrapping="Wrap"/><WrapPanel><ui:Button x:Name="CopyTextButton" Content="{DynamicResource Ui.CopyText}" Click="CopyTextClicked"/><ui:Button Content="{DynamicResource Ui.Retry}" Click="RetryClicked"/></WrapPanel>
   <ui:TextBox x:Name="OcrTextBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="180" MaxHeight="400" VerticalScrollBarVisibility="Auto"/>
  </StackPanel></ScrollViewer></Grid></Border>
  </Grid>

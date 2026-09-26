@@ -32,7 +32,7 @@ public partial class MainWindow : Window
     public MainWindow(App app)
     {
         _app=app; _images=new(app.Store); InitializeComponent(); DataContext=_vm;
-        Title="截图资料盒 · ScreenshotBox "+typeof(App).Assembly.GetName().Version?.ToString(3);
+        Title=L.T("截图资料盒 · ScreenshotBox ","ScreenshotBox ")+typeof(App).Assembly.GetName().Version?.ToString(3);
         _vm.ThumbnailSize=Math.Clamp(app.Preferences.ThumbnailSize,160,320);
         CaptureService.ConfigureTools(app.Preferences.AnnotationColor,app.Preferences.PenWidth,app.Preferences.EraserWidth,app.Preferences.MosaicSize);
         _preferenceDelay.Tick+=(_,_)=>{_preferenceDelay.Stop();PersistPreferences();};
@@ -43,18 +43,18 @@ public partial class MainWindow : Window
         FavoriteBox.Checked+=(_,_)=>RememberDraft();FavoriteBox.Unchecked+=(_,_)=>RememberDraft();
         Loaded+=async (_,_)=>{
             ApplyTheme();
-            ShortcutLabel.Text=$"截图快捷键\n{_app.Preferences.Shortcut}";
+            ShortcutLabel.Text=L.F("截图快捷键\n{0}","Capture shortcut\n{0}",_app.Preferences.Shortcut);
             if(!_app.IsTesting) {
             _hotkey=new(this,()=>_ = CaptureAsync());
             if (!_hotkey.TrySet(_app.Preferences.Shortcut,out var error)) _vm.Status=error;
             System.Drawing.Icon? icon=null;
             try{if(Environment.ProcessPath is string executable)icon=System.Drawing.Icon.ExtractAssociatedIcon(executable);}catch{}
             _trayOwnedIcon=icon;
-            _tray=new(){Icon=icon??System.Drawing.SystemIcons.Application,Text="截图资料盒",Visible=true};
+            _tray=new(){Icon=icon??System.Drawing.SystemIcons.Application,Text=L.T("截图资料盒","ScreenshotBox"),Visible=true};
             var menu=new System.Windows.Forms.ContextMenuStrip();
-            menu.Items.Add("打开资料库",null,(_,_)=>Dispatcher.Invoke(ShowLibrary));
-            menu.Items.Add("新截图",null,(_,_)=>Dispatcher.Invoke(()=>_ = CaptureAsync()));
-            menu.Items.Add("退出",null,(_,_)=>Dispatcher.Invoke(()=>_ = QuitAsync()));
+            menu.Items.Add(L.T("打开资料库","Open library"),null,(_,_)=>Dispatcher.Invoke(ShowLibrary));
+            menu.Items.Add(L.T("新截图","Capture"),null,(_,_)=>Dispatcher.Invoke(()=>_ = CaptureAsync()));
+            menu.Items.Add(L.T("退出","Exit"),null,(_,_)=>Dispatcher.Invoke(()=>_ = QuitAsync()));
             _tray.ContextMenuStrip=menu; _tray.DoubleClick+=(_,_)=>Dispatcher.Invoke(ShowLibrary);
             }
             await RefreshAsync();
@@ -74,7 +74,7 @@ public partial class MainWindow : Window
         _trayOwnedIcon?.Dispose();_trayOwnedIcon=null;
     }
     private async Task QuitAsync(){
-        if(IsBusyForDataTransition||_app.DataTransition){_vm.Status="正在保存或导入图片，请完成后再退出。";_tray?.ShowBalloonTip(3000,"截图资料盒",_vm.Status,System.Windows.Forms.ToolTipIcon.Info);return;}
+        if(IsBusyForDataTransition||_app.DataTransition){_vm.Status=L.T("正在保存或导入图片，请完成后再退出。","Finish saving or importing images before exiting.");_tray?.ShowBalloonTip(3000,L.T("截图资料盒","ScreenshotBox"),_vm.Status,System.Windows.Forms.ToolTipIcon.Info);return;}
         if(await PrepareForDataChangeAsync())await _app.QuitAsync();
     }
     private void PersistPreferences()
@@ -85,24 +85,24 @@ public partial class MainWindow : Window
             var tools=CaptureService.GetToolPreferences();_app.Preferences.AnnotationColor=tools.ColorHex;
             _app.Preferences.PenWidth=tools.PenWidth;_app.Preferences.EraserWidth=tools.EraserWidth;_app.Preferences.MosaicSize=tools.MosaicSize;
             _app.Preferences.Save();
-        }catch(Exception ex){_vm.Status="设置暂未保存："+ex.Message;}
+        }catch(Exception ex){_vm.Status=L.T("设置暂未保存：","Settings could not be saved: ")+L.Error(ex);}
     }
     internal async Task<bool> PrepareForDataChangeAsync()
     {
-        if(IsBusyForDataTransition||_app.DataTransition){MessageBox.Show(this,"正在保存或导入图片，请完成后再处理资料库。","资料处理中",MessageBoxButton.OK,MessageBoxImage.Information);return false;}
+        if(IsBusyForDataTransition||_app.DataTransition){MessageBox.Show(this,L.T("正在保存或导入图片，请完成后再处理资料库。","Finish saving or importing images before changing the library."),L.T("资料处理中","Library busy"),MessageBoxButton.OK,MessageBoxImage.Information);return false;}
         RememberDraft();
         if(_drafts.Count==0)return true;
-        var answer=MessageBox.Show(this,$"有 {_drafts.Count} 张截图的资料修改尚未保存。\n是否保存这些修改？\n选择‘否’将放弃修改，选择‘取消’继续编辑。","未保存的修改",MessageBoxButton.YesNoCancel,MessageBoxImage.Question);
+        var answer=MessageBox.Show(this,L.F("有 {0} 张截图的资料修改尚未保存。\n是否保存这些修改？\n选择‘否’将放弃修改，选择‘取消’继续编辑。","{0} screenshots have unsaved changes.\nSave them now?\nChoose No to discard or Cancel to continue editing.",_drafts.Count),L.T("未保存的修改","Unsaved changes"),MessageBoxButton.YesNoCancel,MessageBoxImage.Question);
         if(answer==MessageBoxResult.Cancel)return false;
         if(answer==MessageBoxResult.No){_drafts.Clear();foreach(var editor in Application.Current.Windows.OfType<ItemEditorWindow>().ToArray())editor.Close();LoadDetails(Selected?.Item);return true;}
         var editors=Application.Current.Windows.OfType<ItemEditorWindow>().Select(w=>(Window:w,Enabled:w.IsEnabled)).ToArray();
         _resolvingDrafts=true;UpdateMetadataState();foreach(var editor in editors)editor.Window.IsEnabled=false;
         try{
             foreach(var pair in _drafts.ToArray())await SaveDraftAsync(pair.Key,pair.Value);
-            if(_drafts.Count>0)throw new IOException("仍有未保存的修改，请继续编辑后再试。");
+            if(_drafts.Count>0)throw new IOException(L.T("仍有未保存的修改，请继续编辑后再试。","Some changes are still unsaved. Continue editing and try again."));
             foreach(var editor in editors)editor.Window.Close();return true;
         }
-        catch(Exception ex){_vm.Status="保存失败："+ex.Message;MessageBox.Show(this,_vm.Status,"保存修改",MessageBoxButton.OK,MessageBoxImage.Error);return false;}
+        catch(Exception ex){_vm.Status=L.T("保存失败：","Save failed: ")+L.Error(ex);MessageBox.Show(this,_vm.Status,L.T("保存修改","Save changes"),MessageBoxButton.OK,MessageBoxImage.Error);return false;}
         finally{_resolvingDrafts=false;foreach(var editor in editors)editor.Window.IsEnabled=editor.Enabled;UpdateMetadataState();}
     }
     private void OnOcrChanged(string id)
@@ -132,7 +132,7 @@ public partial class MainWindow : Window
                 Gallery.SelectedItem=_vm.Items.FirstOrDefault(c=>c.Item.Id==id);
             }finally{_refreshing=false;}
             EmptyState.Visibility=items.Count==0?Visibility.Visible:Visibility.Collapsed;
-            EmptyText.Text=query.Length>0||_selectedTag!=null?"没有匹配的截图。":"按快捷键框选截图，或拖入图片。";
+            EmptyText.Text=query.Length>0||_selectedTag!=null?L.T("没有匹配的截图。","No matching screenshots."):L.T("按快捷键框选截图，或拖入图片。","Use the capture shortcut or drop images here.");
             LoadDetails(Selected?.Item);
             if(_filter=="all") {
                 TagsPanel.Children.Clear();
@@ -141,10 +141,10 @@ public partial class MainWindow : Window
                     button.SetResourceReference(Button.BackgroundProperty,_selectedTag==tag?"SbSelection":"SbBackground");
                     button.SetResourceReference(Button.ForegroundProperty,_selectedTag==tag?"SbAccentText":"SbText");
                     button.ToolTip=tag;
-                    button.Click+=async (_,_)=>{_selectedTag=tag;_filter="all";SectionTitle.Text="标签 · "+tag;_loadLimit=200;await RefreshAsync();};TagsPanel.Children.Add(button);
+                    button.Click+=async (_,_)=>{_selectedTag=tag;_filter="all";SectionTitle.Text=L.T("标签 · ","Tag · ")+tag;_loadLimit=200;await RefreshAsync();};TagsPanel.Children.Add(button);
                 }
             }
-        }catch(Exception ex){_vm.Status="读取资料失败："+ex.Message;}
+        }catch(Exception ex){_vm.Status=L.T("读取资料失败：","Could not read the library: ")+L.Error(ex);}
     }
     private async void ChangeFilter(object sender,RoutedEventArgs e)
     {
@@ -154,7 +154,7 @@ public partial class MainWindow : Window
             button.SetResourceReference(Button.BackgroundProperty,selected?"SbSelection":"SbBackground");
             button.SetResourceReference(Button.ForegroundProperty,selected?"SbAccentText":"SbText");
         }
-        if(tag=="tags"){_filter="all";SectionTitle.Text="标签 · 点击左侧标签查找";}else{_filter=tag;SectionTitle.Text=(string)((Button)sender).Content;}
+        if(tag=="tags"){_filter="all";SectionTitle.Text=L.T("标签 · 点击左侧标签查找","Tags · Select a tag on the left");}else{_filter=tag;SectionTitle.Text=(string)((Button)sender).Content;}
         _loadLimit=200;await RefreshAsync();
     }
     private void SearchChanged(object sender,TextChangedEventArgs e){if(!IsLoaded)return;_loadLimit=200;_searchDelay.Stop();_searchDelay.Start();}
@@ -194,8 +194,8 @@ public partial class MainWindow : Window
         var draft=_drafts.GetValueOrDefault(item.Id)??MetadataDraft.From(item);
         TitleBox.Text=draft.Title;NotesBox.Text=draft.Notes;TagBox.Text=draft.Tags;FavoriteBox.IsChecked=draft.Favorite;
         OcrTextBox.Text=item.OcrText;OcrStatusLabel.Text=Selected!.Status;
-        OcrStatusLabel.ToolTip=item.OcrStatus=="Failed"?item.OcrError:null;
-        DeleteButton.Content=item.IsDeleted?"恢复资料":"移入回收站";
+        OcrStatusLabel.ToolTip=item.OcrStatus=="Failed"?L.Error(item.OcrError):null;
+        DeleteButton.Content=item.IsDeleted?L.T("恢复资料","Restore"):L.T("移入回收站","Move to recycle bin");
         }finally{_loadingEditor=false;UpdateMetadataState();}
     }
     private void UpdateMetadataState()
@@ -204,19 +204,19 @@ public partial class MainWindow : Window
         MetadataFields.IsEnabled=_editorItem!=null&&!external&&!_resolvingDrafts;
         bool dirty=_editorItem!=null&&_drafts.ContainsKey(_editorItem.Id);
         SaveMetadataButton.IsEnabled=dirty&&!external&&!_resolvingDrafts;
-        MetadataStatus.Text=external?"正在独立详情窗口编辑":dirty?"有未保存的修改":"";
+        MetadataStatus.Text=external?L.T("正在独立详情窗口编辑","Editing in a separate details window"):dirty?L.T("有未保存的修改","Unsaved changes"):"";
     }
     private async void SaveMetadata(object sender,RoutedEventArgs e)
     {
         if(_editorItem==null||_savingMetadata||!MetadataFields.IsEnabled)return;
         string id=_editorItem.Id;var draft=CurrentDraft;_savingMetadata=true;
-        try{await SaveDraftAsync(id,draft);_vm.Status="资料已保存";}
-        catch(Exception ex){_vm.Status="保存失败："+ex.Message;}
+        try{await SaveDraftAsync(id,draft);_vm.Status=L.T("资料已保存","Changes saved");}
+        catch(Exception ex){_vm.Status=L.T("保存失败：","Save failed: ")+L.Error(ex);}
         finally{_savingMetadata=false;}
     }
     private async Task SaveDraftAsync(string id,MetadataDraft draft)
     {
-        if(_app.DataTransition)throw new InvalidOperationException("正在迁移资料库，请稍后再保存。" );
+        if(_app.DataTransition)throw new InvalidOperationException(L.T("正在迁移资料库，请稍后再保存。","The library is being moved. Save changes after it finishes.") );
         _metadataWrites++;
         try {
         await _app.Store.UpdateMetadataAsync(id,draft.Title,draft.Notes,draft.Tags,draft.Favorite);
@@ -229,7 +229,7 @@ public partial class MainWindow : Window
     }
     private void OpenItemEditor()
     {
-        if(Selected==null){_vm.Status="请先选择一张截图，再打开详情";return;}
+        if(Selected==null){_vm.Status=L.T("请先选择一张截图，再打开详情","Select a screenshot to open its details.");return;}
         RememberDraft();var item=Selected.Item;
         var existing=Application.Current.Windows.OfType<ItemEditorWindow>().FirstOrDefault(w=>w.ItemId==item.Id);
         if(existing!=null){existing.Show();existing.Activate();return;}
@@ -245,16 +245,16 @@ public partial class MainWindow : Window
     private async void DeleteClicked(object sender,RoutedEventArgs e)
     {
         if(Selected==null)return;
-        if(_app.DataTransition){_vm.Status="正在迁移资料库，请稍后再修改资料。";return;}
+        if(_app.DataTransition){_vm.Status=L.T("正在迁移资料库，请稍后再修改资料。","The library is being moved. Make changes after it finishes.");return;}
         try{var item=Selected.Item;await _app.Store.SetDeletedAsync(item.Id,!item.IsDeleted);if(item.IsDeleted&&item.OcrStatus!="Ready")_app.Ocr.Enqueue(item.Id);await RefreshAsync();}
-        catch(Exception ex){_vm.Status="修改资料失败："+ex.Message;}
+        catch(Exception ex){_vm.Status=L.T("修改资料失败：","Could not update the item: ")+L.Error(ex);}
     }
-    private void CopyTextClicked(object sender,RoutedEventArgs e){if(Selected==null)return;try{Clipboard.SetText(Selected.Item.OcrText);_vm.Status="识别文字已复制";}catch(Exception ex){_vm.Status="复制失败："+ex.Message;}}
-    private void RetryClicked(object sender,RoutedEventArgs e){if(Selected==null||Selected.Item.IsDeleted)return;if(_app.DataTransition){_vm.Status="正在迁移资料库，请稍后再识别。";return;}_app.Ocr.Enqueue(Selected.Item.Id);_vm.Status="已加入识别队列";}
+    private void CopyTextClicked(object sender,RoutedEventArgs e){if(Selected==null)return;try{Clipboard.SetText(Selected.Item.OcrText);_vm.Status=L.T("识别文字已复制","Text copied");}catch(Exception ex){_vm.Status=L.T("复制失败：","Copy failed: ")+L.Error(ex);}}
+    private void RetryClicked(object sender,RoutedEventArgs e){if(Selected==null||Selected.Item.IsDeleted)return;if(_app.DataTransition){_vm.Status=L.T("正在迁移资料库，请稍后再识别。","The library is being moved. Retry OCR after it finishes.");return;}_app.Ocr.Enqueue(Selected.Item.Id);_vm.Status=L.T("已加入识别队列","Added to the OCR queue");}
     private void ExportClicked(object sender,RoutedEventArgs e)
     {
-        if(Selected==null)return;var dialog=new SaveFileDialog{Filter="PNG图片|*.png",FileName="截图.png"};if(dialog.ShowDialog(this)!=true)return;
-        try{ImageLibrary.ExportAtomic(_app.Store.ResolvePath(Selected.Item.ImagePath),dialog.FileName);_vm.Status="图片已导出";}catch(Exception ex){_vm.Status="导出失败："+ex.Message;}
+        if(Selected==null)return;var dialog=new SaveFileDialog{Filter=L.T("PNG图片|*.png","PNG image|*.png"),FileName=L.T("截图.png","Screenshot.png")};if(dialog.ShowDialog(this)!=true)return;
+        try{ImageLibrary.ExportAtomic(_app.Store.ResolvePath(Selected.Item.ImagePath),dialog.FileName);_vm.Status=L.T("图片已导出","Image exported");}catch(Exception ex){_vm.Status=L.T("导出失败：","Export failed: ")+L.Error(ex);}
     }
     private void WindowKey(object sender,KeyEventArgs e)
     {
@@ -263,7 +263,7 @@ public partial class MainWindow : Window
         else if(e.Key==Key.Enter&&Gallery.IsKeyboardFocusWithin&&e.OriginalSource is not Button){OpenItemEditor();e.Handled=true;}
         else if(e.Key==Key.S&&Keyboard.Modifiers==ModifierKeys.Control){SaveMetadata(sender,e);e.Handled=true;}
     }
-    private void OpenPreview(object sender,RoutedEventArgs e){if(Selected==null)return;try{new PreviewWindow(Selected.Item,_app.Store,SearchBox.Text){Owner=this}.Show();}catch(Exception ex){_vm.Status="原图无法打开："+ex.Message;}}
+    private void OpenPreview(object sender,RoutedEventArgs e){if(Selected==null)return;try{new PreviewWindow(Selected.Item,_app.Store,SearchBox.Text){Owner=this}.Show();}catch(Exception ex){_vm.Status=L.T("原图无法打开：","Could not open the original image: ")+L.Error(ex);}}
     private async void CaptureClicked(object sender,RoutedEventArgs e)=>await CaptureAsync();
     private async Task CaptureAsync()
     {
@@ -276,17 +276,17 @@ public partial class MainWindow : Window
             foreach(var state in visibleWindows)state.Window.Hide();
             await Task.Delay(180);var result=await CaptureService.CaptureAsync();if(result==null)return;
             if(result.Action=="Save"){
-                var dialog=new SaveFileDialog{Filter="PNG图片|*.png",FileName="截图.png"};
-                if(dialog.ShowDialog()==true){ImageLibrary.WritePngAtomic(result.Image,dialog.FileName);accepted=true;_vm.Status="图片已保存";}return;
+                var dialog=new SaveFileDialog{Filter=L.T("PNG图片|*.png","PNG image|*.png"),FileName=L.T("截图.png","Screenshot.png")};
+                if(dialog.ShowDialog()==true){ImageLibrary.WritePngAtomic(result.Image,dialog.FileName);accepted=true;_vm.Status=L.T("图片已保存","Image saved");}return;
             }
             if(result.Action=="Collect"){
                 var item=await _images.AddAsync(result.Image);_app.Ocr.Enqueue(item.Id);
-                _vm.Status="已保存到资料库";accepted=true;
+                _vm.Status=L.T("已保存到资料库","Saved to the library");accepted=true;
             }
-            try{await ClipboardHelper.CopyImageAsync(result.Image);_vm.Status=result.Action=="Collect"?"已保存并复制":"图片已复制";}
-            catch(Exception ex){throw new IOException(result.Action=="Collect"?"已保存到资料库，但复制失败。"+ex.Message:ex.Message,ex);}
+            try{await ClipboardHelper.CopyImageAsync(result.Image);_vm.Status=result.Action=="Collect"?L.T("已保存并复制","Saved and copied"):L.T("图片已复制","Image copied");}
+            catch(Exception ex){throw new IOException(result.Action=="Collect"?L.T("已保存到资料库，但复制失败。","Saved to the library, but copying failed. ")+L.Error(ex):L.Error(ex),ex);}
             accepted=true;
-        }catch(Exception ex){_vm.Status=ex.Message;_tray?.ShowBalloonTip(4000,"截图资料盒",ex.Message,System.Windows.Forms.ToolTipIcon.Info);}
+        }catch(Exception ex){_vm.Status=L.Error(ex);_tray?.ShowBalloonTip(4000,L.T("截图资料盒","ScreenshotBox"),L.Error(ex),System.Windows.Forms.ToolTipIcon.Info);}
         finally{
             PersistPreferences();ApplyTheme();
             foreach(var state in visibleWindows) {
@@ -305,7 +305,7 @@ public partial class MainWindow : Window
     [DllImport("user32.dll")]private static extern uint GetWindowThreadProcessId(IntPtr window,out uint processId);
     [DllImport("user32.dll")][return:MarshalAs(UnmanagedType.Bool)]private static extern bool IsWindow(IntPtr window);
     [DllImport("user32.dll")][return:MarshalAs(UnmanagedType.Bool)]private static extern bool SetForegroundWindow(IntPtr window);
-    private async void ImportClicked(object sender,RoutedEventArgs e){var dialog=new OpenFileDialog{Filter="图片|*.png;*.jpg;*.jpeg",Multiselect=true};if(dialog.ShowDialog(this)==true)await ImportAsync(dialog.FileNames);}
+    private async void ImportClicked(object sender,RoutedEventArgs e){var dialog=new OpenFileDialog{Filter=L.T("图片|*.png;*.jpg;*.jpeg","Images|*.png;*.jpg;*.jpeg"),Multiselect=true};if(dialog.ShowDialog(this)==true)await ImportAsync(dialog.FileNames);}
     private async void FilesDropped(object sender,DragEventArgs e){if(e.Data.GetData(DataFormats.FileDrop) is string[] files)await ImportAsync(files);}
     private async Task ImportAsync(IEnumerable<string> files)
     {
@@ -314,11 +314,11 @@ public partial class MainWindow : Window
         try {
         var errors=new List<string>();int count=0;
         foreach(var file in files){if(_app.DataTransition)break;try{
-            if(!new[]{".png",".jpg",".jpeg"}.Contains(Path.GetExtension(file).ToLowerInvariant()))throw new IOException("仅支持PNG或JPEG");
+            if(!new[]{".png",".jpg",".jpeg"}.Contains(Path.GetExtension(file).ToLowerInvariant()))throw new IOException(L.T("仅支持PNG或JPEG","Only PNG and JPEG images are supported."));
             var bmp=await Task.Run(()=>ImageLibrary.Load(file));var item=await _images.AddAsync(bmp,Path.GetFileNameWithoutExtension(file));_app.Ocr.Enqueue(item.Id);count++;
-        }catch(Exception ex){errors.Add(Path.GetFileName(file)+"："+ex.Message);}}
-        _vm.Status=$"已导入 {count} 张";await RefreshAsync();if(errors.Count>0)new ReportWindow("导入失败的项目",string.Join("\n",errors)){Owner=this}.ShowDialog();
+        }catch(Exception ex){errors.Add(Path.GetFileName(file)+L.T("：",": ")+L.Error(ex));}}
+        _vm.Status=L.F("已导入 {0} 张","Imported {0} images",count);await RefreshAsync();if(errors.Count>0)new ReportWindow(L.T("导入失败的项目","Images that failed to import"),string.Join("\n",errors)){Owner=this}.ShowDialog();
         }finally{_importsActive--;}
     }
-    private void SettingsClicked(object sender,RoutedEventArgs e){if(_hotkey==null)return;new SettingsWindow(_app,_hotkey){Owner=this}.ShowDialog();ApplyTheme();ShortcutLabel.Text=$"截图快捷键\n{_app.Preferences.Shortcut}";_app.Preferences.ThumbnailSize=_vm.ThumbnailSize;_app.Preferences.Save();}
+    private void SettingsClicked(object sender,RoutedEventArgs e){if(_hotkey==null)return;new SettingsWindow(_app,_hotkey){Owner=this}.ShowDialog();ApplyTheme();ShortcutLabel.Text=L.F("截图快捷键\n{0}","Capture shortcut\n{0}",_app.Preferences.Shortcut);_app.Preferences.ThumbnailSize=_vm.ThumbnailSize;_app.Preferences.Save();}
 }

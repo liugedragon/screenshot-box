@@ -1,41 +1,33 @@
-# 参与截图资料盒
+# Contributing
 
-简体中文 · [English](CONTRIBUTING.en.md)
+English · [简体中文](CONTRIBUTING.zh-CN.md)
 
-不必先写代码。复现一个问题、试一台不同缩放的电脑、改一句看不懂的说明，都能帮到项目。
+## Report a bug
 
-## 报告问题
+Check the [known limitations](docs/limitations.md), then use an [issue template](https://github.com/liugedragon/screenshot-box/issues/new/choose). Include:
 
-先看[已知限制](docs/limitations.md)，再到 [Issues](https://github.com/liugedragon/screenshot-box/issues/new/choose) 选问题模板。请包含：
+- App and Windows versions, and whether you used the installer or ZIP.
+- Monitor count, resolution, scaling, and relative position of each display.
+- Steps to reproduce, expected and actual behavior, and the exact error message.
+- A synthetic or redacted test image where relevant.
 
-- 应用版本、Windows 版本、安装包或 ZIP。
-- 显示器数量、分辨率、每块屏幕的缩放比例。
-- 操作步骤、预期结果和实际结果。
-- 能复现的合成图片或脱敏图片；有错误提示时附原文。
+Do not upload private screenshots, databases, recognized personal content, keys, or account details.
 
-不要提交真实用户截图、资料库、识别内容、密钥或账户信息。可以先用几行自行编写的文字做一张测试图。单屏自动测试通过不代表双屏现场问题不成立。
+## Suggest a feature
 
-## 提一个改进
+Describe the use case, the problem, and your current workaround. Open an issue before starting a larger feature or adding a dependency. Existing plans are in [ROADMAP](ROADMAP.md).
 
-说清你在做什么、卡在哪里、现在如何绕过。先描述问题，再给方案。较大的功能或新依赖请先开 Issue 讨论，避免做完后才发现方向不合适。
+## Submit a change
 
-当前比较需要的是混合 DPI 多屏实测、原图缺失等失败场景、中文路径与备份恢复检查、OCR 难例和文档纠错。路线见[后续计划](ROADMAP.md)，没有承诺日期。
+1. Fork the repository and create a branch for one focused change.
+2. Follow the [build guide](docs/build.md) to prepare Windows x64 and .NET SDK 10.0.401.
+3. Run `powershell -ExecutionPolicy Bypass -File scripts/build.ps1`. For capture or annotation changes, also run the [capture pixel tests](tests/ScreenshotBox.Capture.Probe/README.md).
+4. Open a PR describing the problem, new behavior, checks performed, and untested conditions. Include window screenshots with synthetic data for UI changes.
 
-## 修改代码
+Keep dependency lock files. New components or models need a source, version, license, and distribution method. Do not commit models, user data, or build outputs. Update both languages when changing documentation or UI text. New controls should follow the [design guide](docs/design.md).
 
-1. Fork 仓库，建一个范围明确的分支。
-2. 按[构建说明](docs/build.md)准备 Windows x64 与 .NET SDK 10.0.401。
-3. 修改后运行 `powershell -ExecutionPolicy Bypass -File scripts/build.ps1`。涉及标注或坐标时，另外运行[截图像素探针](tests/ScreenshotBox.Capture.Probe/README.md)中的命令。
-4. 提交 PR，说明触发条件、改后的行为、验证方法和没法测试的条件。界面修改请附实际窗口图，使用合成资料。
+Add regression coverage for storage, coordinate, search, or OCR state changes. Documentation-only changes need link and formatting checks.
 
-遵守现有依赖锁文件。新增组件或模型时说明来源、版本、许可证和分发方式；不要把模型、用户数据或构建目录提交进去。改中文文档时同步英文对应页，无法确认的技术翻译可在 PR 中指出。
+## License
 
-测试应验证实际约束，比如坐标、字面中文查询、过期 OCR 任务和恢复结果。不要为一个低影响文案修改添加只重复实现的测试，也不要把程序操作写成真人验收。
-
-## 文档与风格
-
-先写实际用途，再写操作。用“图片先保存，文字随后识别”这样的句子，不用“赋能”“极致”“一站式”。没有实现的功能放在路线里；没测过的条件直接标“未验证”。
-
-界面保持单一强调色、系统字体和明确状态。新增工具不应打断保存截图的主流程。详情见[设计规范](docs/design.md)。
-
-提交贡献表示你同意让贡献采用本项目的 MIT 许可证；第三方材料仍须保留自身许可。
+By contributing, you agree to release your contribution under this project's MIT license. Third-party material must retain its original license and notices.

@@ -4,115 +4,93 @@
 
 # ScreenshotBox
 
-**Save a screenshot. Find it later by its text.**
+**Save screenshots locally. Find them by their text.**
 
-[简体中文](README.md) · English
+[English](README.md) · [简体中文](README.zh-CN.md)
 
 [![Windows CI](https://github.com/liugedragon/screenshot-box/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/liugedragon/screenshot-box/actions/workflows/windows.yml)
 [![Release](https://img.shields.io/github/v/release/liugedragon/screenshot-box?include_prereleases&label=release)](https://github.com/liugedragon/screenshot-box/releases)
 [![MIT](https://img.shields.io/badge/license-MIT-1769C2)](LICENSE)
 
-[**Download installer**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.2/ScreenshotBox-0.1.2-win-x64-setup.exe) · [**Download ZIP**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.2/ScreenshotBox-0.1.2-win-x64.zip) · [User guide](docs/en/usage.md) · [Report a problem](https://github.com/liugedragon/screenshot-box/issues/new/choose)
+[**Download installer**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.3/ScreenshotBox-0.1.3-win-x64-setup.exe) · [**Download ZIP**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.3/ScreenshotBox-0.1.3-win-x64.zip) · [User guide](docs/usage.md) · [Report a problem](https://github.com/liugedragon/screenshot-box/issues/new/choose)
 
 </div>
 
-Class schedules, order numbers, warranty dates: taking screenshots is easy; finding them a week later is harder. ScreenshotBox keeps the images and their recognized text together on your computer. Select a region, annotate it, save and copy, then search for a word or number to find the image again. Matching text lines are highlighted on the original.
+ScreenshotBox is a Windows screenshot tool and image library. Select a screen region with a hotkey and save it; text recognition runs in the background. Later, search by title, notes, tags, or text in the image. Class schedules, order numbers, and warranty dates stay on your computer.
 
-For **Windows 11 x64**. No account, API key, Python, or dedicated GPU required. Chinese and English OCR runs locally on the CPU. **0.1.2 is a prerelease**; check the [known limitations](docs/en/limitations.md) before using it.
+For **Windows 11 x64**. No account, API key, Python, or dedicated GPU required. OCR runs locally on the CPU with bundled models. **0.1.3 is a prerelease**; see [known limitations](docs/limitations.md) for current issues and untested configurations.
 
-![Screenshot library with text search and item details](docs/ui-review-images/0.1.2/ui-light.png)
+![Screenshot library with text search and image details](docs/ui-review-images/0.1.3/en-library.png)
 
-*Actual application, shown with synthetic test images. The application UI is currently primarily Chinese. English documentation does not imply an English UI.*
+*Version 0.1.3, using synthetic text images. The interface follows the Windows display language: Chinese for Chinese display languages, English for all others. Choose System, 简体中文, or English in Settings; restart to apply.*
 
 ## Get started
 
-1. After installing, press **Ctrl+Alt+S** and drag a rectangle. Move the selection or resize it with eight handles; add a pen stroke, arrow, or mosaic if needed.
-2. Press **Enter** to save and copy, then return to your previous application. The image is saved first; OCR runs in the background.
-3. Open the library from the tray and search for text in your screenshots. Press **Space** to view the original with matching text lines highlighted.
+1. Press **Ctrl+Alt+S** and drag a selection. Move it or resize it with eight handles, then add a pen stroke, arrow, rectangle, or mosaic if needed.
+2. Press **Enter** to save and copy, then return to your previous app. The image is saved immediately; OCR runs in the background.
+3. Open the library from the tray and search for a word in the screenshot. Select an image and press **Space** to preview it with matching text lines highlighted.
 
-Change the shortcut in settings to a combination such as `Alt+A` or `Ctrl+Shift+Q`. Common system combinations are blocked, and Windows checks global hotkey availability. If registration fails, your previous shortcut stays active. **Esc** cancels without creating an image or library entry.
+You can change the capture hotkey to `Alt+A`, `Ctrl+Shift+Q`, or another combination. The app checks common reserved system shortcuts and global hotkey availability; failed registration leaves the old hotkey active. **Esc** cancels without creating an image or entry.
 
-## What you can do
+## Features
 
-| Task | How it works |
+| Feature | Details |
 | --- | --- |
-| Keep a screenshot and share it right away | Select, adjust, save and copy; or copy only / save as PNG. |
-| Mark something important | Pen, arrow, outlined rectangle; six quick colors, an RGB/Hex palette, adjustable stroke width. |
-| Change an annotation | Erase back to the original pixels, undo, redo; clearing annotations is undoable. Mosaic block size is adjustable. |
-| Find an older screenshot | Search titles, notes, tags, and OCR text, including short Chinese phrases, mixed text, dates, and IDs. |
-| Organize existing images | Drag in or batch-import PNG/JPEG, add notes, tags, and stars; deleted items can be restored from the recycle bin. |
-| Read small text or a tall image | Zoom, pan, fit to window, or use actual pixel size. Search highlights move with the image. |
-| Move the library | Change its location in settings or restore a ZIP backup into a new directory. |
+| Capture and copy | Region selection, movement, eight resize handles; save and copy, copy only, or save as PNG. |
+| Annotation | Pen, arrow, outline rectangle, eraser, mosaic; adjustable sizes, RGB/Hex palette, undo and redo. |
+| Text search | Titles, notes, tags, and OCR text; short Chinese phrases, mixed text, dates, and IDs. |
+| Organization | Import PNG/JPEG, add tags, notes, and stars; restore deleted items from the recycle bin. |
+| Image preview | Zoom, pan, fit to window, or actual pixel size; whole-line OCR match highlights. |
+| Local library | Custom library location, ZIP backup and restore. |
+| Appearance and language | System, light, and dark themes; System, Simplified Chinese, or English. |
 
 <details>
-<summary>Capture tools, color palette, and dark theme</summary>
+<summary>Capture tools, palette, and dark theme</summary>
 
-![Capture pen and adjustable size](docs/ui-review-images/0.1.2/capture-large-pen.png)
+![English capture toolbar with adjustable pen size](docs/ui-review-images/0.1.3/en-capture-narrow.png)
 
-![Custom color with RGB sliders, Hex input, and preview](docs/ui-review-images/0.1.2/palette-large.png)
+![RGB sliders, Hex input, and color preview](docs/ui-review-images/0.1.3/en-palette.png)
 
-![Dark library theme](docs/ui-review-images/0.1.2/ui-dark.png)
+![English dark library](docs/ui-review-images/0.1.3/en-library-dark.png)
 
-See the [UI review](docs/en/ui-review.md) for more images and the fixes made after inspecting them.
+More screenshots are in the [UI inspection record](docs/ui-review.md).
 
 </details>
 
-## Downloads and your data
+## Installation and data
 
-| Package | Use it when | Size |
-| --- | --- | --- |
-| [Installer](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.2/ScreenshotBox-0.1.2-win-x64-setup.exe) | You want a normal installation, a chosen install directory, and an uninstall entry. | About 82 MiB |
-| [ZIP](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.2/ScreenshotBox-0.1.2-win-x64.zip) | You prefer to extract a directory and run `ScreenshotBox.exe`. | About 107 MiB |
+- **Installer**: choose an installation folder; Start menu and uninstall entries are created.
+- **ZIP**: extract the complete directory and run `ScreenshotBox.exe`.
 
-Both include the runtime and Chinese OCR models. **Keep the complete directory, not just the exe.** Packages and checksum files are on the [release page](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.2). Exit the old version from the tray before upgrading.
+Both include the .NET runtime, native libraries, and OCR models. Keep the complete directory together. Checksums are on the [release page](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.3). Exit the old version from the tray before upgrading.
 
-Images, text, and categories default to `%LOCALAPPDATA%\ScreenshotBox\library`, separate from the installation. Settings can migrate the library to a directory you choose. The app does not upload images or text or download models during recognition. Uninstalling preserves your library. Closing the main window leaves the app in the tray; use its menu to exit completely.
+The library defaults to `%LOCALAPPDATA%\ScreenshotBox\library`, separate from the installation. Settings can move it to another folder while retaining the original. The app does not upload images or text, or download models during recognition. Uninstalling preserves your library. Closing the main window leaves the app in the tray; use its menu to quit completely.
 
-## A few limits
+OCR may misread low-resolution, handwritten, or busy images. Mosaic is visual pixelation, not secure redaction; erasing it restores the original pixels. Scrolling capture, recording, cloud sync, automatic updates, and editing annotations after saving are not supported. The app and installer are unsigned. Test environments and results are in the [validation record](docs/validation.md).
 
-- Including the runtime and OCR models makes this larger than a few-megabyte utility. First recognition includes model loading time.
-- OCR can get low-resolution, handwritten, or busy images wrong. Highlights cover whole lines, not individual characters.
-- Mosaic is visual pixelation, not a guarantee of secure redaction. Erasing mosaic restores the original pixels.
-- No scrolling capture, recording, cloud sync, automatic updates, or annotation editing after saving. The app and installer are unsigned.
-- Desktop checks used one Windows monitor at 125% scaling. Mixed-DPI multiple monitors, pasting into external apps, and a physically offline clean PC still need testing.
-
-There are **42 core tests and 35 annotation pixel checks**. Windows CI checks builds, storage, and synthetic image behavior. Separate release checks cover real Chinese OCR, search, backups, installation, restart recovery, and preserving data on uninstall. Their scope differs; see the [validation record](docs/en/validation.md).
-
-## Documentation
+## Documentation and development
 
 | Guide | Contents |
 | --- | --- |
-| [User guide](docs/en/usage.md) | Shortcuts, annotation, search, imports, and backups. |
-| [Build](docs/en/build.md) · [Packaging and installation](docs/en/distribution.md) | Run from source or create a release package. |
-| [Architecture](docs/en/architecture.md) · [Storage and search](docs/en/storage.md) | Physical pixel coordinates, Chinese queries, background tasks, and recovery. |
-| [Design notes](docs/en/design.md) · [UI review](docs/en/ui-review.md) | References, styles, and actual window checks. |
-| [Validation](docs/en/validation.md) · [Limitations](docs/en/limitations.md) | What was tested and what was not. |
-| [Third-party components and models](docs/en/third-party.md) | Sources, licenses, versions, and hashes. |
-
-Chinese is the default documentation language; each guide links to its Chinese counterpart.
-
-## Build from source
+| [User guide](docs/usage.md) | Capture, annotation, search, organization, backups, and settings. |
+| [Build](docs/build.md) · [Packaging and installation](docs/distribution.md) | Run from source, create a ZIP or installer. |
+| [Architecture](docs/architecture.md) · [Storage and search](docs/storage.md) | Coordinates, queries, background jobs, and recovery. |
+| [Design](docs/design.md) · [UI inspection](docs/ui-review.md) | References, styles, and layout records. |
+| [Tests](docs/validation.md) · [Limitations](docs/limitations.md) | Test results and supported conditions. |
+| [Third-party components](docs/third-party.md) | Components, models, versions, licenses, and hashes. |
 
 Requires Windows x64 and **.NET SDK 10.0.401**. Run from the repository root:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/fetch-models.ps1
 powershell -ExecutionPolicy Bypass -File scripts/build.ps1
-powershell -ExecutionPolicy Bypass -File scripts/package.ps1 -Version 0.1.2
+powershell -ExecutionPolicy Bypass -File scripts/package.ps1 -Version 0.1.3
 ```
 
-Fetching models the first time requires a connection. Dependencies are pinned in `packages.lock.json`; running a release needs no SDK. Building an installer also requires Inno Setup; see [packaging and installation](docs/en/distribution.md).
+The first model download requires a connection. Dependencies are pinned in `packages.lock.json`; building an installer requires Inno Setup.
 
-## Help improve it
+See [CONTRIBUTING](CONTRIBUTING.md) for bug reports, documentation fixes, and code contributions, and [ROADMAP](ROADMAP.md) for planned features. If you find the app useful, a Star is welcome.
 
-Multiple-monitor testing, OCR failure samples, documentation corrections, and small bug fixes are useful contributions. Use synthetic or redacted images and include the app version, display scaling, and steps to reproduce. The [contribution guide](CONTRIBUTING.en.md) explains the checks and submission process.
+## License
 
-Next work starts with problems found in actual use. Larger-library search performance, an English UI, and text annotations are candidates, listed in the [roadmap](ROADMAP.en.md).
-
-If this is useful to you, a **Star** is welcome. Bug reports are welcome too.
-
-## License and acknowledgments
-
-New application code and the original icon use [MIT](LICENSE). WPF UI, RapidOcrNet, PaddleOCR models, ONNX Runtime, SQLite, and other components retain their own licenses. This project does not train its own OCR models. See [third-party notices](docs/en/third-party.md).
-
-Layout and documentation organization draw on Eagle, ShareX, PowerToys, Flameshot, and Flow Launcher. Their brand assets, screenshots, and prose are not used as our own. [Design references](docs/en/design.md) · [README references](docs/en/readme-references.md)
+Application code and the original icon use [MIT](LICENSE). WPF UI, RapidOcrNet, PaddleOCR models, ONNX Runtime, SQLite, and other components retain their own licenses; see [third-party notices](docs/third-party.md). Layout references include Eagle, ShareX, and PowerToys; see the [design notes](docs/design.md).
