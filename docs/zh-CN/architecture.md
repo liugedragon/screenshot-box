@@ -8,18 +8,22 @@
 | --- | --- |
 | `ScreenshotBox.Core` | SQLite 资料库、搜索、OCR 任务代数、备份与恢复；不依赖 WPF。 |
 | `ScreenshotBox.App/Native` | Win32 热键、GDI 桌面采集、每屏遮罩、选区、标注与 PNG 输出。 |
-| `ScreenshotBox.App/Services.cs` | 原图与缩略图、OCR 队列、模型生命周期、剪贴板重试。 |
+| `ScreenshotBox.App/Services.cs` | Windows 原图与缩略图、剪贴板重试。 |
+| `ScreenshotBox.Ocr` | 共享的 CPU OCR 队列与模型生命周期。 |
+| `ScreenshotBox.Linux` | Avalonia 资料库界面、X11 截图与快捷键、标注和 PNG 导入。 |
 | `PreviewWindow` | 原图、文字行框、缩放和平移。 |
 
 主窗口使用可观察列表展示资料，视图处理焦点、选择和窗口事件。数据操作在 Core 和 Services 中完成。`SelectionGeometry` 独立处理矩形计算。
 
-## 启动与托盘
+## 启动与托盘（Windows）
 
 正常启动打开资料库。`--background` 初始化窗口原生句柄、截图热键和托盘图标，不显示主窗口。两种模式都会恢复待识别任务。双击托盘图标或选择“打开资料库”显示窗口。
 
 安装向导在当前用户的 Windows Run 项注册带引号的 exe 路径与 `--background`，运行程序本身不注册启动项。向导不改写 Windows 的 `StartupApproved` 状态；项名固定为 `ScreenshotBox`，卸载时删除。
 
 每用户互斥锁保证单实例。再次正常启动会通知已有实例打开资料库；再次后台启动直接退出，不显示窗口。后台启动失败时写入 `%LOCALAPPDATA%\ScreenshotBox\diagnostics\startup-error.txt`，不弹出对话框。
+
+Linux 试用版使用私有 Unix 套接字处理重复启动，保留可见资料库窗口，不注册登录自启动或托盘。
 
 ## 截图坐标
 
@@ -65,6 +69,6 @@ OCR 原文和行框使用原图坐标保存。高亮范围是引擎提供的整�
 
 ## 组件职责
 
-WPF UI 提供主题和控件；Microsoft.Data.Sqlite/SQLite 提供事务数据库；RapidOcrNet 调用检测、方向和识别模型；PaddleOCR 提供训练权重；ONNX Runtime 在 CPU 上推理；SkiaSharp 处理 OCR 图像。
+WPF UI 提供 Windows 主题和控件，Avalonia 提供 Linux 界面；Microsoft.Data.Sqlite/SQLite 提供事务数据库；RapidOcrNet 调用检测、方向和识别模型；PaddleOCR 提供训练权重；ONNX Runtime 在 CPU 上推理；SkiaSharp 处理 OCR 图像。
 
 ScreenshotBox 实现选区交互、热键更新、标注历史、调色盘、资料视图、检索、任务状态、备份恢复和集成测试。组件版本与许可证见[第三方说明](third-party.md)。

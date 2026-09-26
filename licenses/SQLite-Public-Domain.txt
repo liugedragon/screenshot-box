@@ -1,0 +1,20 @@
+SQLite 3.53.3
+Source: https://sqlite.org/2026/sqlite-amalgamation-3530300.zip
+Copyright information: https://sqlite.org/copyright.html
+
+The following notice is reproduced from sqlite3.c:
+
+/*
+** 2001 September 15
+**
+** The author disclaims copyright to this source code.  In place of
+** a legal notice, here is a blessing:
+**
+**    May you do good and not evil.
+**    May you find forgiveness for yourself and forgive others.
+**    May you share freely, never taking more than you give.
+**
+*************************************************************************
+** Internal interface definitions for SQLite.
+**
+*/

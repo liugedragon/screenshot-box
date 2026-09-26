@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
     <ImplicitUsings>enable</ImplicitUsings>

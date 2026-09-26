@@ -1,0 +1,18 @@
+{
+  "sqliteVersion": "3.53.3",
+  "sourceId": "2026-06-26 20:14:12 d4c0e51e4aeb96955b99185ab9cde75c339e2c29c3f3f12428d364a10d782c62",
+  "sourceSha3_256": "28e484abdaa43630e34040ef6ed92be973a1ad54107803d8af5145b889c23ed7",
+  "librarySha256": "c81de93257dd9f653aedb0e6f2b24390b077ef5506a0bca97c2579bf4ba036ec",
+  "bytes": 1601696,
+  "maximumRequiredGlibc": "2.29",
+  "hostGlibc": [
+    "glibc",
+    "2.31"
+  ],
+  "compiler": "gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0",
+  "fts5": true,
+  "json": true,
+  "math": true,
+  "rtree": true,
+  "requiredExports": true
+}

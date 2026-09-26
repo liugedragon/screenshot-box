@@ -8,18 +8,22 @@ English · [简体中文](zh-CN/architecture.md)
 | --- | --- |
 | `ScreenshotBox.Core` | SQLite library, search, OCR task generations, backup and restore; no WPF dependency. |
 | `ScreenshotBox.App/Native` | Win32 hotkeys, GDI desktop capture, per-monitor overlays, selections, annotations, and PNG output. |
-| `ScreenshotBox.App/Services.cs` | Originals, thumbnails, OCR queue, model lifecycle, and clipboard retries. |
+| `ScreenshotBox.App/Services.cs` | Windows originals, thumbnails and clipboard retries. |
+| `ScreenshotBox.Ocr` | Shared CPU OCR queue and model lifecycle. |
+| `ScreenshotBox.Linux` | Avalonia library interface, X11 capture and shortcuts, annotations and PNG imports. |
 | `PreviewWindow` | Original image, text-line boxes, zoom, and pan. |
 
-The main window displays an observable collection. Views handle focus, selection, and window events; Core and Services handle data operations. `SelectionGeometry` provides independent rectangle calculations.
+The Windows main window displays an observable collection. Views handle focus, selection, and window events; Core and Services handle data operations. `SelectionGeometry` provides independent rectangle calculations.
 
-## Startup and tray
+## Startup and tray (Windows)
 
 Normal launch opens the library. `--background` initializes the window's native handle, capture hotkey, and tray icon without showing the main window. Pending OCR jobs resume in either mode. Double-clicking the tray icon or choosing Open library displays the window.
 
 The installation wizard registers the quoted exe path and `--background` under the current user's Windows Run key. The runtime does not register startup. Setup does not rewrite Windows's `StartupApproved` state; the stable `ScreenshotBox` value is removed on uninstall.
 
 A per-user mutex enforces one instance. A second normal launch signals the existing instance to open its library; a second background launch exits without showing it. Background startup failures write `%LOCALAPPDATA%\ScreenshotBox\diagnostics\startup-error.txt` and exit without a dialog.
+
+The Linux preview uses a private Unix socket for repeated-launch activation and keeps its library window available. It does not register login startup or use a tray icon.
 
 ## Capture coordinates
 
@@ -65,6 +69,6 @@ Thumbnail size, annotation settings, and the language preference are stored loca
 
 ## Component responsibilities
 
-WPF UI supplies themes and controls. Microsoft.Data.Sqlite/SQLite provide the transactional database. RapidOcrNet invokes detection, orientation, and recognition models; PaddleOCR supplies trained weights. ONNX Runtime executes CPU inference, and SkiaSharp processes OCR images.
+WPF UI supplies Windows themes and controls; Avalonia supplies the Linux interface. Microsoft.Data.Sqlite/SQLite provide the transactional database. RapidOcrNet invokes detection, orientation, and recognition models; PaddleOCR supplies trained weights. ONNX Runtime executes CPU inference, and SkiaSharp processes OCR images.
 
 ScreenshotBox implements selection interactions, hotkey updates, annotation history, palette, library views, queries, job state, backup restore, and integration tests. Versions and licenses are in [third-party notices](third-party.md).

@@ -1,0 +1,82 @@
+{
+  "test": "Isolated per-user Linux installer",
+  "checks": [
+    {
+      "name": "Custom Unicode and space path installs",
+      "passed": true
+    },
+    {
+      "name": "Desktop executable path is quoted",
+      "passed": true
+    },
+    {
+      "name": "Desktop launcher uses installed SVG",
+      "passed": true
+    },
+    {
+      "name": "Installer leaves login startup unchanged",
+      "passed": true
+    },
+    {
+      "name": "Update rejects a corrupt previous manifest before changes",
+      "passed": true
+    },
+    {
+      "name": "Staging failure leaves previous app and launcher unchanged",
+      "passed": true
+    },
+    {
+      "name": "Failed publication rolls back application and launcher",
+      "passed": true
+    },
+    {
+      "name": "New package files cannot overwrite unowned user files",
+      "passed": true
+    },
+    {
+      "name": "Corrupt release is rejected before overwriting files",
+      "passed": true
+    },
+    {
+      "name": "Upgrade retains ownership of older installed files",
+      "passed": true
+    },
+    {
+      "name": "Upgrade preserves user-added files",
+      "passed": true
+    },
+    {
+      "name": "Unregistered nonempty directory is rejected",
+      "passed": true
+    },
+    {
+      "name": "Launcher owned by another installation blocks replacement",
+      "passed": true
+    },
+    {
+      "name": "Uninstall preserves another installation launcher",
+      "passed": true
+    },
+    {
+      "name": "Uninstall removes current and older managed files",
+      "passed": true
+    },
+    {
+      "name": "Uninstall preserves user files and library data",
+      "passed": true
+    },
+    {
+      "name": "Normal uninstall removes its launcher and empty application directory",
+      "passed": true
+    },
+    {
+      "name": "Uninstall rejects traversal before deleting files",
+      "passed": true
+    },
+    {
+      "name": "Install rejects a directory symlink escaping the prefix",
+      "passed": true
+    }
+  ],
+  "scope": "Synthetic release, custom Unicode path and isolated XDG directories; no real menu launch or application process test."
+}

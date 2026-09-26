@@ -9,6 +9,7 @@
   <RuntimeIdentifier>win-x64</RuntimeIdentifier><SelfContained>true</SelfContained>
  </PropertyGroup>
  <ItemGroup><ProjectReference Include="../ScreenshotBox.Core/ScreenshotBox.Core.csproj" />
+ <ProjectReference Include="../ScreenshotBox.Ocr/ScreenshotBox.Ocr.csproj" />
  <PackageReference Include="WPF-UI" Version="4.3.0" />
  <PackageReference Include="RapidOcrNet" Version="4.2.0" /></ItemGroup>
  <ItemGroup><Content Include="../../models/chinese/*" Link="models/chinese/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>

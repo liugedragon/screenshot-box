@@ -1,0 +1,15 @@
+{
+  "component": "SQLite",
+  "version": "3.53.3",
+  "license": "Public Domain",
+  "licenseFile": "../SQLite-Public-Domain.txt",
+  "source": "https://sqlite.org/2026/sqlite-amalgamation-3530300.zip",
+  "archiveSha3_256": "d45c688a8cb23f68611a894a756a12d7eb6ab6e9e2468ca70adbeab3808b5ab9",
+  "sqlite3cSha3_256": "28e484abdaa43630e34040ef6ed92be973a1ad54107803d8af5145b889c23ed7",
+  "sourceId": "2026-06-26 20:14:12 d4c0e51e4aeb96955b99185ab9cde75c339e2c29c3f3f12428d364a10d782c62",
+  "buildScript": "../../scripts/build-linux-sqlite.sh",
+  "library": "libe_sqlite3.so",
+  "baseline": "Ubuntu 20.04 x64, glibc 2.31",
+  "reason": "The SQLitePCLRaw.lib.e_sqlite3 2.1.12 Linux binary requires glibc 2.33. This source build keeps the same exported SQLite API on the supported glibc baseline.",
+  "compileOptions": ["ENABLE_COLUMN_METADATA", "ENABLE_FTS3", "ENABLE_FTS3_PARENTHESIS", "ENABLE_FTS4", "ENABLE_FTS5", "ENABLE_GEOPOLY", "ENABLE_MATH_FUNCTIONS", "ENABLE_PREUPDATE_HOOK", "ENABLE_RTREE", "ENABLE_SESSION", "ENABLE_SNAPSHOT", "THREADSAFE=1", "DEFAULT_FOREIGN_KEYS=1", "DEFAULT_RECURSIVE_TRIGGERS=1"]
+}

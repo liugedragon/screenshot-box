@@ -27,7 +27,10 @@
   {
     "file": "SkiaSharp-MIT.txt",
     "source": "https://api.nuget.org/v3-flatcontainer/skiasharp/3.119.1/skiasharp.3.119.1.nupkg#LICENSE.txt",
-    "sha256": "89101e35a8c66fd4d6dffc1763259161d35cb564c169714ec227a768c89f2938"
+    "sha256": "89101e35a8c66fd4d6dffc1763259161d35cb564c169714ec227a768c89f2938",
+    "additionalSources": [
+      "https://api.nuget.org/v3-flatcontainer/skiasharp/3.119.4/skiasharp.3.119.4.nupkg#LICENSE.txt"
+    ]
   },
   {
     "file": "SkiaSharp-Win32-ThirdPartyNotices.txt",
@@ -118,5 +121,45 @@
     "file": "VisualStudio-Community-2022-License.txt",
     "source": "https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Visual-Studio-2022-Community-License-EN.docx",
     "sha256": "24b187690944c166a8337208454cbc775e1a39406d6f2a986e9a34d8f1a1f259"
+  },
+  {
+    "file": "SkiaSharp-Linux-ThirdPartyNotices.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/skiasharp.nativeassets.linux.nodependencies/3.119.4/skiasharp.nativeassets.linux.nodependencies.3.119.4.nupkg#THIRD-PARTY-NOTICES.txt",
+    "sha256": "21504c46c4c58aa64c1055bd2dcbc5f9a136b4b8c412ed3cc6740e22c5b127f5"
+  },
+  {
+    "file": "SQLite-Public-Domain.txt",
+    "source": "https://sqlite.org/2026/sqlite-amalgamation-3530300.zip#sqlite3.c",
+    "sha256": "746160607113c70d33741aa6c6eee41154d65c16b228ef14d664aa090b339666"
+  },
+  {
+    "file": "HarfBuzzSharp-MIT.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/harfbuzzsharp/8.3.1.3/harfbuzzsharp.8.3.1.3.nupkg#LICENSE.txt",
+    "sha256": "89101e35a8c66fd4d6dffc1763259161d35cb564c169714ec227a768c89f2938"
+  },
+  {
+    "file": "HarfBuzzSharp-Linux-ThirdPartyNotices.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/harfbuzzsharp.nativeassets.linux/8.3.1.3/harfbuzzsharp.nativeassets.linux.8.3.1.3.nupkg#THIRD-PARTY-NOTICES.txt",
+    "sha256": "21504c46c4c58aa64c1055bd2dcbc5f9a136b4b8c412ed3cc6740e22c5b127f5"
+  },
+  {
+    "file": "Avalonia-MIT.txt",
+    "source": "https://raw.githubusercontent.com/AvaloniaUI/Avalonia/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+    "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+  },
+  {
+    "file": "MicroCom-MIT.txt",
+    "source": "https://raw.githubusercontent.com/kekekeks/MicroCom/76785efcafd91b5902fd19dd11145f6dd655b7b4/LICENSE",
+    "sha256": "6ee769c9ac4dac9abb16b98b1341e9528ff9f4ab685481410d3376d14148f3a9"
+  },
+  {
+    "file": "DotNetLinuxRuntime-MIT.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.netcore.app.runtime.linux-x64/10.0.12/microsoft.netcore.app.runtime.linux-x64.10.0.12.nupkg#LICENSE.TXT",
+    "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+  },
+  {
+    "file": "DotNetLinuxRuntime-ThirdPartyNotices.txt",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.netcore.app.runtime.linux-x64/10.0.12/microsoft.netcore.app.runtime.linux-x64.10.0.12.nupkg#THIRD-PARTY-NOTICES.TXT",
+    "sha256": "66f1d4e44973185519bb4aa8a9718eb22fc7af2cc532e3ae9cfc4c127ee7fc54"
   }
 ]

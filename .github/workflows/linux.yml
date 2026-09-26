@@ -1,0 +1,35 @@
+name: Linux CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '10.0.401'
+          architecture: x64
+      - name: Restore locked desktop dependencies
+        run: dotnet restore src/ScreenshotBox.Linux/ScreenshotBox.Linux.csproj --locked-mode
+      - name: Build Linux desktop
+        run: dotnet build src/ScreenshotBox.Linux/ScreenshotBox.Linux.csproj --no-restore -c Release -m:1
+      - name: Restore locked test dependencies
+        run: dotnet restore tests/ScreenshotBox.Core.Tests/ScreenshotBox.Core.Tests.csproj --locked-mode
+      - name: Test Core on Linux
+        run: dotnet test tests/ScreenshotBox.Core.Tests/ScreenshotBox.Core.Tests.csproj --no-restore -c Release --logger trx

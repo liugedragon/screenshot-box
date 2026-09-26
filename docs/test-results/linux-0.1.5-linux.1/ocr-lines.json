@@ -1,0 +1,60 @@
+{
+  "Id": "b6b999e094f44ca8804ff982a44c51fb",
+  "ImagePath": "images/b6b999e094f44ca8804ff982a44c51fb.png",
+  "ThumbnailPath": "thumbnails/b6b999e094f44ca8804ff982a44c51fb.png",
+  "CreatedUtc": "2026-09-26T16:46:41.635028Z",
+  "Title": "",
+  "Notes": "",
+  "Tags": "",
+  "IsFavorite": false,
+  "IsDeleted": false,
+  "OcrStatus": "Ready",
+  "OcrText": "截图资料盒 ScreenshotBox\n课程安排：计算机网络 B204\n订单编号 SB-20260927-001\n保修日期 2026-09-27\n英文English/中文识别\n",
+  "OcrError": "",
+  "OcrModelVersion": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+  "Width": 1000,
+  "Height": 450,
+  "OcrGeneration": 1,
+  "OcrBlocks": [
+    {
+      "Text": "截图资料盒 ScreenshotBox",
+      "X": 38,
+      "Y": 28,
+      "Width": 525,
+      "Height": 55,
+      "Confidence": 0.9895758032798767
+    },
+    {
+      "Text": "课程安排：计算机网络 B204",
+      "X": 38,
+      "Y": 114,
+      "Width": 534,
+      "Height": 49,
+      "Confidence": 0.9718673229217529
+    },
+    {
+      "Text": "订单编号 SB-20260927-001",
+      "X": 38,
+      "Y": 190,
+      "Width": 521,
+      "Height": 51,
+      "Confidence": 0.9758797883987427
+    },
+    {
+      "Text": "保修日期 2026-09-27",
+      "X": 38,
+      "Y": 265,
+      "Width": 397,
+      "Height": 52,
+      "Confidence": 0.9695084095001221
+    },
+    {
+      "Text": "英文English/中文识别",
+      "X": 36,
+      "Y": 338,
+      "Width": 451,
+      "Height": 61,
+      "Confidence": 0.9816960692405701
+    }
+  ]
+}

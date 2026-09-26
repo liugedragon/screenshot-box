@@ -129,6 +129,13 @@
         "dependencies": {
           "Microsoft.Data.Sqlite": "[10.0.12, )"
         }
+      },
+      "screenshotbox.ocr": {
+        "type": "Project",
+        "dependencies": {
+          "RapidOcrNet": "[4.2.0, )",
+          "ScreenshotBox.Core": "[1.0.0, )"
+        }
       }
     },
     "net10.0-windows7.0/win-x64": {

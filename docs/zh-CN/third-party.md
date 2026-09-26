@@ -4,7 +4,7 @@
 
 下表列出 `packages.lock.json` 中的版本。构建使用 `--locked-mode`；发布包包含锁文件、许可证、第三方通知和文件 SHA-256 清单。界面与交互参考见[设计说明](design.md)。
 
-| 发布组件 | 锁定版本 | 许可证与来源 |
+| Windows 组件 | 锁定版本 | 许可证与来源 |
 | --- | --- | --- |
 | .NET / Windows Desktop Runtime | 10.0.12，win-x64 | MIT，官方运行时 NuGet 包内正文及 .NET 第三方通知 |
 | WPF-UI、WPF-UI.Abstractions | 4.3.0 | MIT，包内 LICENSE.md 与 ThirdPartyNotices.txt；[官方项目](https://github.com/lepoco/wpfui) |
@@ -19,7 +19,22 @@
 | PP-OCRv5 检测、文字方向模型 | RapidOcrNet 4.2.0 包内 v5 默认文件 | PaddleOCR / RapidOCR 上游 Apache-2.0，正文随包；[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)、[RapidOCR](https://github.com/RapidAI/RapidOCR) |
 | PP-OCRv5 中文识别模型及字典 | RapidOCR v3.9.2 模型发布 | 上游 Apache-2.0；下载地址、大小和 SHA-256 见 [`models/chinese/sources.json`](../../models/chinese/sources.json)，并在打包时核对 |
 
-`SkiaSharp.NativeAssets.Linux.NoDependencies` 与 `SkiaSharp.NativeAssets.macOS` 3.119.1 是 RapidOcrNet / SkiaSharp 的传递依赖，保留在锁文件以便复现；Windows 发布阶段只保留 win-x64 原生文件，不分发 Linux/macOS 二进制。RapidOcrNet 的默认拉丁文识别模型与字典不使用，打包时删除这两个文件，保留检测和方向模型以及单独提供的中文识别模型。
+Windows 依赖图中的 `SkiaSharp.NativeAssets.Linux.NoDependencies` 与 `SkiaSharp.NativeAssets.macOS` 3.119.1 是 RapidOcrNet / SkiaSharp 的传递依赖，保留在锁文件以便复现；Windows 发布阶段只保留 win-x64 原生文件，不分发 Linux/macOS 二进制。RapidOcrNet 的默认拉丁文识别模型与字典不使用，打包时删除这两个文件，保留检测和方向模型以及单独提供的中文识别模型。
+
+## Linux 试用版组件
+
+Ubuntu X11 试用版在上述共享 OCR 和资料库依赖之外，使用以下前端与原生组件。Windows 版本继续使用 WPF 和 SkiaSharp 3.119.1。
+
+| Linux 组件 | 锁定版本 | 许可证与来源 |
+| --- | --- | --- |
+| .NET Runtime，linux-x64 | 10.0.12 | MIT；Linux 运行时原始正文与通知见 `licenses/DotNetLinuxRuntime-MIT.txt`、`licenses/DotNetLinuxRuntime-ThirdPartyNotices.txt` |
+| Avalonia、Desktop、X11、Skia、HarfBuzz 和 Fluent 主题 | 12.1.3 | MIT；许可证取自包记录的固定上游提交，见 `licenses/Avalonia-MIT.txt`；[官方项目](https://github.com/AvaloniaUI/Avalonia) |
+| SkiaSharp 和 Linux 原生组件 | 3.119.4 | MIT；正文与既有 `SkiaSharp-MIT.txt` 相同，Linux 原生组件的第三方条款见 `SkiaSharp-Linux-ThirdPartyNotices.txt` |
+| HarfBuzzSharp 和 Linux 原生组件 | 8.3.1.3 | 封装层使用 MIT；原生 HarfBuzz 等各自条款保留在 `HarfBuzzSharp-Linux-ThirdPartyNotices.txt` |
+| MicroCom.Runtime | 0.11.6 | MIT；原始正文取自包记录的固定提交，见 `MicroCom-MIT.txt` |
+| SQLite 原生引擎 `libe_sqlite3.so` | 3.53.3 | 公共领域软件；官方源码地址与校验值见 [`licenses/native/linux-sqlite-source.json`](../../licenses/native/linux-sqlite-source.json)，使用 Ubuntu 20.04 glibc 基线构建 |
+
+Linux 与 Windows 使用相同的中文模型和字典。Linux 包不分发 Windows Visual C++ Runtime 或 WPF 桌面运行时。锁文件可以包含其他平台依赖；打包时排除这些平台的原生二进制。构建与测试范围见 [Ubuntu / Linux 试用版](linux.md)。
 
 ## 许可证与模型来源
 

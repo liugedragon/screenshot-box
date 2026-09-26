@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "checks": [
+    "English settings label",
+    "Chinese localization",
+    "Chinese system language defaults to Chinese",
+    "Other system languages default to English",
+    "Wayland guard prevents XWayland global grabs",
+    "Native window initialized",
+    "UI library imports actual PNG dimensions",
+    "Chinese metadata search through UI library",
+    "Literal symbol search through UI library",
+    "Native clipboard available",
+    "Independent process reads native image clipboard",
+    "Clipboard preserves image dimensions and pixels",
+    "Second launch activates existing instance and exits",
+    "Trash excluded from normal search",
+    "Restored item searchable",
+    "Metadata draft survives background refresh",
+    "Metadata focus and caret survive OCR refresh",
+    "Narrow window layout (client 760)",
+    "X11 confirms actual narrow native window pixels",
+    "Native client rendering"
+  ],
+  "environment": "Unix 6.6.87.2",
+  "language": "en-US",
+  "scope": "App component checks; no external mouse/keyboard automation"
+}

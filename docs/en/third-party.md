@@ -1,10 +1,10 @@
 # Third-party software and models
 
-[English](../third-party.md) · [简体中文](../zh-CN/third-party.md)
+English · [简体中文](../zh-CN/third-party.md)
 
-The table lists the versions in `packages.lock.json`. Builds use `--locked-mode`. Releases include licenses, third-party notices, lock files, and a file SHA-256 manifest. UI and interaction references are listed in [design notes](../design.md).
+The table lists the versions in `packages.lock.json`. Builds use `--locked-mode`. Releases include licenses, third-party notices, lock files, and a file SHA-256 manifest. UI and interaction references are listed in [design notes](design.md).
 
-| Shipped component | Locked version | License and source |
+| Windows component | Locked version | License and source |
 | --- | --- | --- |
 | .NET / Windows Desktop Runtime | 10.0.12, win-x64 | MIT; license text and .NET third-party notices from the official runtime NuGet packages |
 | WPF-UI, WPF-UI.Abstractions | 4.3.0 | MIT; bundled LICENSE.md and ThirdPartyNotices.txt; [upstream](https://github.com/lepoco/wpfui) |
@@ -19,9 +19,24 @@ The table lists the versions in `packages.lock.json`. Builds use `--locked-mode`
 | PP-OCRv5 detection and text-line orientation models | Default v5 files in RapidOcrNet 4.2.0 | PaddleOCR / RapidOCR upstream Apache-2.0 terms included; [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR), [RapidOCR](https://github.com/RapidAI/RapidOCR) |
 | PP-OCRv5 Chinese recognition model and dictionary | RapidOCR v3.9.2 model release | Upstream Apache-2.0. Exact download URLs, sizes, and SHA-256 hashes are pinned in [`models/chinese/sources.json`](../../models/chinese/sources.json) and checked during packaging. |
 
-`SkiaSharp.NativeAssets.Linux.NoDependencies` and `SkiaSharp.NativeAssets.macOS` 3.119.1 are transitive RapidOcrNet / SkiaSharp dependencies. They remain in lock files for reproducibility, but the Windows release does not ship their Linux or macOS binaries.
+In the Windows dependency graph, `SkiaSharp.NativeAssets.Linux.NoDependencies` and `SkiaSharp.NativeAssets.macOS` 3.119.1 are transitive RapidOcrNet / SkiaSharp dependencies. They remain in lock files for reproducibility, but the Windows release does not ship their Linux or macOS binaries.
 
 RapidOcrNet's default Latin recognition model and dictionary are unused. Packaging removes those two files, retaining the detection and orientation models and the separately supplied Chinese recognition model.
+
+## Linux preview components
+
+The Ubuntu X11 preview uses the following frontend and native components in addition to the shared OCR and library dependencies above. The Windows release continues to use WPF and SkiaSharp 3.119.1.
+
+| Linux component | Locked version | License and provenance |
+| --- | --- | --- |
+| .NET Runtime, linux-x64 | 10.0.12 | MIT; original Linux runtime license and notices in `licenses/DotNetLinuxRuntime-MIT.txt` and `licenses/DotNetLinuxRuntime-ThirdPartyNotices.txt` |
+| Avalonia, Desktop, X11, Skia, HarfBuzz and Fluent theme | 12.1.3 | MIT; original license from the package's fixed upstream commit; `licenses/Avalonia-MIT.txt`; [upstream](https://github.com/AvaloniaUI/Avalonia) |
+| SkiaSharp and Linux native assets | 3.119.4 | MIT; the original MIT text matches the existing `SkiaSharp-MIT.txt`. Linux native third-party terms are in `SkiaSharp-Linux-ThirdPartyNotices.txt`. |
+| HarfBuzzSharp and Linux native assets | 8.3.1.3 | MIT wrapper; native HarfBuzz and other notices retain their own terms in `HarfBuzzSharp-Linux-ThirdPartyNotices.txt` |
+| MicroCom.Runtime | 0.11.6 | MIT; original license pinned to the package repository commit; `MicroCom-MIT.txt` |
+| SQLite native engine, `libe_sqlite3.so` | 3.53.3 | Public domain; exact official source archive and checksums in [`licenses/native/linux-sqlite-source.json`](../../licenses/native/linux-sqlite-source.json). Built for the Ubuntu 20.04 glibc baseline. |
+
+The Linux package keeps the same Chinese models and dictionary as Windows. It does not distribute the Windows Visual C++ Runtime or WPF desktop runtime. Lock files can contain dependencies for other platforms; those native binaries are excluded from the Linux package. See [Ubuntu / Linux preview](linux.md) for build and test scope.
 
 ## License and model provenance
 

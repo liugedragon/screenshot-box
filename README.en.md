@@ -16,7 +16,7 @@
 
 </div>
 
-ScreenshotBox is a Windows screenshot tool and image library. Select a screen region with a hotkey and save it; text recognition runs in the background. Later, search by title, notes, tags, or text in the image. Class schedules, order numbers, and warranty dates stay on your computer.
+ScreenshotBox is a screenshot tool and local image library. Select a screen region with a hotkey and save it; text recognition runs in the background. Later, search by title, notes, tags, or text in the image. Class schedules, order numbers, and warranty dates stay on your computer.
 
 For **Windows 11 x64**. No account, API key, Python, or dedicated GPU required. OCR runs locally on the CPU with bundled models. **0.1.4 is a prerelease**; see [known limitations](docs/limitations.md) for current issues and untested configurations.
 
@@ -31,6 +31,16 @@ For **Windows 11 x64**. No account, API key, Python, or dedicated GPU required. 
 3. Open the library from the tray and search for a word in the screenshot. Select an image and press **Space** to preview it with matching text lines highlighted.
 
 You can change the capture hotkey to `Alt+A`, `Ctrl+Shift+Q`, or another combination. The app checks common reserved system shortcuts and global hotkey availability; failed registration leaves the old hotkey active. **Esc** cancels without creating an image or entry.
+
+## Ubuntu / X11 preview
+
+An experimental Ubuntu x64 version is available separately from the Windows release. It includes region capture, annotation, local Chinese/English OCR, search and library backups. It currently requires X11; tray integration and login startup are not included.
+
+[Download Linux preview](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.5-linux.1/ScreenshotBox-0.1.5-linux.1-linux-x64.tar.gz) · [Linux guide and test coverage](docs/linux.md)
+
+![Ubuntu screenshot library with English sample images](docs/images/en/linux-library.png)
+
+*Linux 0.1.5-linux.1, running under WSL Ubuntu with XLaunch. Sample images are synthetic. The Windows feature list follows below; Linux differences are described in its guide.*
 
 ## Features
 

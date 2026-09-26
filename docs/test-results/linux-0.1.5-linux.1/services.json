@@ -1,0 +1,79 @@
+{
+  "platform": "Ubuntu 20.04.3 LTS",
+  "framework": ".NET 10.0.12",
+  "cpuOnly": true,
+  "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+  "image": "Synthetic Chinese and English text; no user data",
+  "passed": 41,
+  "checks": {
+    "originalBeforeDatabase": true,
+    "physicalImageSize": true,
+    "thumbnailProportional": true,
+    "pngByteImport": true,
+    "invalidImageRejected": true,
+    "invalidImportNoFiles": true,
+    "exportPreservesImage": true,
+    "failedExportThrows": true,
+    "failedExportPreservesDestination": true,
+    "atomicTempsRemoved": true,
+    "cpuChineseOcrReady": true,
+    "chineseCourse": true,
+    "chineseOrder": true,
+    "chineseWarranty": true,
+    "mixedEnglish": true,
+    "lineBoxes": true,
+    "confidence": true,
+    "modelVersion": true,
+    "literalSearch:课程": true,
+    "literalSearch:订单": true,
+    "literalSearch:保修": true,
+    "literalSearch:B204": true,
+    "literalSearch:English": true,
+    "literalSearch:2026-09-27": true,
+    "symbolAndMetadataSearch:%": true,
+    "symbolAndMetadataSearch:_": true,
+    "symbolAndMetadataSearch:\"": true,
+    "symbolAndMetadataSearch:'": true,
+    "symbolAndMetadataSearch:/": true,
+    "symbolAndMetadataSearch:课程": true,
+    "symbolAndMetadataSearch:Study": true,
+    "unmatchedSymbolNotWildcard": true,
+    "deletedRejectsOldOcr": true,
+    "restoreRejectsOldOcr": true,
+    "missingOriginalOcrFails": true,
+    "backupRestoresOriginal": true,
+    "backupRestoresTags": true,
+    "backupRestoresSearch": true,
+    "backupRestoresLineBoxes": true,
+    "interruptedJobsRecovered": true,
+    "restoreNeverOverwrites": true
+  },
+  "skia": "3.119.4+release-3.119.4.f568ac94dd768ef9a2f593537cfde2dd0d348ef5.f568ac94dd768ef9a2f593537cfde2dd0d348ef5",
+  "models": {
+    "models/v5/ch_PP-OCRv5_mobile_det.onnx": "4d97c44a20d30a81aad087d6a396b08f786c4635742afc391f6621f5c6ae78ae",
+    "models/v5/ch_PP-LCNet_x0_25_textline_ori_cls_mobile.onnx": "54379ae5174d026780215fc748a7f31910dee36818e63d49e17dc598ecc82df7",
+    "models/chinese/ch_PP-OCRv5_rec_mobile.onnx": "5825fc7ebf84ae7a412be049820b4d86d77620f204a041697b0494669b1742c5",
+    "models/chinese/ppocrv5_dict.txt": "d1979e9f794c464c0d2e0b70a7fe14dd978e9dc644c0e71f14158cdf8342af1b"
+  },
+  "nativeLibraries": {
+    "libe_sqlite3.so": {
+      "bytes": 1601696,
+      "sha256": "c81de93257dd9f653aedb0e6f2b24390b077ef5506a0bca97c2579bf4ba036ec"
+    },
+    "libonnxruntime.so": {
+      "bytes": 28497752,
+      "sha256": "5715f06d8992ca8eeeddcce43df3a7d38f97d537052126f558e912cb312460ca"
+    },
+    "libonnxruntime_providers_shared.so": {
+      "bytes": 14632,
+      "sha256": "086ec1d5388f64153d9c63470d126693db9a182c8ce236d3a1119068471b8a0d"
+    },
+    "libSkiaSharp.so": {
+      "bytes": 11155176,
+      "sha256": "c8a0ee6f954bc6cf80673c34c6d6ba3345700e0ad1305172066e427954214c6b"
+    }
+  },
+  "limits": [
+    "This service probe does not check desktop capture, tray, shortcut, Wayland or clipboard UI."
+  ]
+}

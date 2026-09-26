@@ -1,0 +1,175 @@
+{
+  "platform": "Linux x64 / X11",
+  "display": "XLaunch X11",
+  "checks": [
+    {
+      "name": "Reverse drag keeps physical rectangle",
+      "passed": true
+    },
+    {
+      "name": "Resize NorthWest",
+      "passed": true
+    },
+    {
+      "name": "Resize North",
+      "passed": true
+    },
+    {
+      "name": "Resize NorthEast",
+      "passed": true
+    },
+    {
+      "name": "Resize East",
+      "passed": true
+    },
+    {
+      "name": "Resize SouthEast",
+      "passed": true
+    },
+    {
+      "name": "Resize South",
+      "passed": true
+    },
+    {
+      "name": "Resize SouthWest",
+      "passed": true
+    },
+    {
+      "name": "Resize West",
+      "passed": true
+    },
+    {
+      "name": "Move clamps selection without changing size",
+      "passed": true
+    },
+    {
+      "name": "Resize can cross opposite edge",
+      "passed": true
+    },
+    {
+      "name": "Crop has exact physical pixel dimensions",
+      "passed": true
+    },
+    {
+      "name": "Crop pixels match source at every position",
+      "passed": true
+    },
+    {
+      "name": "Pen produces colored pixels with configured width",
+      "passed": true
+    },
+    {
+      "name": "Eraser removes annotations rather than the image",
+      "passed": true
+    },
+    {
+      "name": "Erased area preserves original screenshot",
+      "passed": true
+    },
+    {
+      "name": "Undo restores erased object",
+      "passed": true
+    },
+    {
+      "name": "Arrow changes real pixels",
+      "passed": true
+    },
+    {
+      "name": "Arrow can be undone",
+      "passed": true
+    },
+    {
+      "name": "Rectangle changes real pixels",
+      "passed": true
+    },
+    {
+      "name": "Rectangle can be undone",
+      "passed": true
+    },
+    {
+      "name": "Mosaic changes real pixels",
+      "passed": true
+    },
+    {
+      "name": "Mosaic can be undone",
+      "passed": true
+    },
+    {
+      "name": "X11 captures actual drawable color",
+      "passed": true
+    },
+    {
+      "name": "X11 region dimensions and location match captured pixels",
+      "passed": true
+    },
+    {
+      "name": "Owner is visible before capture",
+      "passed": true
+    },
+    {
+      "name": "Owner is hidden before actual screenshot acquisition",
+      "passed": true
+    },
+    {
+      "name": "Successful capture leaves owner hidden",
+      "passed": true
+    },
+    {
+      "name": "X11 registers custom modifier shortcut",
+      "passed": true
+    },
+    {
+      "name": "Second X11 client registers another shortcut",
+      "passed": true
+    },
+    {
+      "name": "Occupied shortcut fails and preserves previous registration",
+      "passed": true
+    },
+    {
+      "name": "Reserved combination is rejected without replacing active shortcut",
+      "passed": true
+    },
+    {
+      "name": "Invalid combination preserves previous shortcut",
+      "passed": true
+    },
+    {
+      "name": "Shortcut can be changed",
+      "passed": true
+    },
+    {
+      "name": "Capture toolbar remains within the visible window",
+      "passed": true
+    },
+    {
+      "name": "Real overlay remains laid out at root pixel scale",
+      "passed": true
+    },
+    {
+      "name": "Escape cancels without producing PNG",
+      "passed": true
+    },
+    {
+      "name": "Enter returns SaveAndCopy with actual PNG",
+      "passed": true
+    },
+    {
+      "name": "CopyOnly returns separate action and PNG",
+      "passed": true
+    },
+    {
+      "name": "Export returns separate action and PNG",
+      "passed": true
+    },
+    {
+      "name": "Empty selection does not complete a capture",
+      "passed": true
+    },
+    {
+      "name": "Capture tool preferences retain custom sizes and color",
+      "passed": true
+    }
+  ],
+  "scope": "Actual X11 capture, pixel-space component checks and real Avalonia overlay. Native Ubuntu desktops, Wayland and Windows global hotkeys are outside this test."
+}

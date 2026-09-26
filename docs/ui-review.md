@@ -2,6 +2,14 @@
 
 English · [简体中文](zh-CN/ui-review.md)
 
+## Linux 0.1.5-linux.1 · 2026-09-27
+
+Environment: WSL Ubuntu 20.04.3, XLaunch X11, Avalonia 12.1.3. Native application windows were shown and their client areas rendered with synthetic data.
+
+English light and Chinese dark app checks passed 20 checks each: image clipboard read by another process, repeated-launch activation, edit text/focus/caret retention, and native 760 DIP resize confirmed through X11 geometry. The English gallery imported six colorful samples and produced 79 OCR line boxes. Matching warranty text is highlighted by its whole-line box in the original image.
+
+[Library](images/en/linux-library.png), [dark library](images/en/linux-library-dark.png), [settings](images/en/linux-settings.png), [preview](images/en/linux-preview.png). Linux test scope and limitations are in the [Linux guide](linux.md).
+
 ## 0.1.3 · 2026-09-26
 
 Environment: Windows 11 x64, one 2560 × 1440 display at 125% scaling. The checks use synthetic library data and programmatic WPF controls, followed by client-area image inspection.

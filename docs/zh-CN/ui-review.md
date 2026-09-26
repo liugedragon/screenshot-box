@@ -2,6 +2,14 @@
 
 简体中文 · [English](../ui-review.md)
 
+## Linux 0.1.5-linux.1 · 2026-09-27
+
+环境：WSL Ubuntu 20.04.3、XLaunch X11、Avalonia 12.1.3。检查使用合成资料，显示原生应用窗口后渲染客户区。
+
+英文浅色和中文深色各通过 20 项应用检查，覆盖独立进程读取图片剪贴板、重复启动激活、编辑内容与焦点及光标保留，并通过 X11 几何信息确认 760 DIP 窗口。英文图库导入六张彩色示例图，识别得到 79 个文字行框；原图预览按整行高亮保修关键词。
+
+[资料库](../images/en/linux-library.png)、[深色图库](../images/en/linux-library-dark.png)、[设置](../images/en/linux-settings.png)、[原图高亮](../images/en/linux-preview.png)。验证范围与限制见 [Linux 说明](linux.md)。
+
 ## 0.1.3 · 2026-09-26
 
 环境：Windows 11 x64，2560 × 1440 单屏，125% 缩放。使用合成资料、程序操作 WPF 控件，并查看导出的客户区图片。
