@@ -1,0 +1,707 @@
+{
+  "applicationVersion": "0.1.3",
+  "language": "en-US",
+  "sourceSha256": "88b633a00e5def87341604dea5436cdfaecd9794a734084913e128e47ce07efa",
+  "synthetic": true,
+  "ocrEngine": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+  "sampleCount": 6,
+  "recognition": [
+    {
+      "title": "Class schedule",
+      "text": "CLASS SCHEDULE\r\nAUTUMN 2026\r\nMONDAY\r\nWEDNESDAY\r\nFRIDAY\r\n09:00\r\n14:00\r\n10:00\r\nAlgorithms\r\nComputer networks\r\nSoftware engineering\r\nRoom B204\r\nRoom C105\r\nRoom A301\r\nStudy group\r\nLibrary / Wednesday 16:00\r\n",
+      "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+      "blocks": [
+        {
+          "Text": "CLASS SCHEDULE",
+          "X": 34,
+          "Y": 26,
+          "Width": 285,
+          "Height": 44,
+          "Confidence": 0.9653505682945251
+        },
+        {
+          "Text": "AUTUMN 2026",
+          "X": 747,
+          "Y": 30,
+          "Width": 160,
+          "Height": 36,
+          "Confidence": 0.9826942682266235
+        },
+        {
+          "Text": "MONDAY",
+          "X": 51,
+          "Y": 147,
+          "Width": 129,
+          "Height": 42,
+          "Confidence": 0.9989163279533386
+        },
+        {
+          "Text": "WEDNESDAY",
+          "X": 360,
+          "Y": 147,
+          "Width": 171,
+          "Height": 41,
+          "Confidence": 0.9970613121986389
+        },
+        {
+          "Text": "FRIDAY",
+          "X": 670,
+          "Y": 146,
+          "Width": 104,
+          "Height": 43,
+          "Confidence": 0.9979012608528137
+        },
+        {
+          "Text": "09:00",
+          "X": 49,
+          "Y": 219,
+          "Width": 129,
+          "Height": 60,
+          "Confidence": 0.9988420009613037
+        },
+        {
+          "Text": "14:00",
+          "X": 358,
+          "Y": 220,
+          "Width": 124,
+          "Height": 59,
+          "Confidence": 0.9981388449668884
+        },
+        {
+          "Text": "10:00",
+          "X": 668,
+          "Y": 219,
+          "Width": 124,
+          "Height": 59,
+          "Confidence": 0.9980598092079163
+        },
+        {
+          "Text": "Algorithms",
+          "X": 50,
+          "Y": 296,
+          "Width": 140,
+          "Height": 47,
+          "Confidence": 0.9961480498313904
+        },
+        {
+          "Text": "Computer networks",
+          "X": 363,
+          "Y": 299,
+          "Width": 231,
+          "Height": 42,
+          "Confidence": 0.9864596724510193
+        },
+        {
+          "Text": "Software engineering",
+          "X": 672,
+          "Y": 299,
+          "Width": 230,
+          "Height": 41,
+          "Confidence": 0.9987752437591553
+        },
+        {
+          "Text": "Room B204",
+          "X": 52,
+          "Y": 364,
+          "Width": 143,
+          "Height": 41,
+          "Confidence": 0.9835054874420166
+        },
+        {
+          "Text": "Room C105",
+          "X": 361,
+          "Y": 363,
+          "Width": 145,
+          "Height": 42,
+          "Confidence": 0.969536304473877
+        },
+        {
+          "Text": "Room A301",
+          "X": 670,
+          "Y": 363,
+          "Width": 144,
+          "Height": 42,
+          "Confidence": 0.9467857480049133
+        },
+        {
+          "Text": "Study group",
+          "X": 50,
+          "Y": 501,
+          "Width": 160,
+          "Height": 50,
+          "Confidence": 0.9824098348617554
+        },
+        {
+          "Text": "Library / Wednesday 16:00",
+          "X": 248,
+          "Y": 505,
+          "Width": 305,
+          "Height": 40,
+          "Confidence": 0.9764858484268188
+        }
+      ]
+    },
+    {
+      "title": "Order receipt",
+      "text": "ORDER RECEIPT\r\nPAYMENT COMPLETE\r\nNotebook computer\r\nOrder ID: SB-20260926-001\r\nTOTAL\r\nUSD 999.00\r\nPurchase date\r\nSeptember 26, 2026\r\nKeep this receipt for warranty service.\r\n",
+      "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+      "blocks": [
+        {
+          "Text": "ORDER RECEIPT",
+          "X": 35,
+          "Y": 30,
+          "Width": 254,
+          "Height": 41,
+          "Confidence": 0.9493216872215271
+        },
+        {
+          "Text": "PAYMENT COMPLETE",
+          "X": 719,
+          "Y": 36,
+          "Width": 209,
+          "Height": 29,
+          "Confidence": 0.9918217062950134
+        },
+        {
+          "Text": "Notebook computer",
+          "X": 376,
+          "Y": 143,
+          "Width": 312,
+          "Height": 48,
+          "Confidence": 0.995339572429657
+        },
+        {
+          "Text": "Order ID: SB-20260926-001",
+          "X": 380,
+          "Y": 189,
+          "Width": 300,
+          "Height": 37,
+          "Confidence": 0.9960760474205017
+        },
+        {
+          "Text": "TOTAL",
+          "X": 398,
+          "Y": 260,
+          "Width": 87,
+          "Height": 42,
+          "Confidence": 0.9993811249732971
+        },
+        {
+          "Text": "USD 999.00",
+          "X": 400,
+          "Y": 306,
+          "Width": 247,
+          "Height": 55,
+          "Confidence": 0.9928826093673706
+        },
+        {
+          "Text": "Purchase date",
+          "X": 32,
+          "Y": 454,
+          "Width": 173,
+          "Height": 43,
+          "Confidence": 0.9680725932121277
+        },
+        {
+          "Text": "September 26, 2026",
+          "X": 356,
+          "Y": 455,
+          "Width": 262,
+          "Height": 45,
+          "Confidence": 0.9755380153656006
+        },
+        {
+          "Text": "Keep this receipt for warranty service.",
+          "X": 35,
+          "Y": 522,
+          "Width": 440,
+          "Height": 40,
+          "Confidence": 0.992790937423706
+        }
+      ]
+    },
+    {
+      "title": "Warranty details",
+      "text": "WARRANTY DETAILS\r\nSERVICE RECORD\r\nNotebook computer\r\nCOVERAGE\r\nSerial number\r\n2 YEARS\r\nDEMO-2048-A\r\nParts and repairs\r\nCovered until\r\nProof of purchase\r\nSeptember 26, 2028\r\nSupport\r\nMonday-Friday / 09:00-18:00\r\n",
+      "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+      "blocks": [
+        {
+          "Text": "WARRANTY DETAILS",
+          "X": 35,
+          "Y": 32,
+          "Width": 330,
+          "Height": 40,
+          "Confidence": 0.9589651226997375
+        },
+        {
+          "Text": "SERVICE RECORD",
+          "X": 749,
+          "Y": 36,
+          "Width": 168,
+          "Height": 34,
+          "Confidence": 0.9941098093986511
+        },
+        {
+          "Text": "Notebook computer",
+          "X": 56,
+          "Y": 164,
+          "Width": 304,
+          "Height": 47,
+          "Confidence": 0.999318540096283
+        },
+        {
+          "Text": "COVERAGE",
+          "X": 673,
+          "Y": 172,
+          "Width": 140,
+          "Height": 37,
+          "Confidence": 0.9973892569541931
+        },
+        {
+          "Text": "Serial number",
+          "X": 55,
+          "Y": 227,
+          "Width": 164,
+          "Height": 42,
+          "Confidence": 0.9883024096488953
+        },
+        {
+          "Text": "2 YEARS",
+          "X": 671,
+          "Y": 228,
+          "Width": 178,
+          "Height": 55,
+          "Confidence": 0.9526045918464661
+        },
+        {
+          "Text": "DEMO-2048-A",
+          "X": 57,
+          "Y": 271,
+          "Width": 222,
+          "Height": 45,
+          "Confidence": 0.9976335167884827
+        },
+        {
+          "Text": "Parts and repairs",
+          "X": 671,
+          "Y": 331,
+          "Width": 202,
+          "Height": 42,
+          "Confidence": 0.9981973171234131
+        },
+        {
+          "Text": "Covered until",
+          "X": 57,
+          "Y": 349,
+          "Width": 155,
+          "Height": 37,
+          "Confidence": 0.9911220073699951
+        },
+        {
+          "Text": "Proof of purchase",
+          "X": 670,
+          "Y": 375,
+          "Width": 198,
+          "Height": 40,
+          "Confidence": 0.9979065656661987
+        },
+        {
+          "Text": "September 26, 2028",
+          "X": 55,
+          "Y": 384,
+          "Width": 299,
+          "Height": 48,
+          "Confidence": 0.9551382660865784
+        },
+        {
+          "Text": "Support",
+          "X": 53,
+          "Y": 505,
+          "Width": 118,
+          "Height": 46,
+          "Confidence": 0.999625563621521
+        },
+        {
+          "Text": "Monday-Friday / 09:00-18:00",
+          "X": 207,
+          "Y": 507,
+          "Width": 346,
+          "Height": 40,
+          "Confidence": 0.9903845191001892
+        }
+      ]
+    },
+    {
+      "title": "Lecture notes",
+      "text": "LECTURE NOTES\r\nALGORITHMS / WEEK 1\r\nGraph traversal\r\nKEY POINTS\r\nqueue.enqueue(start)\r\nBFS: queue\r\nwhile queue is not empty:\r\nDFS: stack\r\nnode = queue.dequeue)\r\nO(V + E)\r\nvisit(node)\r\nExercise\r\nFind the shortest path in a maze.\r\nTime complexity: O(V + E)\r\n",
+      "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+      "blocks": [
+        {
+          "Text": "LECTURE NOTES",
+          "X": 35,
+          "Y": 30,
+          "Width": 261,
+          "Height": 41,
+          "Confidence": 0.9432018995285034
+        },
+        {
+          "Text": "ALGORITHMS / WEEK 1",
+          "X": 696,
+          "Y": 39,
+          "Width": 236,
+          "Height": 30,
+          "Confidence": 0.9748107194900513
+        },
+        {
+          "Text": "Graph traversal",
+          "X": 56,
+          "Y": 144,
+          "Width": 216,
+          "Height": 44,
+          "Confidence": 0.9994537830352783
+        },
+        {
+          "Text": "KEY POINTS",
+          "X": 659,
+          "Y": 150,
+          "Width": 148,
+          "Height": 35,
+          "Confidence": 0.9740359783172607
+        },
+        {
+          "Text": "queue.enqueue(start)",
+          "X": 57,
+          "Y": 220,
+          "Width": 265,
+          "Height": 38,
+          "Confidence": 0.9932791590690613
+        },
+        {
+          "Text": "BFS: queue",
+          "X": 654,
+          "Y": 218,
+          "Width": 161,
+          "Height": 51,
+          "Confidence": 0.9918763637542725
+        },
+        {
+          "Text": "while queue is not empty:",
+          "X": 53,
+          "Y": 266,
+          "Width": 302,
+          "Height": 41,
+          "Confidence": 0.9893589019775391
+        },
+        {
+          "Text": "DFS: stack",
+          "X": 657,
+          "Y": 285,
+          "Width": 145,
+          "Height": 43,
+          "Confidence": 0.992793083190918
+        },
+        {
+          "Text": "node = queue.dequeue)",
+          "X": 68,
+          "Y": 316,
+          "Width": 288,
+          "Height": 39,
+          "Confidence": 0.9909379482269287
+        },
+        {
+          "Text": "O(V + E)",
+          "X": 656,
+          "Y": 353,
+          "Width": 130,
+          "Height": 46,
+          "Confidence": 0.9838764667510986
+        },
+        {
+          "Text": "visit(node)",
+          "X": 69,
+          "Y": 364,
+          "Width": 140,
+          "Height": 42,
+          "Confidence": 0.9328470826148987
+        },
+        {
+          "Text": "Exercise",
+          "X": 60,
+          "Y": 491,
+          "Width": 96,
+          "Height": 31,
+          "Confidence": 0.9994078874588013
+        },
+        {
+          "Text": "Find the shortest path in a maze.",
+          "X": 205,
+          "Y": 490,
+          "Width": 386,
+          "Height": 38,
+          "Confidence": 0.9823154211044312
+        },
+        {
+          "Text": "Time complexity: O(V + E)",
+          "X": 56,
+          "Y": 526,
+          "Width": 276,
+          "Height": 38,
+          "Confidence": 0.9747023582458496
+        }
+      ]
+    },
+    {
+      "title": "Travel checklist",
+      "text": "TRAVEL CHECKLIST\r\nWEEKEND TRIP\r\nSATURDAY\r\nDepart 08:30\r\nPACKING LIST\r\nCharger and headphones\r\nWater bottle\r\nLight jacket\r\nWeekend trail / 4.8 km\r\nReturn: Sunday 18:00\r\n",
+      "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+      "blocks": [
+        {
+          "Text": "TRAVEL CHECKLIST",
+          "X": 36,
+          "Y": 30,
+          "Width": 304,
+          "Height": 40,
+          "Confidence": 0.9834096431732178
+        },
+        {
+          "Text": "WEEKEND TRIP",
+          "X": 771,
+          "Y": 37,
+          "Width": 160,
+          "Height": 33,
+          "Confidence": 0.9732058048248291
+        },
+        {
+          "Text": "SATURDAY",
+          "X": 593,
+          "Y": 142,
+          "Width": 140,
+          "Height": 40,
+          "Confidence": 0.9981001615524292
+        },
+        {
+          "Text": "Depart 08:30",
+          "X": 595,
+          "Y": 195,
+          "Width": 196,
+          "Height": 51,
+          "Confidence": 0.9994089007377625
+        },
+        {
+          "Text": "PACKING LIST",
+          "X": 595,
+          "Y": 309,
+          "Width": 172,
+          "Height": 39,
+          "Confidence": 0.9832892417907715
+        },
+        {
+          "Text": "Charger and headphones",
+          "X": 595,
+          "Y": 356,
+          "Width": 272,
+          "Height": 42,
+          "Confidence": 0.9856908321380615
+        },
+        {
+          "Text": "Water bottle",
+          "X": 593,
+          "Y": 400,
+          "Width": 161,
+          "Height": 41,
+          "Confidence": 0.9981281757354736
+        },
+        {
+          "Text": "Light jacket",
+          "X": 591,
+          "Y": 438,
+          "Width": 154,
+          "Height": 48,
+          "Confidence": 0.9976715445518494
+        },
+        {
+          "Text": "Weekend trail / 4.8 km",
+          "X": 57,
+          "Y": 455,
+          "Width": 287,
+          "Height": 36,
+          "Confidence": 0.9697974324226379
+        },
+        {
+          "Text": "Return: Sunday 18:00",
+          "X": 56,
+          "Y": 524,
+          "Width": 245,
+          "Height": 36,
+          "Confidence": 0.9782645106315613
+        }
+      ]
+    },
+    {
+      "title": "Home inventory",
+      "text": "HOME INVENTORY\r\nAPPLIANCE LOG\r\nITEM\r\nPURCHASED\r\nNEXT CHECK\r\nCoffe maker\r\nMarch 2026\r\nDecember 2026\r\nA\r\nAir purifier\r\nJuly 2025\r\nOctober 2026\r\nD\r\nDesk lamp\r\nFebruary 2026\r\nJanuary 2027\r\nStore receipts with warranty details.\r\n",
+      "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+      "blocks": [
+        {
+          "Text": "HOME INVENTORY",
+          "X": 33,
+          "Y": 29,
+          "Width": 307,
+          "Height": 44,
+          "Confidence": 0.9815952777862549
+        },
+        {
+          "Text": "APPLIANCE LOG",
+          "X": 764,
+          "Y": 35,
+          "Width": 174,
+          "Height": 36,
+          "Confidence": 0.9899684190750122
+        },
+        {
+          "Text": "ITEM",
+          "X": 130,
+          "Y": 125,
+          "Width": 68,
+          "Height": 40,
+          "Confidence": 0.9989120364189148
+        },
+        {
+          "Text": "PURCHASED",
+          "X": 483,
+          "Y": 126,
+          "Width": 142,
+          "Height": 37,
+          "Confidence": 0.9986851215362549
+        },
+        {
+          "Text": "NEXT CHECK",
+          "X": 736,
+          "Y": 123,
+          "Width": 146,
+          "Height": 40,
+          "Confidence": 0.9904770255088806
+        },
+        {
+          "Text": "Coffe maker",
+          "X": 139,
+          "Y": 206,
+          "Width": 182,
+          "Height": 47,
+          "Confidence": 0.8982998728752136
+        },
+        {
+          "Text": "March 2026",
+          "X": 483,
+          "Y": 208,
+          "Width": 148,
+          "Height": 41,
+          "Confidence": 0.9711787104606628
+        },
+        {
+          "Text": "December 2026",
+          "X": 737,
+          "Y": 209,
+          "Width": 174,
+          "Height": 37,
+          "Confidence": 0.9700462222099304
+        },
+        {
+          "Text": "A",
+          "X": 79,
+          "Y": 327,
+          "Width": 27,
+          "Height": 32,
+          "Confidence": 0.9936698079109192
+        },
+        {
+          "Text": "Air purifier",
+          "X": 137,
+          "Y": 320,
+          "Width": 154,
+          "Height": 51,
+          "Confidence": 0.9439451098442078
+        },
+        {
+          "Text": "July 2025",
+          "X": 477,
+          "Y": 315,
+          "Width": 131,
+          "Height": 58,
+          "Confidence": 0.9444330334663391
+        },
+        {
+          "Text": "October 2026",
+          "X": 735,
+          "Y": 322,
+          "Width": 156,
+          "Height": 42,
+          "Confidence": 0.9988082051277161
+        },
+        {
+          "Text": "D",
+          "X": 76,
+          "Y": 444,
+          "Width": 31,
+          "Height": 34,
+          "Confidence": 0.999529242515564
+        },
+        {
+          "Text": "Desk lamp",
+          "X": 137,
+          "Y": 434,
+          "Width": 149,
+          "Height": 55,
+          "Confidence": 0.9828120470046997
+        },
+        {
+          "Text": "February 2026",
+          "X": 482,
+          "Y": 435,
+          "Width": 178,
+          "Height": 51,
+          "Confidence": 0.9833812117576599
+        },
+        {
+          "Text": "January 2027",
+          "X": 732,
+          "Y": 435,
+          "Width": 154,
+          "Height": 48,
+          "Confidence": 0.9646517634391785
+        },
+        {
+          "Text": "Store receipts with warranty details.",
+          "X": 34,
+          "Y": 550,
+          "Width": 403,
+          "Height": 42,
+          "Confidence": 0.9709540009498596
+        }
+      ]
+    }
+  ],
+  "ocrSearches": [
+    {
+      "query": "SB-20260926-001",
+      "title": "Order receipt",
+      "metadataMatch": false,
+      "imageTextMatch": true,
+      "matched": true
+    },
+    {
+      "query": "B204",
+      "title": "Class schedule",
+      "metadataMatch": false,
+      "imageTextMatch": true,
+      "matched": true
+    },
+    {
+      "query": "queue",
+      "title": "Lecture notes",
+      "metadataMatch": false,
+      "imageTextMatch": true,
+      "matched": true
+    }
+  ]
+}
