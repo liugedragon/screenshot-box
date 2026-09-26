@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="15" y="13" width="37" height="42" rx="5" fill="#1769C2"/><rect x="7" y="7" width="37" height="42" rx="5" fill="#FFFFFF" stroke="#1769C2" stroke-width="4"/><path d="M15 25V16h9M36 25V16h-7M15 31v9h9M36 31v9h-7" fill="none" stroke="#1769C2" stroke-width="3"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <title>ScreenshotBox</title>
+  <rect x="5" y="5" width="54" height="54" rx="12" fill="#1769C2"/>
+  <path d="M23 15H15V23M41 15H49V23M15 41V49H23M49 41V49H41" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="23" y="22" width="18" height="19" rx="2.5" fill="#AACFED"/>
+  <path d="M20 32H44V42Q44 45 41 45H23Q20 45 20 42Z" fill="#FFFFFF"/>
+  <path d="M20 32H26L29 36H35L38 32H44" fill="none" stroke="#1769C2" stroke-width="3" stroke-linejoin="round"/>
+</svg>

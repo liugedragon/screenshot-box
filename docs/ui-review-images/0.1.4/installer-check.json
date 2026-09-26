@@ -1,0 +1,81 @@
+{
+  "version": "0.1.4",
+  "scope": "Installed candidate before final documentation synchronization",
+  "candidateSetupSha256": "754ca848f0825fd4b0eda6e76798b898c037822a8d588519f9cc4a8e62757a09",
+  "startedUtc": "2026-09-26T16:03:09.6594919Z",
+  "completedUtc": "2026-09-26T16:04:21.1793818Z",
+  "customInstallPathContainsChineseAndSpaces": true,
+  "installExit": 0,
+  "installedBinaryHashesMatched": true,
+  "verifiedBinaryCount": 497,
+  "startupCommandQuotesInstalledExe": true,
+  "startupArguments": [
+    "--background"
+  ],
+  "startupApprovedUnchanged": true,
+  "shortcutExists": true,
+  "installedStartupChecks": [
+    {
+      "language": "en-US",
+      "checks": 13,
+      "passed": true
+    },
+    {
+      "language": "zh-CN",
+      "checks": 13,
+      "passed": true
+    }
+  ],
+  "languageChecks": [
+    {
+      "policy": "System",
+      "effectiveLanguage": "zh-CN",
+      "checks": 43,
+      "passed": true
+    },
+    {
+      "language": "en-US",
+      "checks": 43,
+      "passed": true
+    },
+    {
+      "language": "zh-CN",
+      "checks": 43,
+      "passed": true
+    }
+  ],
+  "systemRun": {
+    "ocrMilliseconds": 990,
+    "workingSetAfterOcrMiB": 364.09375,
+    "imageWidth": 1000,
+    "imageHeight": 600,
+    "textLineCount": 4
+  },
+  "runtimeFromInstallDirectory": true,
+  "environment": {
+    "windowsOnlyPath": true,
+    "nonexistentDotnetRoot": true,
+    "unavailableProxy": true,
+    "systemNetworkPhysicallyIsolated": false
+  },
+  "resumeExit": 0,
+  "resume": {
+    "recoveredCount": 1,
+    "courseSearch": 4,
+    "notesSearch": 2,
+    "missingImages": 0
+  },
+  "uninstallExit": 0,
+  "userDatabasePreserved": true,
+  "userDatabaseHashUnchanged": true,
+  "allUserImageHashesPreserved": true,
+  "preservedOriginalCount": 5,
+  "preservedThumbnailCount": 5,
+  "extraUserFilePreserved": true,
+  "uninstallRegistrationRemoved": true,
+  "installedExecutableRemoved": true,
+  "startupEntryRemoved": true,
+  "userSettingsUnchanged": true,
+  "testedRealSignIn": false,
+  "testedTaskManagerInterface": false
+}

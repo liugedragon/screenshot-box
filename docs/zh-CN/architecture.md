@@ -13,6 +13,14 @@
 
 主窗口使用可观察列表展示资料，视图处理焦点、选择和窗口事件。数据操作在 Core 和 Services 中完成。`SelectionGeometry` 独立处理矩形计算。
 
+## 启动与托盘
+
+正常启动打开资料库。`--background` 初始化窗口原生句柄、截图热键和托盘图标，不显示主窗口。两种模式都会恢复待识别任务。双击托盘图标或选择“打开资料库”显示窗口。
+
+安装向导在当前用户的 Windows Run 项注册带引号的 exe 路径与 `--background`，运行程序本身不注册启动项。向导不改写 Windows 的 `StartupApproved` 状态；项名固定为 `ScreenshotBox`，卸载时删除。
+
+每用户互斥锁保证单实例。再次正常启动会通知已有实例打开资料库；再次后台启动直接退出，不显示窗口。后台启动失败时写入 `%LOCALAPPDATA%\ScreenshotBox\diagnostics\startup-error.txt`，不弹出对话框。
+
 ## 截图坐标
 
 虚拟桌面原点可以为负。应用枚举所有屏幕，计算联合物理矩形，并用 GDI 冻结画面。鼠标位置由 `GetCursorPos` 读取；选区与标注统一使用物理像素。

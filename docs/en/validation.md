@@ -2,6 +2,63 @@
 
 [English](../validation.md) · [简体中文](../zh-CN/validation.md)
 
+## 0.1.4 · 2026-09-26–27
+
+Environment: Windows 11 x64, one 2560 × 1440 display at 125% scaling; .NET SDK 10.0.401, runtime 10.0.12, CPU OCR. The Release build completed with 0 warnings and 0 errors, and all 42 Core tests passed.
+
+### Application integration
+
+The built executable ran with isolated synthetic libraries and exited with code 0 in both languages:
+
+| Interface | Result | First OCR |
+| --- | --- | ---: |
+| English | 43 checks passed | 735 ms |
+| Simplified Chinese | 43 checks passed | 605 ms |
+
+Checks cover OCR and original-image line boxes, literal Chinese and symbol searches, metadata, clipboard readback, retry, deletion races, backup restore, atomic overwrite, edit drafts, preview sizing, and language settings. Public reports: [English](../ui-review-images/0.1.4/en-self-test.json) and [Simplified Chinese](../ui-review-images/0.1.4/zh-self-test.json). They omit local paths and temporary item identifiers; OCR text is synthetic test content.
+
+### Background startup
+
+The startup script ran 13 checks in English and 13 in Simplified Chinese, all passing. User settings remained unchanged. The tests use separate instance identifiers and library directories, with a live native window handle, tray icon, and registered hotkey.
+
+- Background launch never loaded or displayed the library window.
+- The hidden window owned the capture hotkey; a competing registration was rejected.
+- A second background process exited without opening the library.
+- A normal second launch opened the existing library while retaining the tray and hotkey.
+- Closing the window returned it to the tray; a later background launch kept it hidden.
+
+Reports: [English](../ui-review-images/0.1.4/en-startup-test.json) and [Simplified Chinese](../ui-review-images/0.1.4/zh-startup-test.json). Reproduce from the repository root after building:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/test-startup.ps1
+```
+
+Use `-ExePath` for an extracted release and `-OutputDirectory` for a new result directory. Actual sign-out/sign-in and Task Manager enable/disable were not performed.
+
+### Installer startup registration
+
+Isolated registration fixtures passed 25 checks for the Inno Setup installer and 20 for the PowerShell installer. They use separate installation identifiers and Run value names; preexisting Run and StartupApproved values remained unchanged.
+
+Coverage includes default startup selection, quoting a custom Unicode path with `--background`, retained upgrade choices, opting out and opting back in, rejecting commands over 260 characters before installation, and unregistering on uninstall. Script checks also confirm that opting out or uninstalling preserves a Run entry owned by another installation and files outside the installation manifest.
+
+StartupApproved values were treated as opaque test data, without decoding the Windows format or writing it from production installers. These checks did not operate Task Manager or perform a real sign-in. Reports: [Inno Setup, 25 checks](../ui-review-images/0.1.4/installer-startup-check.json), [PowerShell, 20 checks](../ui-review-images/0.1.4/script-startup-check.json).
+
+### Installed candidate and uninstall
+
+On 2026-09-27 local time, the candidate installed to a selected directory containing Chinese characters and spaces. Installation and uninstall exited with code 0. All 497 installed exe/dll/onnx hashes matched the distribution, and the Start menu shortcut was present.
+
+The Run entry quoted the installed executable and included `--background`; StartupApproved remained unchanged. The installed executable passed 13 startup checks in English and 13 in Simplified Chinese. It also passed 43 application checks under each of System, English, and Simplified Chinese. System selected Chinese on the test computer; its first OCR took 990 ms.
+
+A second independent process recovered one interrupted OCR task, returned four course-query results and two note-query results, and found no missing originals. The test process had a Windows-only PATH, a nonexistent DOTNET_ROOT, and an unavailable proxy. Its runtime loaded from the installation directory; the system network was not physically isolated.
+
+Uninstall removed the exe, uninstall registration, and Run entry. The database hash, five originals, five thumbnails, and an extra user file remained unchanged. User settings were unchanged.
+
+The [installation report](../ui-review-images/0.1.4/installer-check.json) identifies the tested candidate by SHA-256 and omits local paths and temporary identifiers. Final documentation synchronization repackages the installer while keeping the 497 application binaries unchanged; final download hashes are provided with the release assets. Actual sign-in and Task Manager controls remain unverified.
+
+### Windows icon
+
+Windows `LoadImage` loaded the original ICO at 16, 20, 24, 32, 40, 48, 64, 128, and 256 px. All nine checks returned the requested dimensions, with transparent and opaque pixels. The [icon report](../ui-review-images/0.1.4/icon-load-test.json) identifies the asset by SHA-256. Source and regeneration instructions are in [design](../design.md#application-icon).
+
 ## 0.1.3 · 2026-09-26
 
 Environment: Windows 11 x64, one 2560 × 1440 display at 125% scaling; SDK 10.0.401, bundled runtime 10.0.12, CPU OCR. The App Release build completed with 0 warnings and 0 errors.
@@ -31,7 +88,7 @@ Use `System` or `zh-CN` instead of `en-US` for the other policies. The command-l
 
 ### English capture layout
 
-Six tools at 320/560/720/960 DIP produced 24 English toolbar samples. Every toolbar stayed within the window, all labels fitted, and no resize-handle centers were obscured. See the [layout log](../ui-review-images/0.1.3/layout-log.txt) and [UI check record](ui-review.md).
+Six tools at 320/560/720/960 DIP produced 24 English toolbar samples. Every toolbar stayed within the window, all labels fitted, and no resize-handle centers were obscured. See the [layout log](../ui-review-images/0.1.3/layout-log.txt) and [UI check record](../ui-review.md).
 
 ### Candidate installation and uninstall
 

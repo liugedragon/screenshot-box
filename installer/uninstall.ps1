@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param([string]$InstallPath = (Split-Path -Parent $PSScriptRoot))
 $ErrorActionPreference = 'Stop'
 $target = [IO.Path]::GetFullPath($InstallPath).TrimEnd('\')
@@ -10,11 +10,26 @@ if (-not (Test-Path $registry) -or (Get-ItemProperty $registry).InstallLocation.
     throw 'The registered installation directory does not match this uninstaller.'
 }
 $prefix = $target + '\'
-$files = @(Get-Content $manifestPath -Raw | ConvertFrom-Json)
+$files = Get-Content $manifestPath -Raw | ConvertFrom-Json
 foreach ($relative in $files) {
     $file = [IO.Path]::GetFullPath((Join-Path $target $relative))
     if (-not $file.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Invalid installation manifest path.' }
 }
+# Do not remove a Run value now owned by a different installation.
+$installedExe = Join-Path $target 'ScreenshotBox.exe'
+$startupRoot = [Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::CurrentUser, [Microsoft.Win32.RegistryView]::Registry64)
+try {
+    $startupKey = $startupRoot.OpenSubKey('Software\Microsoft\Windows\CurrentVersion\Run', $true)
+    try {
+        if ($startupKey) {
+            $current = $startupKey.GetValue('ScreenshotBox', $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+            $prefix = '"' + $installedExe + '"'
+            if ($current -is [string] -and ($current.TrimStart().Equals($prefix, [StringComparison]::OrdinalIgnoreCase) -or $current.TrimStart().StartsWith($prefix + ' ', [StringComparison]::OrdinalIgnoreCase))) {
+                $startupKey.DeleteValue('ScreenshotBox', $false)
+            }
+        }
+    } finally { if ($startupKey) { $startupKey.Dispose() } }
+} finally { $startupRoot.Dispose() }
 $menu = Join-Path ([Environment]::GetFolderPath('Programs')) 'ScreenshotBox'
 if (Test-Path $menu) { Remove-Item -LiteralPath $menu -Recurse -Force }
 if (Test-Path $registry) { Remove-Item $registry -Recurse -Force }

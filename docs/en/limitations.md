@@ -16,7 +16,7 @@ ScreenshotBox is currently a preview release. Recorded checks are in the [test r
 
 ## Size and runtime
 
-The 0.1.2 installer is 85,945,228 bytes (about 82.0 MiB); the ZIP is 111,799,384 bytes (about 106.6 MiB). They include .NET, Chinese OCR models, ONNX, and related native libraries.
+The 0.1.4 installer is approximately 84.0 MiB; the ZIP is approximately 108.5 MiB. They include .NET, Chinese OCR models, ONNX, and related native libraries.
 
 OCR models load on demand, adding a delay to the first recognition. On the 0.1.1 test machine, an empty library used about 148.3 MiB of working set six seconds after startup. A multi-window recognition test used about 360.3 MiB, falling to 281.1 MiB after releasing the model following 90 idle seconds. Usage varies with images, open windows, and model state.
 
@@ -26,6 +26,7 @@ Closing the main window leaves the app in the tray. Use the tray menu to quit. U
 
 Hardware checks currently use one 2560 × 1440 display at 125% scaling. The following scenarios have not completed hardware or manual testing:
 
+- Actual Windows sign-out/sign-in and Task Manager startup enable/disable.
 - Dual displays, mixed DPI, cross-screen mouse selection, and physical display connection/disconnection.
 - Pasting into common external applications, a complete manual mouse/keyboard pass, and prolonged use.
 - A fresh Windows computer with no development SDK and a physically disconnected network.

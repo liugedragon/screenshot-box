@@ -30,6 +30,12 @@ The reference projects' branding, screenshots, and prose are not used as Screens
 
 Empty-library messages explain capture and import; empty searches report no matches. OCR states describe recognition, search availability, or a failure with retry. Titles and notes remain searchable before recognition completes.
 
+## Application icon
+
+The original [SVG](../assets/screenshotbox.svg) combines a screenshot corner frame and document cards in the primary blue `#1769C2`. The [ICO](../assets/screenshotbox.ico) supplies the Windows application, installer, and tray icon. Both assets use the project's MIT license. The tray loads the embedded ICO at Windows's requested small-icon size.
+
+The SVG is the editable source. Small icon variants keep the frame and card shapes legible without text. The ICO includes 16, 20, 24, 32, 40, 48, 64, 128, and 256 px images. Regenerate it with [build-icons.py](../scripts/build-icons.py); the script lists its development dependencies. Normal builds use the committed ICO, and the application gains no runtime dependency.
+
 ## Capture tools
 
 Save and copy adds the image to both the library and clipboard. Copy only and Save PNG as are separate actions. Stars are independent of saving.

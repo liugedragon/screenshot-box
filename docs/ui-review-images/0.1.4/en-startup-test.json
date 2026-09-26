@@ -1,0 +1,17 @@
+{
+  "backgroundWindowNeverLoaded": true,
+  "backgroundWindowHidden": true,
+  "backgroundTrayAvailable": true,
+  "backgroundHotkeyRegistered": true,
+  "registrationOwnedByHiddenWindow": true,
+  "backgroundDuplicateExited": true,
+  "backgroundDuplicateDidNotOpenLibrary": true,
+  "manualDuplicateExited": true,
+  "manualDuplicateOpenedExistingLibrary": true,
+  "runtimeSurvivesLibraryOpen": true,
+  "closeReturnsToTray": true,
+  "backgroundDuplicateAfterCloseExited": true,
+  "backgroundDuplicateAfterCloseStaysHidden": true,
+  "language": "en-US",
+  "testScope": "Windows process, native visibility, live tray and RegisterHotKey; no sign-out or Task Manager interaction"
+}

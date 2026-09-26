@@ -10,6 +10,20 @@ The installation and library folders are separate. In Settings, change the save 
 
 Settings offers system, light, and dark themes. Language defaults to System: Chinese Windows display languages use Simplified Chinese; other display languages use English. Choose **System**, **简体中文**, or **English** and restart to apply changes. Changing the language does not change the OCR models; the bundled models continue to recognize Chinese and English text.
 
+## Start with Windows (0.1.4)
+
+The installer selects **Start in the tray when I sign in to Windows** by default. Clear it on the installation options page if you prefer manual startup. If you select the final launch option, the app starts in the tray after Setup completes. At sign-in, ScreenshotBox enables the capture shortcut and tray icon without opening the library window. Double-click the tray icon or choose Open library to view it.
+
+Open **Task Manager → Startup apps**, select **ScreenshotBox**, and choose Disable or Enable. Disabling startup affects future sign-ins; use Quit from the tray to stop the current process. Upgrading retains the Windows-controlled enable/disable state. Uninstall removes the startup entry and keeps your library.
+
+Running the extracted ZIP does not register sign-in startup. You can start it in the tray manually:
+
+```powershell
+.\ScreenshotBox.exe --background
+```
+
+If a background startup fails, check `%LOCALAPPDATA%\ScreenshotBox\diagnostics\startup-error.txt`. Launch the app normally to see its startup error dialog. If the installer reports a startup command longer than 260 characters, shorten the installation path or clear the startup option.
+
 ## Capture
 
 1. Press `Ctrl+Alt+S` and drag a selection.

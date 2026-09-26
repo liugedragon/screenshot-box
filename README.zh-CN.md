@@ -12,13 +12,13 @@
 [![Release](https://img.shields.io/github/v/release/liugedragon/screenshot-box?include_prereleases&label=release)](https://github.com/liugedragon/screenshot-box/releases)
 [![MIT](https://img.shields.io/badge/license-MIT-1769C2)](LICENSE)
 
-[**下载安装包**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.3/ScreenshotBox-0.1.3-win-x64-setup.exe) · [**下载 ZIP**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.3/ScreenshotBox-0.1.3-win-x64.zip) · [使用说明](docs/zh-CN/usage.md) · [反馈问题](https://github.com/liugedragon/screenshot-box/issues/new/choose)
+[**下载安装包**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.4/ScreenshotBox-0.1.4-win-x64-setup.exe) · [**下载 ZIP**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.4/ScreenshotBox-0.1.4-win-x64.zip) · [使用说明](docs/zh-CN/usage.md) · [反馈问题](https://github.com/liugedragon/screenshot-box/issues/new/choose)
 
 </div>
 
 截图资料盒是 Windows 桌面截图和图片资料库。按快捷键框选截图，保存后自动识别文字；以后可以按标题、备注、标签或图片中的文字查找。课程安排、订单编号、保修日期等内容都保存在电脑里。
 
-支持 **Windows 11 x64**，无需账号、API 密钥、Python 或独立显卡。OCR 在本地 CPU 上运行，模型随发行包提供。**0.1.3 为测试版**，已知问题和未验证的使用条件见[已知限制](docs/zh-CN/limitations.md)。
+支持 **Windows 11 x64**，无需账号、API 密钥、Python 或独立显卡。OCR 在本地 CPU 上运行，模型随发行包提供。**0.1.4 为测试版**，已知问题和未验证的使用条件见[已知限制](docs/zh-CN/limitations.md)。
 
 ![资料库：搜索截图文字并查看图片详情](docs/ui-review-images/0.1.3/zh-library.png)
 
@@ -59,10 +59,12 @@
 
 ## 安装与数据
 
-- **安装包**：选择安装位置，创建开始菜单和卸载入口。
-- **ZIP**：解压完整目录后运行 `ScreenshotBox.exe`。
+- **安装包**：选择安装位置，创建开始菜单和卸载入口。从 0.1.4 起，默认勾选“登录 Windows 后在托盘启动”，安装时可取消。
+- **ZIP**：解压完整目录后运行 `ScreenshotBox.exe`，便携运行不添加 Windows 启动项。
 
-两种包都包含 .NET 运行时、原生库和 OCR 模型，请保留完整目录。校验文件见[发行页](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.3)。升级前请从托盘退出旧版。
+两种包都包含 .NET 运行时、原生库和 OCR 模型，请保留完整目录。校验文件见[发行页](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.4)。升级前请从托盘退出旧版。
+
+安装 0.1.4 后，登录启动安静驻留托盘，截图快捷键可直接使用；从托盘打开资料库。可在“任务管理器 → 启动应用 → ScreenshotBox”禁用或重新启用，应用不更改已禁用的启动状态。
 
 资料默认位于 `%LOCALAPPDATA%\ScreenshotBox\library`，与安装目录分开。在设置中可迁移到其他文件夹，原目录保留。应用不上传图片或文字，识别时不下载模型；卸载保留资料库。关闭主窗口后继续在托盘运行，托盘菜单可彻底退出。
 
@@ -84,7 +86,7 @@ OCR 可能识别错低清晰度、手写或复杂背景中的文字。马赛克�
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/fetch-models.ps1
 powershell -ExecutionPolicy Bypass -File scripts/build.ps1
-powershell -ExecutionPolicy Bypass -File scripts/package.ps1 -Version 0.1.3
+powershell -ExecutionPolicy Bypass -File scripts/package.ps1 -Version 0.1.4
 ```
 
 首次下载模型需要联网。依赖由 `packages.lock.json` 锁定，安装包构建需要 Inno Setup。

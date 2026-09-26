@@ -4,16 +4,16 @@
 
 ## 构建发行包
 
-应用目标为 Windows 10 2004（19041）及更新版本的 x64 系统，主要测试环境为 Windows 11。构建环境见[构建说明](build.md)。
+安装向导要求 **Windows 11 x64**（22000 及更新版本），主要开发与测试环境为 Windows 11。便携 exe 的目标平台最低为 Windows 10 19041，但尚未实测 Windows 10 兼容性。构建环境见[构建说明](build.md)。
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/package.ps1 -Version 0.1.3
-powershell -ExecutionPolicy Bypass -File scripts/installer.ps1 -Version 0.1.3
+powershell -ExecutionPolicy Bypass -File scripts/package.ps1 -Version 0.1.4
+powershell -ExecutionPolicy Bypass -File scripts/installer.ps1 -Version 0.1.4
 ```
 
-`package.ps1` 编译和测试后生成完整发行目录及 `artifacts/ScreenshotBox-0.1.3-win-x64.zip`。包中包含 .NET 运行时、Windows x64 原生组件、OCR 模型、许可证、依赖锁文件和逐文件校验清单 `FILE-SHA256SUMS.txt`。ZIP 的 SHA-256 写入旁边的 `.sha256` 文件。
+`package.ps1` 编译和测试后生成完整发行目录及 `artifacts/ScreenshotBox-0.1.4-win-x64.zip`。包中包含 .NET 运行时、Windows x64 原生组件、OCR 模型、许可证、依赖锁文件和逐文件校验清单 `FILE-SHA256SUMS.txt`。ZIP 的 SHA-256 写入旁边的 `.sha256` 文件。
 
-`installer.ps1` 使用 Inno Setup 将已有发行目录打成 `ScreenshotBox-0.1.3-win-x64-setup.exe`，并生成独立校验文件。默认编译器为 `.tools/inno/ISCC.exe`，可用 `-CompilerPath` 指定。
+`installer.ps1` 使用 Inno Setup 将已有发行目录打成 `ScreenshotBox-0.1.4-win-x64-setup.exe`，并生成独立校验文件。默认编译器为 `.tools/inno/ISCC.exe`，可用 `-CompilerPath` 指定。
 
 ## 安装包与 ZIP
 
@@ -21,9 +21,17 @@ powershell -ExecutionPolicy Bypass -File scripts/installer.ps1 -Version 0.1.3
 
 ZIP 解压后运行 `ScreenshotBox.exe`，无需安装 SDK、Python 或单独的 .NET 运行时。请保留原生库和模型，不要只复制 exe。
 
-ZIP 还附带 [`installer/install.ps1`](../../installer/install.ps1) 与 [`installer/uninstall.ps1`](../../installer/uninstall.ps1)。安装脚本可用 `-Destination` 指定位置，卸载脚本只删除清单中的应用文件，保留额外文件。升级或卸载前从托盘退出应用。
+ZIP 还附带 [`installer/install.ps1`](../../installer/install.ps1) 与 [`installer/uninstall.ps1`](../../installer/uninstall.ps1)。安装脚本可用 `-Destination` 指定位置。从 0.1.4 起，脚本安装默认注册登录启动，可传 `-NoAutoStart` 取消；脚本卸载仅在 Run 项指向该安装时删除。卸载只删除清单中的应用文件，保留额外文件。升级或卸载前从托盘退出应用。
 
 应用语言默认跟随 Windows 界面语言，中文系统使用简体中文，其他系统使用 English。设置中可选择跟随系统、简体中文或 English，重启后生效；与安装向导语言独立。
+
+## 登录启动（0.1.4）
+
+安装向导默认在当前用户登录时启动 ScreenshotBox，启动任务可以取消，完成页的启动选项同样在托盘启动。向导在 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` 写入名为 `ScreenshotBox` 的字符串，内容为带引号的安装 exe 路径和 `--background` 参数。
+
+Windows 通过任务管理器的“启动应用”控制该项。向导和脚本安装保持项名不变，不写 `StartupApproved`，保留已有禁用状态。升级时取消任务会删除 Run 项，卸载也删除该项。
+
+Run 命令超过 260 字符时会在安装前拒绝；需选择更短的安装目录或取消登录启动。便携运行不添加该注册表项。
 
 ## 用户资料
 

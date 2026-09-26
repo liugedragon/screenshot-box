@@ -1,0 +1,92 @@
+{
+  "version": "0.1.4",
+  "test": "Isolated script startup registration",
+  "independentAppId": true,
+  "originalProductionRunPresent": false,
+  "checks": [
+    {
+      "name": "install.ps1 does not write StartupApproved",
+      "passed": true
+    },
+    {
+      "name": "uninstall.ps1 does not write StartupApproved",
+      "passed": true
+    },
+    {
+      "name": "Default script installation succeeds",
+      "passed": true
+    },
+    {
+      "name": "Default script installation registers quoted Unicode path and background argument",
+      "passed": true
+    },
+    {
+      "name": "Default installation preserves Windows approval value",
+      "passed": true
+    },
+    {
+      "name": "NoAutoStart update succeeds and removes its own Run value",
+      "passed": true
+    },
+    {
+      "name": "NoAutoStart preserves a Run value owned by another installation",
+      "passed": true
+    },
+    {
+      "name": "Uninstall preserves a Run value owned by another installation",
+      "passed": true
+    },
+    {
+      "name": "Uninstall preserves opaque Windows approval state",
+      "passed": true
+    },
+    {
+      "name": "Reinstallation registers the same stable Run name",
+      "passed": true
+    },
+    {
+      "name": "Uninstall removes the Run value that matches its own executable",
+      "passed": true
+    },
+    {
+      "name": "Uninstall preserves files outside the installed manifest",
+      "passed": true
+    },
+    {
+      "name": "Boundary fixture exceeds command limit without exceeding executable path limit",
+      "passed": true
+    },
+    {
+      "name": "Long startup command is rejected before writing installation files",
+      "passed": true
+    },
+    {
+      "name": "Script rejection states the length limit and NoAutoStart option",
+      "passed": true
+    },
+    {
+      "name": "Long path installation works with NoAutoStart",
+      "passed": true
+    },
+    {
+      "name": "Long path uninstalls successfully",
+      "passed": true
+    },
+    {
+      "name": "All script operations preserve Windows approval value",
+      "passed": true
+    },
+    {
+      "name": "All preexisting Run values remain unchanged",
+      "passed": true
+    },
+    {
+      "name": "All preexisting approval values remain unchanged",
+      "passed": true
+    }
+  ],
+  "preexistingStartupValuesUnchanged": true,
+  "testedTaskManagerInterface": false,
+  "testedRealSignIn": false,
+  "approvalEncoding": "Opaque sentinel only; Windows format not decoded or written by production scripts."
+}

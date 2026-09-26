@@ -22,7 +22,7 @@ public partial class MainWindow : Window
     private HotkeyService? _hotkey;
     private System.Windows.Forms.NotifyIcon? _tray;
     private System.Drawing.Icon? _trayOwnedIcon;
-    private bool _runtimeDisposed;
+    private bool _runtimeDisposed, _runtimeInitialized;
     private string _filter="all";
     private string? _selectedTag;
     private readonly DispatcherTimer _preferenceDelay=new(){Interval=TimeSpan.FromMilliseconds(600)};
@@ -42,26 +42,39 @@ public partial class MainWindow : Window
         TitleBox.TextChanged+=MetadataChanged;NotesBox.TextChanged+=MetadataChanged;TagBox.TextChanged+=MetadataChanged;
         FavoriteBox.Checked+=(_,_)=>RememberDraft();FavoriteBox.Unchecked+=(_,_)=>RememberDraft();
         Loaded+=async (_,_)=>{
-            ApplyTheme();
-            ShortcutLabel.Text=L.F("截图快捷键\n{0}","Capture shortcut\n{0}",_app.Preferences.Shortcut);
-            if(!_app.IsTesting) {
+            InitializeRuntime();
+            await RefreshAsync();
+        };
+        Closing+=OnClosing;
+        app.Ocr.Changed+=OnOcrChanged;
+    }
+    // A native handle is enough for hotkeys and the tray. Never show/hide the window at login.
+    internal void InitializeRuntime()
+    {
+        if(_runtimeInitialized||_runtimeDisposed)return;
+        ApplyTheme();
+        ShortcutLabel.Text=L.F("截图快捷键\n{0}","Capture shortcut\n{0}",_app.Preferences.Shortcut);
+        if(!_app.IsTesting||_app.IsStartupTesting) {
             _hotkey=new(this,()=>_ = CaptureAsync());
-            if (!_hotkey.TrySet(_app.Preferences.Shortcut,out var error)) _vm.Status=error;
+            if(!_hotkey.TrySet(_app.Preferences.Shortcut,out var error))_vm.Status=error;
             System.Drawing.Icon? icon=null;
-            try{if(Environment.ProcessPath is string executable)icon=System.Drawing.Icon.ExtractAssociatedIcon(executable);}catch{}
+            try{
+                using var stream=typeof(App).Assembly.GetManifestResourceStream("ScreenshotBox.Icon");
+                if(stream!=null)icon=new System.Drawing.Icon(stream,System.Windows.Forms.SystemInformation.SmallIconSize);
+                else if(Environment.ProcessPath is string executable)icon=System.Drawing.Icon.ExtractAssociatedIcon(executable);
+            }catch{}
             _trayOwnedIcon=icon;
             _tray=new(){Icon=icon??System.Drawing.SystemIcons.Application,Text=L.T("截图资料盒","ScreenshotBox"),Visible=true};
             var menu=new System.Windows.Forms.ContextMenuStrip();
             menu.Items.Add(L.T("打开资料库","Open library"),null,(_,_)=>Dispatcher.Invoke(ShowLibrary));
             menu.Items.Add(L.T("新截图","Capture"),null,(_,_)=>Dispatcher.Invoke(()=>_ = CaptureAsync()));
             menu.Items.Add(L.T("退出","Exit"),null,(_,_)=>Dispatcher.Invoke(()=>_ = QuitAsync()));
-            _tray.ContextMenuStrip=menu; _tray.DoubleClick+=(_,_)=>Dispatcher.Invoke(ShowLibrary);
-            }
-            await RefreshAsync();
-        };
-        Closing+=OnClosing;
-        app.Ocr.Changed+=OnOcrChanged;
+            _tray.ContextMenuStrip=menu;_tray.DoubleClick+=(_,_)=>Dispatcher.Invoke(ShowLibrary);
+        }
+        _runtimeInitialized=true;
     }
+    internal bool HasTrayIcon=>_tray?.Visible==true;
+    internal string RegisteredShortcut=>_hotkey?.CurrentShortcut??"";
     public void ShowLibrary(){if(_captureBusy)return;Show();WindowState=WindowState.Normal;Activate();}
     private void OnClosing(object? sender,CancelEventArgs e){if(!_quitting){e.Cancel=true;Hide();}}
     internal void DisposeRuntimeResources()

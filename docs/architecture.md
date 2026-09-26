@@ -13,6 +13,14 @@ English · [简体中文](zh-CN/architecture.md)
 
 The main window displays an observable collection. Views handle focus, selection, and window events; Core and Services handle data operations. `SelectionGeometry` provides independent rectangle calculations.
 
+## Startup and tray
+
+Normal launch opens the library. `--background` initializes the window's native handle, capture hotkey, and tray icon without showing the main window. Pending OCR jobs resume in either mode. Double-clicking the tray icon or choosing Open library displays the window.
+
+The installation wizard registers the quoted exe path and `--background` under the current user's Windows Run key. The runtime does not register startup. Setup does not rewrite Windows's `StartupApproved` state; the stable `ScreenshotBox` value is removed on uninstall.
+
+A per-user mutex enforces one instance. A second normal launch signals the existing instance to open its library; a second background launch exits without showing it. Background startup failures write `%LOCALAPPDATA%\ScreenshotBox\diagnostics\startup-error.txt` and exit without a dialog.
+
 ## Capture coordinates
 
 The virtual desktop origin can be negative. The app enumerates monitors, computes their combined physical rectangle, and freezes the desktop through GDI. Mouse positions come from `GetCursorPos`; selections and annotations use physical pixels.

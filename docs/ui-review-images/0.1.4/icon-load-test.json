@@ -1,0 +1,78 @@
+{
+  "method": "Windows user32 LoadImage at each requested size; Icon.FromHandle, ToBitmap and RGBA validation",
+  "sha256": "934b4366c41da82e5293572d9e6edf866d55e38a86d6a6c54a6eda90131d92e4",
+  "frames": [
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 16,
+      "loaded": true,
+      "height": 16,
+      "size": 16
+    },
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 20,
+      "loaded": true,
+      "height": 20,
+      "size": 20
+    },
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 24,
+      "loaded": true,
+      "height": 24,
+      "size": 24
+    },
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 32,
+      "loaded": true,
+      "height": 32,
+      "size": 32
+    },
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 40,
+      "loaded": true,
+      "height": 40,
+      "size": 40
+    },
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 48,
+      "loaded": true,
+      "height": 48,
+      "size": 48
+    },
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 64,
+      "loaded": true,
+      "height": 64,
+      "size": 64
+    },
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 128,
+      "loaded": true,
+      "height": 128,
+      "size": 128
+    },
+    {
+      "maximumAlpha": 255,
+      "minimumAlpha": 0,
+      "width": 256,
+      "loaded": true,
+      "height": 256,
+      "size": 256
+    }
+  ]
+}

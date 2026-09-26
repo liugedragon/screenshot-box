@@ -1,0 +1,112 @@
+{
+  "version": "0.1.4",
+  "test": "Isolated installer startup registration",
+  "independentAppId": true,
+  "originalProductionRunPresent": false,
+  "checks": [
+    {
+      "name": "Production installer does not write StartupApproved",
+      "passed": true
+    },
+    {
+      "name": "Startup task is selected by default",
+      "passed": true
+    },
+    {
+      "name": "Fixture has isolated AppId and Run name",
+      "passed": true
+    },
+    {
+      "name": "Isolated installer compiles",
+      "passed": true
+    },
+    {
+      "name": "Default installation succeeds",
+      "passed": true
+    },
+    {
+      "name": "Default registration quotes custom Unicode path and includes background flag",
+      "passed": true
+    },
+    {
+      "name": "Fixture accepts background argument from installed path",
+      "passed": true
+    },
+    {
+      "name": "Upgrade keeps selected startup task",
+      "passed": true
+    },
+    {
+      "name": "Upgrade leaves opaque Windows approval value unchanged",
+      "passed": true
+    },
+    {
+      "name": "Unchecking startup on upgrade removes the Run value",
+      "passed": true
+    },
+    {
+      "name": "Disabled selection persists on the next upgrade",
+      "passed": true
+    },
+    {
+      "name": "Task removal does not clear Windows approval state",
+      "passed": true
+    },
+    {
+      "name": "Selecting startup again registers the same value name",
+      "passed": true
+    },
+    {
+      "name": "Reselecting task leaves Windows approval state unchanged",
+      "passed": true
+    },
+    {
+      "name": "Boundary fixture exceeds 260-character command but has a supported executable path",
+      "passed": true
+    },
+    {
+      "name": "Long startup command rejects installation",
+      "passed": true
+    },
+    {
+      "name": "Rejected update leaves current Run registration unchanged",
+      "passed": true
+    },
+    {
+      "name": "Long-path rejection explains the startup command limit",
+      "passed": true
+    },
+    {
+      "name": "Long directory is accepted when startup is unselected",
+      "passed": true
+    },
+    {
+      "name": "Disabled long-path installation preserves Windows approval state",
+      "passed": true
+    },
+    {
+      "name": "A later selected-task upgrade refreshes the registered path",
+      "passed": true
+    },
+    {
+      "name": "Uninstall removes only the test Run value",
+      "passed": true
+    },
+    {
+      "name": "Uninstall preserves the Windows approval value",
+      "passed": true
+    },
+    {
+      "name": "All preexisting Run values remain unchanged",
+      "passed": true
+    },
+    {
+      "name": "All preexisting approval values remain unchanged",
+      "passed": true
+    }
+  ],
+  "preexistingStartupValuesUnchanged": true,
+  "testedTaskManagerInterface": false,
+  "testedRealSignIn": false,
+  "approvalEncoding": "Opaque sentinel only; Windows format not decoded or written by production installer."
+}

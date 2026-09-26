@@ -6,6 +6,7 @@ Released features are listed in the [release notes](https://github.com/liugedrag
 
 ## Testing and stability
 
+- Verify installed-app startup after Windows sign-in, tray-only launch, Task Manager enable/disable, upgrades, and removal of the startup entry on uninstall.
 - Mixed-DPI monitors, negative coordinates, cross-monitor selections, and display connection changes.
 - Image pasting into common applications and offline checks on a clean PC without a development SDK.
 - Shortcut, focus, recognition, and recovery fixes based on bug reports.
