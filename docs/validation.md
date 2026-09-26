@@ -53,7 +53,9 @@ A second independent process recovered one interrupted OCR task, returned four c
 
 Uninstall removed the exe, uninstall registration, and Run entry. The database hash, five originals, five thumbnails, and an extra user file remained unchanged. User settings were unchanged.
 
-The [installation report](ui-review-images/0.1.4/installer-check.json) identifies the tested candidate by SHA-256 and omits local paths and temporary identifiers. Final documentation synchronization repackages the installer while keeping the 497 application binaries unchanged; final download hashes are provided with the release assets. Actual sign-in and Task Manager controls remain unverified.
+The [installation report](ui-review-images/0.1.4/installer-check.json) identifies the earlier tested candidate by SHA-256 and omits local paths and temporary identifiers. The final application was rebuilt from [source revision c6739d3](https://github.com/liugedragon/screenshot-box/commit/c6739d39c843bd360b885a3becdfeeb50a9ddf90) to align its SourceLink metadata with the committed source. The application code and dependencies were unchanged; executable, assembly, and debug-symbol metadata changed.
+
+The rebuilt application passed 43 application checks. Startup checks passed 13 checks in English and 13 in Simplified Chinese. Chinese OCR took 1865 ms. The [rebuild report](ui-review-images/0.1.4/committed-binary-check.json) records these results. The full installation and uninstall sequence above was not repeated with the metadata rebuild. Final documentation packaging uses this rebuilt binary baseline; download hashes are provided with the release assets. Actual sign-in and Task Manager controls remain unverified.
 
 ### Windows icon
 

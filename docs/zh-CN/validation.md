@@ -53,7 +53,9 @@ Run 项使用带引号的安装 exe 路径与 `--background`，StartupApproved �
 
 卸载移除 exe、卸载登记与 Run 项。数据库哈希、5 张原图、5 张缩略图和额外用户文件保持不变，用户设置未变。
 
-[安装报告](../ui-review-images/0.1.4/installer-check.json)以 SHA-256 标识测试候选包，省略本地路径与临时标识。最终文档同步会重新封装安装包，497 个应用二进制保持不变；最终下载文件的哈希随发行附件提供。真实登录和任务管理器控制仍未验证。
+[安装报告](../ui-review-images/0.1.4/installer-check.json)以 SHA-256 标识之前测试的候选包，省略本地路径与临时标识。最终程序从[源码提交 c6739d3](https://github.com/liugedragon/screenshot-box/commit/c6739d39c843bd360b885a3becdfeeb50a9ddf90)重新构建，使 SourceLink 元数据对应已提交源码。应用代码和依赖未变，可执行文件、程序集和调试符号的元数据发生变化。
+
+重新构建的程序通过 43 项应用检查，英文与简体中文下各通过 13 项启动检查，中文 OCR 为 1865 ms。[重构建报告](../ui-review-images/0.1.4/committed-binary-check.json)记录了这些结果。元数据更新后的程序未重复上述完整安装与卸载流程。最终文档打包以重新构建的二进制为基准，下载文件的哈希随发行附件提供。真实登录和任务管理器控制仍未验证。
 
 ### Windows 图标
 

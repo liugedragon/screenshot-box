@@ -1,0 +1,10 @@
+{
+  "appSourceRevision": "c6739d39c843bd360b885a3becdfeeb50a9ddf90",
+  "applicationChecks": 43,
+  "startupChecksPerLanguage": 13,
+  "applicationExit": 0,
+  "passed": true,
+  "ocrMilliseconds": 1865,
+  "model": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+  "systemNetworkPhysicallyIsolated": false
+}
