@@ -4,6 +4,10 @@ Windows本地截图资料库：组合快捷键 → 拖动框选 → 调整或涂
 
 首版 Windows 11 x64，C# / .NET 10 / WPF。CPU运行，不需要账号、API密钥、Python、CUDA或显卡。应用代码MIT开源；上游组件和模型保留各自许可证。
 
+实际运行界面，使用合成资料展示：
+
+![截图资料盒浅色资料库](docs/ui-review-images/ui-light.png)
+
 ## 使用
 
 解压发行ZIP后双击 `ScreenshotBox.exe`，或运行用户级setup.exe并选择安装目录。完整发行目录包含运行时、原生库和中文模型，不要只复制exe。所有数据默认保存在 `%LOCALAPPDATA%\ScreenshotBox\library`，与安装位置无关。设置中的“更改保存位置并迁移资料”可以选择自定义目录，自动迁移已有图片、文字和分类后重启。
@@ -39,6 +43,7 @@ GitHub Actions 的 [Windows CI](.github/workflows/windows.yml) 会在推送、�
 - [存储、搜索和恢复约束](docs/storage.md)
 - [第三方依赖与模型来源](docs/third-party.md)
 - [实际验证记录](docs/validation.md)
+- [实际界面截图与迭代自评](docs/ui-review.md)
 - [已知限制](docs/limitations.md)
 
 不包含云同步、滚动截图、录屏、翻译或语义检索。不上传图片或文字。用户数据、真实截图、数据库、密钥和构建工具均不进入Git仓库。
