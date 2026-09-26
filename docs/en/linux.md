@@ -87,10 +87,10 @@ Requirements: .NET SDK **10.0.401**, GCC, binutils, curl and Python 3. Chinese t
 
 ```bash
 python3 scripts/fetch-models.py
-scripts/build-linux-sqlite.sh
+bash scripts/build-linux-sqlite.sh
 dotnet restore src/ScreenshotBox.Linux/ScreenshotBox.Linux.csproj --locked-mode
 dotnet build src/ScreenshotBox.Linux/ScreenshotBox.Linux.csproj --configuration Release --no-restore
-scripts/package-linux.sh 0.1.5-linux.1
+bash scripts/package-linux.sh 0.1.5-linux.1
 ```
 
 Before packaging, build the pinned SQLite 3.53.3 library with [`build-linux-sqlite.sh`](../../scripts/build-linux-sqlite.sh). This replaces the NuGet SQLite binary requiring glibc 2.33 with a source build compatible with the Ubuntu 20.04 baseline. Builds for this baseline must use glibc 2.31 or an equivalent toolchain.

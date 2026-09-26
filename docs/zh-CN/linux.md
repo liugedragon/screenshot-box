@@ -87,10 +87,10 @@ XLaunch 适合检查 Linux 窗口、截图工具和剪贴板组件，不能完�
 
 ```bash
 python3 scripts/fetch-models.py
-scripts/build-linux-sqlite.sh
+bash scripts/build-linux-sqlite.sh
 dotnet restore src/ScreenshotBox.Linux/ScreenshotBox.Linux.csproj --locked-mode
 dotnet build src/ScreenshotBox.Linux/ScreenshotBox.Linux.csproj --configuration Release --no-restore
-scripts/package-linux.sh 0.1.5-linux.1
+bash scripts/package-linux.sh 0.1.5-linux.1
 ```
 
 打包前通过 [`build-linux-sqlite.sh`](../../scripts/build-linux-sqlite.sh) 构建固定的 SQLite 3.53.3。NuGet 包自带的 Linux SQLite 库需要 glibc 2.33，因此发行包使用兼容 Ubuntu 20.04 基线的源码构建。构建该基线的发行包时，需使用 glibc 2.31 或等效工具链。

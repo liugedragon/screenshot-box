@@ -64,6 +64,6 @@ chmod 755 "$stage/ScreenshotBox.Linux" "$stage/installer/linux/install.sh" "$sta
 (cd -- "$stage" && find . -type f ! -name FILE-SHA256SUMS.txt -print0 | LC_ALL=C sort -z | xargs -0 sha256sum | sed 's/  \.\//  /' > FILE-SHA256SUMS.txt)
 (cd -- "$stage" && sha256sum --check --strict FILE-SHA256SUMS.txt >/dev/null)
 mv -- "$stage" "$output"
-tar -C "$repo/artifacts" -czf "$archive" "$name"
+python3 "$repo/scripts/archive-linux.py" "$output" "$archive"
 (cd -- "$repo/artifacts" && sha256sum "$name.tar.gz" > "$name.sha256")
 printf 'Package directory: %s\nArchive: %s\n' "$output" "$archive"

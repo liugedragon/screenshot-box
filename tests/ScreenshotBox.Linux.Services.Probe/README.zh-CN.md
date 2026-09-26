@@ -9,7 +9,7 @@
 在仓库根目录执行：
 
 ```bash
-scripts/build-linux-sqlite.sh
+bash scripts/build-linux-sqlite.sh
 
 dotnet restore tests/ScreenshotBox.Linux.Services.Probe/ScreenshotBox.Linux.Services.Probe.csproj --locked-mode
 dotnet build tests/ScreenshotBox.Linux.Services.Probe/ScreenshotBox.Linux.Services.Probe.csproj --no-restore

@@ -9,7 +9,7 @@ Requirements: .NET SDK 10.0.401, GCC, binutils, curl, Python 3, and a font cover
 From the repository root:
 
 ```bash
-scripts/build-linux-sqlite.sh
+bash scripts/build-linux-sqlite.sh
 
 dotnet restore tests/ScreenshotBox.Linux.Services.Probe/ScreenshotBox.Linux.Services.Probe.csproj --locked-mode
 dotnet build tests/ScreenshotBox.Linux.Services.Probe/ScreenshotBox.Linux.Services.Probe.csproj --no-restore
