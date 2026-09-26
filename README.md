@@ -10,6 +10,8 @@ Windows本地截图资料库：组合快捷键 → 拖动框选 → 选区与标
 
 ## 使用
 
+[下载 0.1.2 安装包与 ZIP](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.2)。安装前从托盘退出旧版；既有资料库会保留。
+
 解压发行ZIP后双击 `ScreenshotBox.exe`，或运行用户级setup.exe并选择安装目录。完整发行目录包含运行时、原生库和中文模型，不要只复制exe。所有数据默认保存在 `%LOCALAPPDATA%\ScreenshotBox\library`，与安装位置无关。设置中的“更改保存位置并迁移资料”可以选择自定义目录，自动迁移已有图片、文字和分类后重启。
 
 默认快捷键 `Ctrl+Alt+S`。在设置中录入新的组合键，例如 `Alt+A` 或 `Ctrl+Shift+Q`。系统保留或已被其他应用注册的组合不能覆盖，修改失败时保留旧组合。
