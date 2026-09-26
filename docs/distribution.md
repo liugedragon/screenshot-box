@@ -1,5 +1,7 @@
 # 构建与安装
 
+简体中文 · [English](en/distribution.md)
+
 需要 Windows 10 2004（19041）或更新版本，x64。源码构建使用 .NET SDK 10.0.401；优先使用项目 `.tools/dotnet/dotnet.exe`，否则使用本机 SDK。依赖由锁文件固定，运行 `scripts/build.ps1` 会检查锁文件、编译应用并执行核心模块测试。
 
 `scripts/package.ps1 -Version 0.1.2` 先构建测试，再产生自带 .NET 运行时的 `artifacts/ScreenshotBox-0.1.2-win-x64.zip`。用户不必安装 Python、.NET 或登录账号；中文 OCR 模型随包携带。包中只包含 Windows x64 原生组件，包含依赖锁文件、许可证、每个文件的校验清单。ZIP 的 SHA-256 写在同目录 `.sha256` 文件中。

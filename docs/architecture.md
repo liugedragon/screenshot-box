@@ -1,5 +1,7 @@
 # 架构与可以讲清的实现
 
+简体中文 · [English](en/architecture.md)
+
 ## 模块
 
 `ScreenshotBox.Core`：SQLite资料、搜索、OCR任务代数、备份恢复。独立于WPF，可运行真实SQLite单元测试。

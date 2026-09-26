@@ -1,53 +1,118 @@
-# 截图资料盒 / ScreenshotBox
+<div align="center">
 
-Windows本地截图资料库：组合快捷键 → 拖动框选 → 选区与标注 → 保存并复制 → 后台中文OCR → 关键词找回。
+<img src="assets/screenshotbox.svg" width="64" height="64" alt="截图资料盒图标">
 
-适用 Windows 11 x64，C# / .NET 10 / WPF。CPU运行，不需要账号、API密钥、Python、CUDA或显卡。应用代码MIT开源；上游组件和模型保留各自许可证。
+# 截图资料盒 · ScreenshotBox
 
-实际运行界面，使用合成资料展示：
+**截图存下来，按文字找回来。**
 
-![截图资料盒浅色资料库](docs/ui-review-images/0.1.2/ui-light.png)
+简体中文 · [English](README.en.md)
 
-## 使用
+[![Windows CI](https://github.com/liugedragon/screenshot-box/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/liugedragon/screenshot-box/actions/workflows/windows.yml)
+[![Release](https://img.shields.io/github/v/release/liugedragon/screenshot-box?include_prereleases&label=release)](https://github.com/liugedragon/screenshot-box/releases)
+[![MIT](https://img.shields.io/badge/license-MIT-1769C2)](LICENSE)
 
-[下载 0.1.2 安装包与 ZIP](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.2)。安装前从托盘退出旧版；既有资料库会保留。
+[**下载安装包**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.2/ScreenshotBox-0.1.2-win-x64-setup.exe) · [**下载 ZIP**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.2/ScreenshotBox-0.1.2-win-x64.zip) · [使用说明](docs/usage.md) · [反馈问题](https://github.com/liugedragon/screenshot-box/issues/new/choose)
 
-解压发行ZIP后双击 `ScreenshotBox.exe`，或运行用户级setup.exe并选择安装目录。完整发行目录包含运行时、原生库和中文模型，不要只复制exe。所有数据默认保存在 `%LOCALAPPDATA%\ScreenshotBox\library`，与安装位置无关。设置中的“更改保存位置并迁移资料”可以选择自定义目录，自动迁移已有图片、文字和分类后重启。
+</div>
 
-默认快捷键 `Ctrl+Alt+S`。在设置中录入新的组合键，例如 `Alt+A` 或 `Ctrl+Shift+Q`。系统保留或已被其他应用注册的组合不能覆盖，修改失败时保留旧组合。
+课程安排、订单编号、保修日期——截图很快，过几天再找却不容易。截图资料盒把截图和识别出的文字一起保存在电脑里。你可以框选、标注、保存并复制，之后搜“课程”或“订单”找回图片，在原图上看到匹配的文字位置。
 
-拖动框选后可以移动选区、拖八个调整点，使用画笔、箭头、矩形、橡皮或马赛克。六种快捷颜色之外，可用 RGB 滑条和 Hex 色值自定义颜色；画笔和形状线宽1–32px、橡皮4–80px、马赛克块6–32px。橡皮恢复原图像素；`Ctrl+Z` 撤销、`Ctrl+Y` 重做，清除标注也能撤销。`Enter` 保存并复制，`Esc` 取消；也可以仅复制或另存PNG。图片先保存，OCR在后台识别最终输出图像。
+面向 **Windows 11 x64**。不需要账号、API 密钥、Python 或独立显卡，中文 OCR 在本地 CPU 上运行。当前版本 **0.1.2 为测试版**，请先阅读[已知限制](docs/limitations.md)。
 
-Ctrl+F定位搜索框。资料库支持PNG/JPEG拖入或批量导入、标题、备注、逗号分隔标签、星标、回收站恢复、原图预览和导出。空格预览选中图片；Ctrl+滚轮缩放，鼠标拖动平移。搜索匹配OCR整行时在原图高亮整行，跟随缩放和平移。点击“保存修改”或按 Ctrl+S 保存标题/备注/标签改动。未保存状态明确显示；独立编辑窗打开时，该资料的主窗口编辑字段暂停，避免互相覆盖。标签分类按完整标签筛选，能和搜索词组合。
+![资料库：搜索截图文字，查看原图与资料详情](docs/ui-review-images/0.1.2/ui-light.png)
 
-预览中 Ctrl+C 复制图片、Ctrl+0 适应窗口、Ctrl+1 显示实际像素大小；长图的适应比例随窗口变化。缩略图大小、自定义颜色和标注大小会在重启后保留。
+*实际应用界面，展示的是合成测试资料。界面目前以中文为主；中英文文档不代表已有英文界面。*
 
-关闭主窗口进入托盘；托盘右键可以打开、截图、退出。备份与恢复位于设置；迁移和恢复到新目录后自动重启。彻底退出或处理资料库前，会提示保存、放弃或取消未保存的资料修改。
+## 三步开始
 
-## 构建
+1. 安装后按 **Ctrl+Alt+S**，拖动框选。松开后还能移动选区、拖动八个调整点；需要时加画笔、箭头或马赛克。
+2. 按 **Enter**，保存并复制，然后回到原来的应用。图片先落盘，文字在后台识别。
+3. 从托盘打开资料库，搜截图里的文字。按 **空格**看原图，匹配到的文字行会高亮。
 
-需要 Windows x64 和 .NET SDK 10.0.401（运行发行包不需要SDK）。依赖版本及传递依赖锁定在 `packages.lock.json`。首次构建先取得模型，再运行：
+快捷键可以在设置里改成 `Alt+A`、`Ctrl+Shift+Q` 等组合；会检查常见系统组合和全局热键占用；注册失败时保留原快捷键。取消截图按 `Esc`，不会留下图片或资料记录。
+
+## 可以做什么
+
+| 你要做的事 | 软件里的做法 |
+| --- | --- |
+| 保存一张截图，顺手发给别人 | 框选、调整、保存并复制；也可仅复制或另存 PNG。 |
+| 标出重点 | 画笔、箭头、空心矩形；六个常用色、RGB/Hex 调色盘，可调线宽。 |
+| 修改刚画的标注 | 橡皮擦恢复原图像素，撤销、重做，清空也能撤销；马赛克块大小可调。 |
+| 找到以前截过的内容 | 搜标题、备注、标签和识别文字；支持两字中文、中英混排、日期及编号。 |
+| 整理已有图片 | 拖入或批量导入 PNG/JPEG，加标签、备注、星标；删除进入回收站，可恢复。 |
+| 读小字或很长的图 | 原图缩放、平移、适应窗口和实际像素大小；搜索高亮跟随图片。 |
+| 换一个保存位置 | 在设置中迁移资料库，或用 ZIP 备份恢复到新目录。 |
+
+<details>
+<summary>查看截图工具、调色盘和深色界面</summary>
+
+![截图画笔与可调大小](docs/ui-review-images/0.1.2/capture-large-pen.png)
+
+![自定义颜色：RGB 滑条、Hex 输入和颜色预览](docs/ui-review-images/0.1.2/palette-large.png)
+
+![深色资料库](docs/ui-review-images/0.1.2/ui-dark.png)
+
+更多图片和修改记录见[界面检查与自评](docs/ui-review.md)。
+
+</details>
+
+## 下载与数据
+
+| 版本 | 适合谁 | 大小 |
+| --- | --- | --- |
+| [安装包](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.2/ScreenshotBox-0.1.2-win-x64-setup.exe) | 日常使用；向导中可选安装位置，带卸载入口。 | 约 82 MiB |
+| [ZIP](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.2/ScreenshotBox-0.1.2-win-x64.zip) | 不想安装；解压完整目录后运行 `ScreenshotBox.exe`。 | 约 107 MiB |
+
+两种包都带运行时和中文模型，**不要只拿走 exe**。发行包与校验文件在[下载页](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.2)。升级前从托盘退出旧版。
+
+图片、文字和分类默认在 `%LOCALAPPDATA%\ScreenshotBox\library`，不在安装目录。可在设置里更改保存位置并迁移已有资料。应用不上传图片或文字，识别时不下载模型；卸载保留资料库。关闭主窗口后仍在托盘运行，彻底退出用托盘菜单。
+
+## 先说明几个边界
+
+- 自带运行时和 OCR 模型，发行包不是几 MB；模型首次加载会有延迟。
+- OCR 可能识别错低清晰度、手写或复杂背景。高亮按整行显示，没有字符级定位。
+- 马赛克是视觉像素化，不提供安全脱敏保证；橡皮擦掉马赛克会恢复原图。
+- 当前没有滚动截图、录屏、云同步、自动更新或保存后的再次标注。应用和安装包未数字签名。
+- 已在单屏 125% 缩放的 Windows 环境运行验证。混合 DPI 双屏、外部应用真实粘贴、全新机器物理断网流程仍待实测。
+
+项目有 **42 项核心测试和 35 项标注像素检查**。Windows CI 检查编译、存储与合成图像行为；发行包另做了中文 OCR、搜索、备份、安装、重启恢复和卸载保留数据检查。两类证据的范围不同，详见[验证记录](docs/validation.md)。
+
+## 文档
+
+| 使用与开发 | 说明 |
+| --- | --- |
+| [使用说明](docs/usage.md) | 快捷键、标注、搜索、导入、备份。 |
+| [构建](docs/build.md) · [安装与打包](docs/distribution.md) | 从源码运行或生成发行包。 |
+| [架构](docs/architecture.md) · [存储与搜索](docs/storage.md) | 物理像素坐标、中文检索、后台任务和数据恢复。 |
+| [设计记录](docs/design.md) · [界面自评](docs/ui-review.md) | 参考、样式和真实界面检查。 |
+| [验证](docs/validation.md) · [限制](docs/limitations.md) | 测过什么，以及还没测什么。 |
+| [第三方组件与模型](docs/third-party.md) | 来源、许可证、版本和校验值。 |
+
+所有文档提供英文对应页，入口见 [English README](README.en.md)。
+
+## 从源码构建
+
+需要 Windows x64 和 **.NET SDK 10.0.401**。在仓库根目录运行：
 
 ```powershell
-pwsh -File scripts/fetch-models.ps1
-pwsh -File scripts/build.ps1
-pwsh -File scripts/package.ps1 -Version 0.1.2
+powershell -ExecutionPolicy Bypass -File scripts/fetch-models.ps1
+powershell -ExecutionPolicy Bypass -File scripts/build.ps1
+powershell -ExecutionPolicy Bypass -File scripts/package.ps1 -Version 0.1.2
 ```
 
-Windows PowerShell 5.1 也可调用上述脚本。命令实际生成包含运行时、CPU ONNX原生库及中文模型的发行目录ZIP。SDK可使用系统安装，也可以仅放在 `.tools/dotnet`。详见 [构建说明](docs/build.md)。
+首次下载模型需要联网。依赖由 `packages.lock.json` 锁定；发行应用不需要 SDK。安装包构建还需要 Inno Setup，见[构建与安装](docs/distribution.md)。
 
-## 验证与说明
+## 一起改进
 
-GitHub Actions 的 [Windows CI](.github/workflows/windows.yml) 会在推送、拉取请求和手动触发时，用 .NET SDK 10.0.401 按锁文件恢复依赖、编译 Windows x64 App，并运行全部 Core 测试（当前42项）及截图标注的合成像素探针（当前35项）。CI验证编译、核心逻辑和合成图像上的标注/撤销行为，不下载OCR模型、不采集真实桌面、不运行截图界面、不打包或发布发行版，也不需要账号或额外密钥。
+双屏与不同缩放测试、OCR 失败样本、文档纠错和小问题修复都很有帮助。提交图片请用合成或脱敏资料，写清版本、显示器缩放和复现步骤。[贡献说明](CONTRIBUTING.md)里有测试方法和提交建议。
 
+项目下一步先处理真实使用中的问题，大规模检索性能、英文界面和文字标注暂列为候选，见[后续计划](ROADMAP.md)。
 
-- [设计参考和样式](docs/design.md)
-- [使用说明](docs/usage.md)
-- [架构与学习要点](docs/architecture.md)
-- [存储、搜索和恢复约束](docs/storage.md)
-- [第三方依赖与模型来源](docs/third-party.md)
-- [实际验证记录](docs/validation.md)
-- [实际界面截图与迭代自评](docs/ui-review.md)
-- [已知限制](docs/limitations.md)
+觉得有用，欢迎点个 **Star**；遇到问题也请留下反馈。
 
-不包含云同步、滚动截图、录屏、翻译或语义检索。不上传图片或文字。用户数据、真实截图、数据库、密钥和构建工具均不进入Git仓库。
+## 许可证与致谢
+
+本项目新增代码和原创图标采用 [MIT](LICENSE)。WPF UI、RapidOcrNet、PaddleOCR 模型、ONNX Runtime、SQLite 等组件保留各自许可证；没有自行训练 OCR 模型。完整来源见[第三方说明](docs/third-party.md)。
+
+界面与文档组织参考了 Eagle、ShareX、PowerToys、Flameshot 和 Flow Launcher，没有把这些项目的品牌资产、截图或文案当作本项目内容。[界面参考](docs/design.md) · [README 参考记录](docs/readme-references.md)

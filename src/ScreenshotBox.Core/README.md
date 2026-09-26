@@ -1,54 +1,25 @@
-# Local library implementation
+# 本地资料库实现
 
-`LibraryStore` owns metadata and OCR job states. Screenshot and thumbnail files
-must already exist before `AddAsync`, use unique relative paths, and remain
-immutable after insertion. Recycle-bin deletion does not delete image files.
+简体中文 · [English](README.en.md)
 
-## Search
+`LibraryStore`管理元数据和OCR任务状态。调用`AddAsync`前，截图和缩略图文件应已经存在，使用唯一的相对路径，入库后保持不变。移入回收站不删除图片文件。
 
-Version 1 uses parameterized SQLite `instr(lower(column), lower(query))` over
-title, notes, tags, and OCR text. This is literal substring search, including
-one- and two-character Chinese. Quotes, `%`, and `_` do not become SQL syntax
-or wildcards. ASCII letters are case-insensitive. It is intentionally a linear
-scan and is not advertised as FTS, fuzzy, semantic, or pinyin search.
+## 搜索
 
-Supported filters: `all`, `favorites` (`favorite`), `trash` (`deleted`),
-`recent` (the last seven UTC days), `pending` (Pending or Processing), and `failed`.
-Pagination sorts the entire filtered result by UTC date (newest by default, or
-oldest with `oldestFirst`), then ID ascending, before applying `limit`/`offset`.
-The maximum per-query limit is 1,000,000; the UI should use result pages. Item JSON
-and queryable columns update in the same transaction.
+首版在标题、备注、标签和识别文字上使用参数化SQLite查询`instr(lower(column), lower(query))`。这是字面子串匹配，包含一字和两字中文；引号、`%`、`_`不会成为SQL语法或通配符。ASCII字母不区分大小写。查询会扫描记录，不宣称是FTS、模糊、语义或拼音检索。
 
-The optional `requiredTag` is an independent exact-member classification, combined
-with the text query and other filters before pagination. SQLite runs a deterministic
-registered member function; no `LIKE` pattern is used. Both this function and
-`GetTagsAsync` split English/Chinese commas, trim whitespace, and compare tags using
-.NET ordinal case-insensitive rules. Percent, underscore, and quotes are literal.
-The original tag metadata is preserved rather than silently rewriting editor text.
-Title or OCR matches alone never qualify an item for a tag classification.
+筛选包括`all`、`favorites`（`favorite`）、`trash`（`deleted`）、`recent`（最近七个UTC日）、`pending`（Pending或Processing）和`failed`。先按UTC日期排序（默认最新优先，`oldestFirst`为最早优先），再按ID升序，最后应用`limit`和`offset`。单次查询上限1,000,000，界面应分页。资料JSON和可查询字段在同一个事务中更新。
 
-## OCR durability
+可选的`requiredTag`按完整标签成员分类，在分页前与关键词及其他条件取交集。SQLite运行注册的确定性成员函数，不使用`LIKE`。该函数和`GetTagsAsync`均按中英文逗号分隔、清除两侧空白、使用.NET ordinal规则忽略大小写；百分号、下划线和引号仍是字面内容。保留原始编辑文本；标题或OCR同词不会使图片归入标签。
 
-`BeginOcrAsync` returns a generation. A completion is accepted only for the
-same generation, an active item, and a Processing job. Deletion, recovery from
-an interrupted Processing job, and a newer OCR job invalidate old completions.
-On initialization, interrupted jobs become Pending and can be requeued.
+## OCR持久性
 
-## Backups
+`BeginOcrAsync`返回任务代数。完成结果只接受同一代数、未删除资料和Processing任务。删除、中断Processing的恢复及新的OCR任务都会使旧结果失效。初始化时，中断任务变回Pending，可重新排队。
 
-Backups use SQLite's database backup API, not a copy of the live database file.
-The snapshot determines exactly which immutable originals and thumbnails to
-include. Changes after the snapshot are excluded consistently. Recycled items
-are included. A missing referenced image fails the backup without publishing
-an incomplete archive. An existing destination ZIP is never overwritten.
+## 备份
 
-Restoration stages a validated backup and installs it only into a new, empty
-directory. Validation rejects traversal, drive/alternate-stream paths,
-duplicate names, files absent from the database manifest, missing images,
-unsupported schema versions, and SQLite integrity failures. Existing libraries
-are never merged or overwritten. Run `InitializeAsync` on the restored library
-before use to create standard subdirectories and recover interrupted OCR jobs.
+备份使用SQLite数据库备份接口，不直接复制正在使用的数据库文件。快照确定要包含的不可变原图和缩略图，快照之后的变更一致地排除；包含回收站资料。引用图片缺失时备份失败，不生成不完整包。既有目标ZIP不被覆盖。
 
-The module tests exercise actual SQLite, filesystem, ZIP, restart, and OCR-race
-behavior. UI screenshot correctness, OCR recognition quality, and multi-monitor
-behavior require separate Windows integration testing.
+恢复先验证备份，再安装到新的空目录。拒绝路径穿越、驱动器及备用数据流路径、重复文件名、数据库清单外文件、缺失图片、不支持的结构版本和SQLite完整性错误。不合并或覆盖旧库。使用恢复后的库前调用`InitializeAsync`建立标准子目录并恢复中断OCR任务。
+
+模块测试使用真实SQLite、文件系统、ZIP、重启状态和OCR竞态。截图界面、识别质量与多屏行为需要单独进行Windows集成验证。

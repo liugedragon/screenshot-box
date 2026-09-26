@@ -1,12 +1,14 @@
 # Windows构建
 
+简体中文 · [English](en/build.md)
+
 Windows11 x64，.NET SDK10.0.401。终端位于项目根目录，运行README中的构建脚本。`global.json`固定SDK补丁范围；每个项目的packages.lock.json锁定传递依赖。构建失败时不要删除锁文件盲目升版本。
 
 `scripts/fetch-models.ps1`只在开发构建时联网。发行应用读取旁边models目录，不下载模型，不需要联网。模型URL、字节数与SHA256见models/chinese/sources.json。脚本核验后才替换文件。
 
 App不启用单文件发布或裁剪，因为WPF资源、ONNX Runtime和SkiaSharp需完整依赖。仅发布win-x64 CPU资产。ZIP中包含.NET runtime、中文移动识别模型、检测和方向模型；不要搬走exe后删除其他文件。
 
-自动测试：`scripts/build.ps1`执行全部Core/几何测试。
+自动测试：`scripts/build.ps1`执行Core项目的42项测试（包含几何测试）。截图标注的35项合成像素检查由独立探针执行，命令见[截图探针说明](../tests/ScreenshotBox.Capture.Probe/README.md)；Windows CI会运行两者。
 
 发行包集成自测（使用合成内容，不会导入真实截图）：
 
