@@ -9,6 +9,7 @@
 简体中文 · [English](README.md)
 
 [![Windows CI](https://github.com/liugedragon/screenshot-box/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/liugedragon/screenshot-box/actions/workflows/windows.yml)
+[![Linux CI](https://github.com/liugedragon/screenshot-box/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/liugedragon/screenshot-box/actions/workflows/linux.yml)
 [![Release](https://img.shields.io/github/v/release/liugedragon/screenshot-box?include_prereleases&label=release)](https://github.com/liugedragon/screenshot-box/releases)
 [![MIT](https://img.shields.io/badge/license-MIT-1769C2)](LICENSE)
 

@@ -25,6 +25,8 @@ A per-user mutex enforces one instance. A second normal launch signals the exist
 
 The Linux preview uses a private Unix socket for repeated-launch activation and keeps its library window available. It does not register login startup or use a tray icon.
 
+The capture, annotation, preview and editing sections describe the Windows frontend. Search, OCR and storage are shared; see the [Linux guide](linux.md) for frontend differences.
+
 ## Capture coordinates
 
 The virtual desktop origin can be negative. The app enumerates monitors, computes their combined physical rectangle, and freezes the desktop through GDI. Mouse positions come from `GetCursorPos`; selections and annotations use physical pixels.

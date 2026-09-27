@@ -4,7 +4,7 @@ English · [简体中文](zh-CN/ui-review.md)
 
 ## Linux 0.1.5-linux.1 · 2026-09-27
 
-Environment: WSL Ubuntu 20.04.3, XLaunch X11, Avalonia 12.1.3. Native application windows were shown and their client areas rendered with synthetic data.
+Environment: WSL Ubuntu 20.04.3, XLaunch X11, Avalonia 12.1.3. The self-contained release showed native application windows; their client areas were rendered with synthetic data. The settings window is 680 DIP high, and the details panel was rendered after its layout completed.
 
 English light and Chinese dark app checks passed 20 checks each: image clipboard read by another process, repeated-launch activation, edit text/focus/caret retention, and native 760 DIP resize confirmed through X11 geometry. The English gallery imported six colorful samples and produced 79 OCR line boxes. Matching warranty text is highlighted by its whole-line box in the original image.
 

@@ -9,10 +9,11 @@
 English · [简体中文](README.zh-CN.md)
 
 [![Windows CI](https://github.com/liugedragon/screenshot-box/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/liugedragon/screenshot-box/actions/workflows/windows.yml)
+[![Linux CI](https://github.com/liugedragon/screenshot-box/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/liugedragon/screenshot-box/actions/workflows/linux.yml)
 [![Release](https://img.shields.io/github/v/release/liugedragon/screenshot-box?include_prereleases&label=release)](https://github.com/liugedragon/screenshot-box/releases)
 [![MIT](https://img.shields.io/badge/license-MIT-1769C2)](LICENSE)
 
-[**Download installer**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.4/ScreenshotBox-0.1.4-win-x64-setup.exe) · [**Download ZIP**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.4/ScreenshotBox-0.1.4-win-x64.zip) · [User guide](docs/usage.md) · [Report a problem](https://github.com/liugedragon/screenshot-box/issues/new/choose)
+[**Download installer**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.4/ScreenshotBox-0.1.4-win-x64-setup.exe) · [**Download ZIP**](https://github.com/liugedragon/screenshot-box/releases/download/v0.1.4/ScreenshotBox-0.1.4-win-x64.zip) · [**Linux preview**](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.5-linux.1) · [User guide](docs/usage.md) · [Report a problem](https://github.com/liugedragon/screenshot-box/issues/new/choose)
 
 </div>
 
@@ -22,7 +23,7 @@ For **Windows 11 x64**. No account, API key, Python, or dedicated GPU required. 
 
 ![Screenshot library with text search and image details](docs/images/en/library-light.png)
 
-*Version 0.1.3, with English sample documents and metadata. All sample content is synthetic. The interface follows the Windows display language: Chinese for Chinese display languages, English for all others. Choose System, 简体中文, or English in Settings; restart to apply.*
+*Version 0.1.3, with English sample documents and metadata. All sample content is synthetic. The interface follows the Windows display language: Chinese for Chinese display languages, English for all others. Choose System, Simplified Chinese, or English in Settings; restart to apply.*
 
 ## Get started
 

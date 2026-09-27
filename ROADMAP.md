@@ -12,6 +12,12 @@ Released features are listed in the [release notes](https://github.com/liugedrag
 - Shortcut, focus, recognition, and recovery fixes based on bug reports.
 - Measurements of cold starts, OCR memory use, and larger-library search times.
 
+## Linux preview
+
+- Verify physical Ubuntu X11 desktops, window managers, common clipboard destinations and monitor arrangements.
+- Evaluate Wayland capture and shortcut portals.
+- Add tray integration and optional login startup after desktop compatibility checks.
+
 ## Feature candidates
 
 - Text annotations, solid masking, and editing a copy after saving.

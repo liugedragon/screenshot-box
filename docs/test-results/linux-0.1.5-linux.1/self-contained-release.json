@@ -1,0 +1,152 @@
+{
+  "version": "0.1.5-linux.1",
+  "sourceCommit": "b881fded5ea557ec0ba8cfc4c12d45c2bafcc403",
+  "archiveBytes": 81310804,
+  "archiveSha256": "f815a3591109ffd4c1398ff804d3ea71b9ec3eaa8006b3d73a974368d19b261d",
+  "scope": "Self-contained release on Ubuntu 20.04.3 / WSL and XLaunch; synthetic fixtures only",
+  "processEnvironment": {
+    "DOTNET_ROOT": "/nonexistent",
+    "PATH": "/usr/bin:/bin",
+    "outgoingTcp": "connect calls denied except local X11 127.0.0.1:6000",
+    "unixSockets": "allowed",
+    "limitation": "SDK remains installed on the host. This is not a disconnected fresh-machine test."
+  },
+  "appChecks": {
+    "en": {
+      "passed": 20,
+      "checks": [
+        "English settings label",
+        "Chinese localization",
+        "Chinese system language defaults to Chinese",
+        "Other system languages default to English",
+        "Wayland guard prevents XWayland global grabs",
+        "Native window initialized",
+        "UI library imports actual PNG dimensions",
+        "Chinese metadata search through UI library",
+        "Literal symbol search through UI library",
+        "Native clipboard available",
+        "Independent process reads native image clipboard",
+        "Clipboard preserves image dimensions and pixels",
+        "Second launch activates existing instance and exits",
+        "Trash excluded from normal search",
+        "Restored item searchable",
+        "Metadata draft survives background refresh",
+        "Metadata focus and caret survive OCR refresh",
+        "Narrow window layout (client 760)",
+        "X11 confirms actual narrow native window pixels",
+        "Native client rendering"
+      ]
+    },
+    "zh": {
+      "passed": 20,
+      "checks": [
+        "English settings label",
+        "Chinese localization",
+        "Chinese system language defaults to Chinese",
+        "Other system languages default to English",
+        "Wayland guard prevents XWayland global grabs",
+        "Native window initialized",
+        "UI library imports actual PNG dimensions",
+        "Chinese metadata search through UI library",
+        "Literal symbol search through UI library",
+        "Native clipboard available",
+        "Independent process reads native image clipboard",
+        "Clipboard preserves image dimensions and pixels",
+        "Second launch activates existing instance and exits",
+        "Trash excluded from normal search",
+        "Restored item searchable",
+        "Metadata draft survives background refresh",
+        "Metadata focus and caret survive OCR refresh",
+        "Narrow window layout (client 760)",
+        "X11 confirms actual narrow native window pixels",
+        "Native client rendering"
+      ]
+    }
+  },
+  "chineseOcr": {
+    "actualCpuInference": true,
+    "imageSize": [
+      1000,
+      450
+    ],
+    "modelVersion": "RapidOcrNet-4.2.0/PP-OCRv5-Chinese-Mobile",
+    "text": "截图资料盒 ScreenshotBox\n课程安排：计算机网络 B204\n订单编号 SB-20260927-001\n保修日期 2026-09-27\n英文English/中文识别\n",
+    "lineBoxes": [
+      {
+        "text": "截图资料盒 ScreenshotBox",
+        "x": 38,
+        "y": 28,
+        "width": 525,
+        "height": 55,
+        "confidence": 0.9895758032798767
+      },
+      {
+        "text": "课程安排：计算机网络 B204",
+        "x": 38,
+        "y": 114,
+        "width": 534,
+        "height": 49,
+        "confidence": 0.9718673229217529
+      },
+      {
+        "text": "订单编号 SB-20260927-001",
+        "x": 38,
+        "y": 190,
+        "width": 521,
+        "height": 51,
+        "confidence": 0.9758797883987427
+      },
+      {
+        "text": "保修日期 2026-09-27",
+        "x": 38,
+        "y": 265,
+        "width": 397,
+        "height": 52,
+        "confidence": 0.9695084095001221
+      },
+      {
+        "text": "英文English/中文识别",
+        "x": 36,
+        "y": 338,
+        "width": 451,
+        "height": 61,
+        "confidence": 0.9816960692405701
+      }
+    ],
+    "literalImageTextQueries": [
+      "课程",
+      "订单",
+      "保修",
+      "B204",
+      "English",
+      "2026-09-27"
+    ],
+    "originalPresentAfterRestart": true,
+    "readyItemsAfterRestart": 1,
+    "lineBoxesAfterRestart": 5
+  },
+  "englishGallery": {
+    "en": {
+      "language": "en-US",
+      "screenshots": 6,
+      "ready": 6,
+      "textBoxes": 79,
+      "syntheticContent": true,
+      "nativeWindow": true
+    },
+    "dark": {
+      "language": "en-US",
+      "screenshots": 6,
+      "ready": 6,
+      "textBoxes": 79,
+      "syntheticContent": true,
+      "nativeWindow": true
+    }
+  },
+  "unverified": [
+    "Physical Ubuntu desktop and window manager",
+    "Mixed-DPI multi-monitor hardware",
+    "Manual image paste in common Linux applications",
+    "Fresh disconnected machine without developer tools"
+  ]
+}

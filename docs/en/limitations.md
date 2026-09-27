@@ -4,6 +4,8 @@
 
 ScreenshotBox is currently a preview release. Recorded checks are in the [test record](../validation.md).
 
+The sections below describe the Windows release. Linux differences and unverified desktop environments are listed in the [Linux guide](linux.md).
+
 ## Features
 
 - The app provides English and Simplified Chinese interfaces. System mode follows the Windows display language at startup. Language changes require a restart; system errors and Windows file dialogs may retain the operating system's language. Other display-language packs have not been tested on hardware.

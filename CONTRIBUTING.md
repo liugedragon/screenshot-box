@@ -6,7 +6,7 @@ English · [简体中文](CONTRIBUTING.zh-CN.md)
 
 Check the [known limitations](docs/limitations.md), then use an [issue template](https://github.com/liugedragon/screenshot-box/issues/new/choose). Include:
 
-- App and Windows versions, and whether you used the installer or ZIP.
+- App and operating system versions, and the installation method. For Linux, include the distribution and X11/Wayland session.
 - Monitor count, resolution, scaling, and relative position of each display.
 - Steps to reproduce, expected and actual behavior, and the exact error message.
 - A synthetic or redacted test image where relevant.
@@ -23,6 +23,8 @@ Describe the use case, the problem, and your current workaround. Open an issue b
 2. Follow the [build guide](docs/build.md) to prepare Windows x64 and .NET SDK 10.0.401.
 3. Run `powershell -ExecutionPolicy Bypass -File scripts/build.ps1`. For capture or annotation changes, also run the [capture pixel tests](tests/ScreenshotBox.Capture.Probe/README.md).
 4. Open a PR describing the problem, new behavior, checks performed, and untested conditions. Include window screenshots with synthetic data for UI changes.
+
+For Linux changes, follow the [Linux build and test guide](docs/linux.md) and the [service checks](tests/ScreenshotBox.Linux.Services.Probe/README.md). Linux capture changes also need the [X11 capture checks](tests/ScreenshotBox.Linux.Capture.Probe/README.md). The steps above describe the Windows build.
 
 Keep dependency lock files. New components or models need a source, version, license, and distribution method. Do not commit models, user data, or build outputs. Update both languages when changing documentation or UI text. New controls should follow the [design guide](docs/design.md).
 

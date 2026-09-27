@@ -1,0 +1,23 @@
+{
+  "version": "0.1.5-linux.1",
+  "scope": "Uninstall after running the real installed app; isolated XDG data/config directories and Chinese installation path",
+  "checks": {
+    "uninstallerExitZero": true,
+    "ownedExecutableAndMarkerRemoved": true,
+    "ownedDesktopLauncherRemoved": true,
+    "realLibraryDatabaseHashUnchanged": true,
+    "realImageAndThumbnailHashesUnchanged": true,
+    "allExistingDataAndConfigFilesUnchanged": true,
+    "extraUserFileHashUnchanged": true
+  },
+  "passed": 7,
+  "total": 7,
+  "allPassed": true,
+  "preservedDatabaseFiles": 1,
+  "preservedImageFiles": 1,
+  "preservedThumbnailFiles": 1,
+  "preservedDataAndConfigFiles": 5,
+  "appSettingsJsonPresentBeforeUninstall": false,
+  "configScope": "Existing synthetic settings-preservation.json retained; app component run did not create settings.json",
+  "databaseSha256": "8e2374502da098bd1bc860cc114f0507b8f996d1b5712495d8bf1f8545409d7a"
+}

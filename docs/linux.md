@@ -28,7 +28,7 @@ cd ScreenshotBox-0.1.5-linux.1-linux-x64
 
 An X11 display must be available. On an Ubuntu login screen, select an Xorg session if your desktop offers one. Screenshot capture and global shortcuts are disabled in a Wayland session; importing and searching existing images remain available.
 
-The package requires normal Linux desktop libraries, including X11, fontconfig, ICU, OpenSSL and the C/C++ runtime. It has been exercised on Ubuntu 20.04.3 with glibc 2.31. A missing library error can be investigated with:
+The package requires normal Linux desktop libraries, including X11, fontconfig, ICU, OpenSSL and the C/C++ runtime. It has been exercised on Ubuntu 20.04.3 with glibc 2.31. This is an experimental compatibility check: Ubuntu 20.04 is outside the current [.NET Ubuntu support list](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install). A missing library error can be investigated with:
 
 ```bash
 ldd ./ScreenshotBox.Linux
@@ -36,6 +36,12 @@ ldd ./libSkiaSharp.so
 ldd ./libHarfBuzzSharp.so
 ldd ./libonnxruntime.so
 ldd ./libe_sqlite3.so
+```
+
+The archive is **81,310,804 bytes (77.54 MiB)**; the extracted directory is about **159.8 MiB**. SHA-256:
+
+```text
+f815a3591109ffd4c1398ff804d3ea71b9ec3eaa8006b3d73a974368d19b261d
 ```
 
 ## Install for the current user
@@ -116,12 +122,19 @@ Checks on **Ubuntu 20.04.3 / WSL, .NET 10.0.12**:
 | Linux capture component checks | 42 passed |
 | App components: English light and Chinese dark, native clipboard, second launch, edit focus, real 760 DIP window | 20 passed in each language |
 | User-only installer transactions, ownership, rollback and uninstall | 19 passed |
+| Archive permissions, ownership, payload integrity and symlink rejection | 8 passed |
+| Complete release install, update and uninstall in a Chinese path with spaces | 10 passed |
+| Final archive extraction permissions and installation lifecycle on a Linux filesystem | 13 passed |
+| Installed self-contained app in the Chinese path with spaces | 20 passed |
+| Uninstall after the app ran: original, thumbnail, database and additional files preserved | 7 passed |
 | SQLite 3.53.3 source build | Exact source ID and source checksums verified; FTS5, JSON, math, R-tree and required exports passed; maximum required glibc 2.29 |
 | Shared OCR extraction, Windows WPF Release build | Passed with no warnings or errors |
 
 Records: [capture](test-results/linux-0.1.5-linux.1/capture.json), [services](test-results/linux-0.1.5-linux.1/services.json), [English app](test-results/linux-0.1.5-linux.1/app-en.json), [Chinese app](test-results/linux-0.1.5-linux.1/app-zh.json) and [installer](test-results/linux-0.1.5-linux.1/installer.json). These records use synthetic data; workspace paths have been replaced with a placeholder.
 
 The service OCR fixture produced five line boxes. Image-only searches found `课程`, `订单`, `保修`, `B204`, `English` and `2026-09-27`. These are programmatic component and integration checks. They do not establish that every desktop shortcut, compositor or clipboard destination works.
+
+The self-contained executable repeated the 20 app checks in each language with `DOTNET_ROOT=/nonexistent` and a path excluding the local SDK. Process-local checks blocked outgoing TCP connections except the local X11 server; Chinese CPU OCR produced five saved line boxes, and all six image-text queries still matched after restart. The final archive was extracted on a Linux filesystem and installed in a Chinese path with spaces; the installed executable passed [20 app checks](test-results/linux-0.1.5-linux.1/installed-app.json). [Extraction and installation checks](test-results/linux-0.1.5-linux.1/final-archive-install.json) passed 13 checks. [Uninstall after execution](test-results/linux-0.1.5-linux.1/installed-app-uninstall.json) retained the database, original and thumbnail with unchanged hashes. The host still contains developer tools. This does not replace a disconnected fresh-machine test. See the [release checks](test-results/linux-0.1.5-linux.1/self-contained-release.json), [complete installation checks](test-results/linux-0.1.5-linux.1/full-release-install.json) and [package record](test-results/linux-0.1.5-linux.1/package.json).
 
 Wayland capture and portal-based shortcuts are not implemented. Mixed-DPI multi-monitor capture, physical Ubuntu desktop sessions, manual image pastes into common Linux applications and a disconnected fresh machine without developer tools have not been verified. OCR can misread text; highlights follow whole recognized lines. The Linux preview should be evaluated separately from the Windows release.
 

@@ -1,0 +1,24 @@
+{
+  "version": "0.1.5-linux.1",
+  "sourceCommit": "b881fded5ea557ec0ba8cfc4c12d45c2bafcc403",
+  "archiveSha256": "f815a3591109ffd4c1398ff804d3ea71b9ec3eaa8006b3d73a974368d19b261d",
+  "scope": "Final archive extracted on Linux filesystem, full release install/update/uninstall in isolated Chinese path and XDG directories; no app launch",
+  "checks": {
+    "extractedRegularFiles644": true,
+    "extractedExecutables755": true,
+    "customChineseSpacePrefixInstalled": true,
+    "allManagedFileHashesMatch": true,
+    "installedExecutable755": true,
+    "launcherUsesQuotedCustomExecutable": true,
+    "launcherUsesInstalledSvg": true,
+    "fullReleaseUpdateRetainsUserFile": true,
+    "updateRetainsExternalDataAndSettings": true,
+    "uninstallRemovedAppAndOwnedLauncher": true,
+    "uninstallPreservedUserFile": true,
+    "uninstallPreservedExternalDataAndSettings": true,
+    "noAutostartCreated": true
+  },
+  "passed": 13,
+  "total": 13,
+  "allPassed": true
+}

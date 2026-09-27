@@ -1,0 +1,19 @@
+{
+  "version": "0.1.5-linux.1",
+  "scope": "Full self-contained release install/update/uninstall in isolated XDG directories; no app launch or desktop interaction",
+  "checks": {
+    "customChineseSpacePrefixInstalled": true,
+    "allManagedFileHashesMatch": true,
+    "launcherUsesQuotedCustomExecutable": true,
+    "launcherUsesInstalledSvg": true,
+    "fullReleaseUpdateRetainsUserFile": true,
+    "updateRetainsExternalDataAndSettings": true,
+    "uninstallRemovedAppAndOwnedLauncher": true,
+    "uninstallPreservedUserFile": true,
+    "uninstallPreservedExternalDataAndSettings": true,
+    "noAutostartCreated": true
+  },
+  "passed": 10,
+  "total": 10,
+  "allPassed": true
+}

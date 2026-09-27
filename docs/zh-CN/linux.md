@@ -28,7 +28,7 @@ cd ScreenshotBox-0.1.5-linux.1-linux-x64
 
 运行时需要可连接的 X11 显示服务。如果 Ubuntu 登录界面提供 Xorg 会话，可先选择该会话。Wayland 会话下禁用截图与全局快捷键，仍可导入和搜索已有图片。
 
-程序依赖正常 Linux 桌面系统提供的 X11、fontconfig、ICU、OpenSSL 和 C/C++ 运行库。目前已在 Ubuntu 20.04.3、glibc 2.31 上运行验证。遇到缺少共享库的问题，可检查：
+程序依赖正常 Linux 桌面系统提供的 X11、fontconfig、ICU、OpenSSL 和 C/C++ 运行库。目前已在 Ubuntu 20.04.3、glibc 2.31 上运行验证。这属于实验性兼容检查：Ubuntu 20.04 不在当前 [.NET 的 Ubuntu 支持列表](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install)中。遇到缺少共享库的问题，可检查：
 
 ```bash
 ldd ./ScreenshotBox.Linux
@@ -36,6 +36,12 @@ ldd ./libSkiaSharp.so
 ldd ./libHarfBuzzSharp.so
 ldd ./libonnxruntime.so
 ldd ./libe_sqlite3.so
+```
+
+压缩包为 **81,310,804 字节（77.54 MiB）**，解压后的目录约 **159.8 MiB**。SHA-256：
+
+```text
+f815a3591109ffd4c1398ff804d3ea71b9ec3eaa8006b3d73a974368d19b261d
 ```
 
 ## 为当前用户安装
@@ -116,10 +122,17 @@ dotnet test tests/ScreenshotBox.Core.Tests/ScreenshotBox.Core.Tests.csproj --no-
 | Linux 截图组件检查 | 42 项通过 |
 | 英文浅色与中文深色应用组件：剪贴板、重复启动、编辑焦点及真实 760 DIP 窗口 | 两种语言各 20 项通过 |
 | 当前用户安装事务、所有权、回滚及卸载 | 19 项通过 |
+| 归档权限、所有者字段、内容完整性与符号链接拒绝 | 8 项通过 |
+| 完整发行包在中文空格路径安装、更新与卸载 | 10 项通过 |
+| 最终归档在 Linux 文件系统解压后的权限与安装过程 | 13 项通过 |
+| 中文空格安装路径中的自带运行时程序 | 20 项通过 |
+| 实际启动后的卸载：原图、缩略图、数据库与附加文件保留 | 7 项通过 |
 | SQLite 3.53.3 源码构建 | SOURCE_ID 与源码校验值一致；FTS5、JSON、数学函数、R-tree 和所需导出通过；最高 glibc 依赖为 2.29 |
 | OCR 共享模块提取后的 Windows WPF Release 构建 | 通过，无警告或错误 |
 
 服务验证的合成图片识别出 5 行文字框。仅凭图片文字即可搜索“课程”“订单”“保修”、`B204`、`English` 和 `2026-09-27`。上述结果属于程序化组件与集成检查，不能据此认定所有桌面快捷键、合成器或粘贴目标都已验证。
+
+自带运行时的发行程序在 `DOTNET_ROOT=/nonexistent`、不包含本地 SDK 的 PATH 下重新通过两种语言各 20 项应用检查。进程内检查阻止了除本机 X11 服务外的 TCP 连接；中文 CPU OCR 保存了 5 个文字行框，重启后六个图片文字查询仍然匹配。最终归档在 Linux 文件系统解压并安装到中文空格路径后，安装位置的程序通过 [20 项应用检查](../test-results/linux-0.1.5-linux.1/installed-app.json)，[解压与安装检查](../test-results/linux-0.1.5-linux.1/final-archive-install.json)通过 13 项。[运行后的卸载检查](../test-results/linux-0.1.5-linux.1/installed-app-uninstall.json)确认数据库、原图和缩略图的哈希保持不变。本机仍安装有开发工具，这不等同于全新断网电脑验证。见[发行程序检查](../test-results/linux-0.1.5-linux.1/self-contained-release.json)、[完整安装检查](../test-results/linux-0.1.5-linux.1/full-release-install.json)和[打包记录](../test-results/linux-0.1.5-linux.1/package.json)。
 
 Wayland 截图和基于 portal 的快捷键尚未实现。混合 DPI 多屏、实机 Ubuntu 桌面、常用 Linux 应用的手工图片粘贴，以及未安装开发工具的新机器断网运行，尚未验证。OCR 可能识别错误，高亮按识别出的整行显示。Linux 试用版的验证范围独立于 Windows 发行版。
 

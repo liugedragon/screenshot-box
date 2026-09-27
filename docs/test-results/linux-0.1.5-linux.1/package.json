@@ -1,0 +1,12 @@
+{
+  "sourceCommit": "b881fded5ea557ec0ba8cfc4c12d45c2bafcc403",
+  "sourceDirty": false,
+  "unchangedBinaryModelFiles": 235,
+  "archiveSHA256": "f815a3591109ffd4c1398ff804d3ea71b9ec3eaa8006b3d73a974368d19b261d",
+  "archiveBytes": 81310804,
+  "directoryBytes": 167594376,
+  "fileManifestEntries": 453,
+  "archivePermissions": "regular files644; directories/apphost/createdump/install/uninstall755; uid/gid0",
+  "applicationSourceCommit": "5a3e2e9cba94083f2d4efeae613b1562d09faae7",
+  "applicationSourceTreeMatchesPackageCommit": true
+}
