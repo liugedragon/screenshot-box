@@ -4,7 +4,7 @@
 
 ## GitHub 托管的 Windows 候选构建 · 2026-09-28
 
-[工作流 36439669958](https://github.com/liugedragon/screenshot-box/actions/runs/36439669958)在 GitHub 托管的 Windows 2025 构建机上完成，源码提交为 `8060a57ebf678fc9bae97bcb5d835469ecc51d66`。流程安装 .NET SDK 10.0.401 和通过哈希核对的 Inno Setup 7.1.0，获取固定版本的中文 OCR 模型，然后生成未签名的 `0.1.4-ci.36439669958` ZIP 与安装包。工作流核对了两个 SHA-256 文件，并将产物和 `BUILD-PROVENANCE.json` 上传为保留 14 天的 Actions 附件。此次确认了托管打包流程，没有运行安装后的程序、执行 Authenticode 签名或发布发行版。
+[工作流 36444318872](https://github.com/liugedragon/screenshot-box/actions/runs/36444318872)在 GitHub 托管的 Windows 2025 构建机上完成，源码提交为 `8aa715a3a9292bc4f96c4287740bff3f6fe97ecf`。流程安装 .NET SDK 10.0.401 和通过哈希核对的 Inno Setup 7.1.0，获取固定版本的中文 OCR 模型，然后生成 `0.1.4-ci.36444318872` ZIP 与安装包。下载后两个 SHA-256 文件均与产物一致，ZIP 中新增的两份微软许可证正文与仓库文件逐字节相同。Windows 对主程序及安装包均返回 `NotSigned`。保留 14 天的 Actions 附件包含记录源码提交及签名状态的 `BUILD-PROVENANCE.json`。更早的[工作流 36439669958](https://github.com/liugedragon/screenshot-box/actions/runs/36439669958)也曾在许可证说明修正前生成未签名候选包。这些检查没有运行安装后的程序，也没有发布发行版。
 
 ## Windows 签名流程 · 2026-09-28
 

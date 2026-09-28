@@ -4,7 +4,7 @@ English · [简体中文](zh-CN/validation.md)
 
 ## GitHub-hosted Windows candidate · 2026-09-28
 
-[Workflow run 36439669958](https://github.com/liugedragon/screenshot-box/actions/runs/36439669958) completed on a GitHub-hosted Windows 2025 runner from source commit `8060a57ebf678fc9bae97bcb5d835469ecc51d66`. It installed .NET SDK 10.0.401 and hash-checked Inno Setup 7.1.0, fetched the pinned Chinese OCR model, then built an unsigned `0.1.4-ci.36439669958` ZIP and installer. The workflow verified both SHA-256 sidecars and uploaded the files with `BUILD-PROVENANCE.json` as a 14-day Actions artifact. This checked the hosted packaging path; it did not exercise the installed app, perform Authenticode signing, or publish a release.
+[Workflow run 36444318872](https://github.com/liugedragon/screenshot-box/actions/runs/36444318872) completed on a GitHub-hosted Windows 2025 runner from source commit `8aa715a3a9292bc4f96c4287740bff3f6fe97ecf`. It installed .NET SDK 10.0.401 and hash-checked Inno Setup 7.1.0, fetched the pinned Chinese OCR model, then built a `0.1.4-ci.36444318872` ZIP and installer. Both SHA-256 sidecars matched the downloaded files; the ZIP contained the two added Microsoft license texts byte-for-byte. Windows reported `NotSigned` for the extracted application and installer. The 14-day Actions artifact includes `BUILD-PROVENANCE.json` with the source commit and signing status. The earlier [run 36439669958](https://github.com/liugedragon/screenshot-box/actions/runs/36439669958) also built an unsigned candidate before the license-notice correction. These checks did not exercise the installed app or publish a release.
 
 ## Windows signing workflow · 2026-09-28
 
