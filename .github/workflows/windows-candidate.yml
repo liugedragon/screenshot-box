@@ -83,7 +83,11 @@ jobs:
           $base = "ScreenshotBox-$env:BUILD_VERSION-win-x64"
           foreach ($name in @("$base.zip", "$base-setup.exe")) {
             $file = Join-Path 'artifacts' $name
-            $sidecar = "$file.sha256"
+            $sidecar = if ($name.EndsWith('.zip')) {
+              Join-Path 'artifacts' "$base.sha256"
+            } else {
+              "$file.sha256"
+            }
             $actual = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
             $expected = "$actual  $name"
             if ((Get-Content -LiteralPath $sidecar -Raw).Trim() -ne $expected) {
