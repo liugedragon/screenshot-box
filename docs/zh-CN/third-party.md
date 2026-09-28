@@ -6,7 +6,7 @@
 
 | Windows 组件 | 锁定版本 | 许可证与来源 |
 | --- | --- | --- |
-| .NET / Windows Desktop Runtime | 10.0.12，win-x64 | MIT，官方运行时 NuGet 包内正文及 .NET 第三方通知 |
+| .NET / Windows Desktop Runtime | 10.0.12，win-x64 | 微软按文件适用不同条款：.NET Library License、Windows SDK License 和 MIT；详见下文。包含运行时第三方通知。 |
 | WPF-UI、WPF-UI.Abstractions | 4.3.0 | MIT，包内 LICENSE.md 与 ThirdPartyNotices.txt；[官方项目](https://github.com/lepoco/wpfui) |
 | RapidOcrNet | 4.2.0 | Apache-2.0，包含上游 LICENSE.txt / NOTICE.txt；[官方项目](https://github.com/BobLd/RapidOcrNet) |
 | Clipper2 | 2.0.0 | Boost Software License 1.0，官方 NuGet 包 License.txt；[官方项目](https://github.com/AngusJohnson/Clipper2) |
@@ -18,6 +18,8 @@
 | Microsoft Visual C++ Runtime，应用目录 x64 CRT | 14.51.36247.0 | 微软专有可再分发组件；由[官方已签名 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)提取，微软条款随包 |
 | PP-OCRv5 检测、文字方向模型 | RapidOcrNet 4.2.0 包内 v5 默认文件 | PaddleOCR / RapidOCR 上游 Apache-2.0，正文随包；[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)、[RapidOCR](https://github.com/RapidAI/RapidOCR) |
 | PP-OCRv5 中文识别模型及字典 | RapidOCR v3.9.2 模型发布 | 上游 Apache-2.0；下载地址、大小和 SHA-256 见 [`models/chinese/sources.json`](../../models/chinese/sources.json)，并在打包时核对 |
+
+根据微软的 [Windows 版 .NET 许可证说明](https://github.com/dotnet/core/blob/main/license-information-windows.md)，win-x64 自包含发布文件中的 `coreclr.dll`、`Microsoft.DiaSymReader.Native.amd64.dll`、`PresentationNative_cor3.dll`、`vcruntime140_cor3.dll` 和 `wpfgfx_cor3.dll` 适用 **.NET Library License**；`D3DCompiler_47_cor3.dll` 适用 **Windows SDK License**；其他 Windows 版 .NET 文件适用 MIT。仓库保留 [.NET Library License 原文](../../licenses/DotNetLibrary-License.html)和 [Windows SDK License 原文](../../licenses/WindowsSDK-License.html)，并保留运行时 NuGet 包的 MIT 正文及 .NET 第三方通知。NuGet 运行时包中的 MIT 文件不能替代微软按文件列出的 Windows 版许可证信息。
 
 Windows 依赖图中的 `SkiaSharp.NativeAssets.Linux.NoDependencies` 与 `SkiaSharp.NativeAssets.macOS` 3.119.1 是 RapidOcrNet / SkiaSharp 的传递依赖，保留在锁文件以便复现；Windows 发布阶段只保留 win-x64 原生文件，不分发 Linux/macOS 二进制。RapidOcrNet 的默认拉丁文识别模型与字典不使用，打包时删除这两个文件，保留检测和方向模型以及单独提供的中文识别模型。
 
@@ -53,7 +55,7 @@ Linux 与 Windows 使用相同的中文模型和字典。Linux 包不分发 Wind
 
 Microsoft.NET.Test.Sdk 17.14.1、xUnit 2.9.3、xunit.runner.visualstudio 3.1.1 仅用于测试项目，不进入安装包。
 
-安装程序使用 Inno Setup **7.1.0** 编译。工具本身不随应用分发，其条款见[官方许可证](https://github.com/jrsoftware/issrc/blob/is-7_1_0/LICENSE.TXT)。下载的编译器已通过 Authenticode 签名检查，发布者为 **Pyrsys B.V.**。ScreenshotBox 的安装程序当前未签名。
+安装程序使用 Inno Setup **7.1.0** 编译。编译器本身不随应用分发，但生成的 setup EXE 含 Inno Setup 安装运行时代码，适用其[单独许可证](../../licenses/InnoSetup-License.txt)。下载的编译器已通过 Authenticode 签名检查，发布者为 **Pyrsys B.V.**。ScreenshotBox 的安装程序当前未签名。
 
 ## Visual C++ Runtime 再分发
 

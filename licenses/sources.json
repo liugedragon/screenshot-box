@@ -88,6 +88,17 @@
     "sha256": "a89886665765362eb77e0f8e26602c924520041d1711b2eedc136434fe4d01ab"
   },
   {
+    "file": "DotNetLibrary-License.html",
+    "source": "https://dotnet.microsoft.com/en-us/dotnet_library_license.htm",
+    "sha256": "0f69be2c8ac44c3980047664c3347ff22cba5842dc9d8b0a88a4f0914645a780"
+  },
+  {
+    "file": "WindowsSDK-License.html",
+    "source": "https://learn.microsoft.com/en-us/legal/windows-sdk/license",
+    "derivation": "Standalone HTML containing the unmodified article body from the official Microsoft page",
+    "sha256": "11463d9c845c23807bd19e7ac07dc4cfe6458ad9f1dec3b6e89910ec0607989a"
+  },
+  {
     "file": "RapidOcrNet-Apache-2.0.txt",
     "source": "https://raw.githubusercontent.com/BobLd/RapidOcrNet/708cae2fcb88720e1d891a81b5ee3e8b2bcc139e/LICENSE.txt",
     "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"

@@ -21,7 +21,7 @@ ScreenshotBox is a screenshot tool and local image library. Select a screen regi
 
 For **Windows 11 x64**. No account, API key, Python, or dedicated GPU required. OCR runs locally on the CPU with bundled models. **0.1.4 is a prerelease**; see [known limitations](docs/limitations.md) for current issues and untested configurations.
 
-**Windows download:** 0.1.4 is unsigned, so Edge may mark its installer as “not commonly downloaded.” This is a reputation warning, not a malware finding. Check the [published SHA-256 and signing status](docs/distribution.md#release-checks-and-signing) before opening it; a matching hash alone does not establish that software is safe.
+**Windows download:** 0.1.4 is unsigned, so Edge may mark its installer as “not commonly downloaded.” This is a reputation warning, not a malware finding. Check the [published SHA-256 and signing status](docs/distribution.md#release-checks-and-signing) before opening it; a matching hash alone does not establish that software is safe. See the [Code signing policy](docs/code-signing.md).
 
 ![Screenshot library with text search and image details](docs/images/en/library-light.png)
 
@@ -95,6 +95,7 @@ OCR may misread low-resolution, handwritten, or busy images. Mosaic is visual pi
 | [Design](docs/design.md) · [UI inspection](docs/ui-review.md) | References, styles, and layout records. |
 | [Tests](docs/validation.md) · [Limitations](docs/limitations.md) | Test results and supported conditions. |
 | [Third-party components](docs/third-party.md) | Components, models, versions, licenses, and hashes. |
+| [Code signing policy](docs/code-signing.md) | Current signature status, release responsibilities, and local data handling. |
 
 Requires Windows x64 and **.NET SDK 10.0.401**. Run from the repository root:
 

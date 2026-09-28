@@ -6,7 +6,7 @@ The table lists the versions in `packages.lock.json`. Builds use `--locked-mode`
 
 | Windows component | Locked version | License and source |
 | --- | --- | --- |
-| .NET / Windows Desktop Runtime | 10.0.12, win-x64 | MIT; license text and .NET third-party notices from the official runtime NuGet packages |
+| .NET / Windows Desktop Runtime | 10.0.12, win-x64 | Mixed Microsoft terms: .NET Library License, Windows SDK License, and MIT; see the file-level details below. Runtime third-party notices are included. |
 | WPF-UI, WPF-UI.Abstractions | 4.3.0 | MIT; bundled LICENSE.md and ThirdPartyNotices.txt; [upstream](https://github.com/lepoco/wpfui) |
 | RapidOcrNet | 4.2.0 | Apache-2.0; upstream LICENSE.txt and NOTICE.txt included; [upstream](https://github.com/BobLd/RapidOcrNet) |
 | Clipper2 | 2.0.0 | Boost Software License 1.0; License.txt from the official NuGet package; [upstream](https://github.com/AngusJohnson/Clipper2) |
@@ -18,6 +18,8 @@ The table lists the versions in `packages.lock.json`. Builds use `--locked-mode`
 | Microsoft Visual C++ Runtime, app-local x64 CRT | 14.51.36247.0 | Proprietary Microsoft redistributable. Extracted from the [official signed Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist); Microsoft terms included. |
 | PP-OCRv5 detection and text-line orientation models | Default v5 files in RapidOcrNet 4.2.0 | PaddleOCR / RapidOCR upstream Apache-2.0 terms included; [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR), [RapidOCR](https://github.com/RapidAI/RapidOCR) |
 | PP-OCRv5 Chinese recognition model and dictionary | RapidOCR v3.9.2 model release | Upstream Apache-2.0. Exact download URLs, sizes, and SHA-256 hashes are pinned in [`models/chinese/sources.json`](../models/chinese/sources.json) and checked during packaging. |
+
+Microsoft's [.NET license information for Windows](https://github.com/dotnet/core/blob/main/license-information-windows.md) assigns the **.NET Library License** to `coreclr.dll`, `Microsoft.DiaSymReader.Native.amd64.dll`, `PresentationNative_cor3.dll`, `vcruntime140_cor3.dll`, and `wpfgfx_cor3.dll`, all present in the win-x64 self-contained publish. It assigns the **Windows SDK License** to the included `D3DCompiler_47_cor3.dll`, and MIT to the other .NET Windows binaries and files. The repository carries the [.NET Library License](../licenses/DotNetLibrary-License.html) and [Windows SDK License](../licenses/WindowsSDK-License.html) texts alongside the runtime packs' MIT texts and .NET third-party notices. The MIT files supplied in the NuGet runtime packs do not replace Microsoft's file-level Windows license information.
 
 In the Windows dependency graph, `SkiaSharp.NativeAssets.Linux.NoDependencies` and `SkiaSharp.NativeAssets.macOS` 3.119.1 are transitive RapidOcrNet / SkiaSharp dependencies. They remain in lock files for reproducibility, but the Windows release does not ship their Linux or macOS binaries.
 
@@ -55,7 +57,7 @@ The table indexes sources; the original license texts contain the applicable ter
 
 Microsoft.NET.Test.Sdk 17.14.1, xUnit 2.9.3, and xunit.runner.visualstudio 3.1.1 are used only by test projects and are not included in the installer.
 
-Inno Setup **7.1.0** is the local installer compiler; the development tool itself is not distributed to users. Its terms are in the [official license](https://github.com/jrsoftware/issrc/blob/is-7_1_0/LICENSE.TXT). The downloaded compiler's Windows Authenticode signature and publisher, **Pyrsys B.V.**, were verified. ScreenshotBox's installer is currently unsigned.
+Inno Setup **7.1.0** compiles the installer. The compiler itself is not distributed, but the generated setup EXE contains Inno Setup installer runtime code under its [own license](../licenses/InnoSetup-License.txt). The downloaded compiler's Windows Authenticode signature and publisher, **Pyrsys B.V.**, were verified. ScreenshotBox's installer is currently unsigned.
 
 ## Visual C++ Runtime redistribution
 

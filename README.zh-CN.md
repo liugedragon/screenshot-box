@@ -21,7 +21,7 @@
 
 支持 **Windows 11 x64**，无需账号、API 密钥、Python 或独立显卡。OCR 在本地 CPU 上运行，模型随发行包提供。**0.1.4 为测试版**，已知问题和未验证的使用条件见[已知限制](docs/zh-CN/limitations.md)。
 
-**Windows 下载提示：**0.1.4 尚未签名，Edge 可能显示“通常不会下载”。这是下载信誉提示，不是病毒检出结论。打开前请核对[发行文件的 SHA-256 和签名状态](docs/zh-CN/distribution.md#发行检查与签名)；哈希一致本身不证明软件安全。
+**Windows 下载提示：**0.1.4 尚未签名，Edge 可能显示“通常不会下载”。这是下载信誉提示，不是病毒检出结论。打开前请核对[发行文件的 SHA-256 和签名状态](docs/zh-CN/distribution.md#发行检查与签名)；哈希一致本身不证明软件安全。另见[代码签名政策](docs/zh-CN/code-signing.md)。
 
 ![资料库：搜索截图文字并查看图片详情](docs/ui-review-images/0.1.3/zh-library.png)
 
@@ -91,6 +91,7 @@ OCR 可能识别错低清晰度、手写或复杂背景中的文字。马赛克�
 | [设计](docs/zh-CN/design.md) · [界面检查](docs/zh-CN/ui-review.md) | 参考来源、样式和布局记录。 |
 | [测试](docs/zh-CN/validation.md) · [限制](docs/zh-CN/limitations.md) | 测试结果和使用条件。 |
 | [第三方组件](docs/zh-CN/third-party.md) | 组件、模型、版本、许可证和校验值。 |
+| [代码签名政策](docs/zh-CN/code-signing.md) | 当前签名状态、发行责任与本地资料处理。 |
 
 需要 Windows x64 和 **.NET SDK 10.0.401**。在仓库根目录运行：
 

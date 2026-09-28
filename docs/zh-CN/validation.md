@@ -2,6 +2,10 @@
 
 简体中文 · [English](../validation.md)
 
+## GitHub 托管的 Windows 候选构建 · 2026-09-28
+
+[工作流 36439669958](https://github.com/liugedragon/screenshot-box/actions/runs/36439669958)在 GitHub 托管的 Windows 2025 构建机上完成，源码提交为 `8060a57ebf678fc9bae97bcb5d835469ecc51d66`。流程安装 .NET SDK 10.0.401 和通过哈希核对的 Inno Setup 7.1.0，获取固定版本的中文 OCR 模型，然后生成未签名的 `0.1.4-ci.36439669958` ZIP 与安装包。工作流核对了两个 SHA-256 文件，并将产物和 `BUILD-PROVENANCE.json` 上传为保留 14 天的 Actions 附件。此次确认了托管打包流程，没有运行安装后的程序、执行 Authenticode 签名或发布发行版。
+
 ## Windows 签名流程 · 2026-09-28
 
 在 Windows 11、PowerShell 5.1 和 Inno Setup 7.1 上，更新后的打包脚本通过语法检查。临时构建的未签名发行 ZIP 和测试安装包均成功生成，主程序的逐文件校验清单与 ZIP 校验文件一致。要求签名却未提供证书指纹，或指纹不在证书存储区中时，脚本均在生成发行文件前停止。测试签名器即使返回成功，只要未给卸载程序添加签名，Inno Setup 仍会拒绝编译。临时测试文件已清理。
