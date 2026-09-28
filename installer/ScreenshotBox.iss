@@ -30,6 +30,10 @@ UninstallDisplayIcon={app}\ScreenshotBox.exe
 CloseApplications=yes
 RestartApplications=no
 SetupLogging=yes
+#ifdef SignedRelease
+SignTool=ScreenshotBoxRelease
+SignedUninstaller=yes
+#endif
 
 [Languages]
 Name: "chinesesimp"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"

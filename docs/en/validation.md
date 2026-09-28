@@ -2,6 +2,18 @@
 
 [English](../validation.md) · [简体中文](../zh-CN/validation.md)
 
+## Windows signing workflow · 2026-09-28
+
+On Windows 11 with PowerShell 5.1 and Inno Setup 7.1, the updated packaging scripts parsed without error. A temporary unsigned release ZIP and a fixture installer were built; the executable checksum inventory and ZIP sidecar matched their files. `-RequireSignature` without a certificate thumbprint, and a thumbprint absent from the certificate store, both stopped before producing release files. Inno Setup refused a generated uninstaller when a test signer returned success without adding a signature. Temporary test outputs were removed.
+
+The machine has no usable code-signing certificate and private key. A signed ZIP, setup, and uninstaller have **not** been produced or tested; trusted signing and download behavior require verification with an actual certificate on a clean Windows installation.
+
+## 0.1.4 download check · 2026-09-28
+
+The Edge message “not commonly downloaded” is a file-reputation warning; the screenshot did not show a malware detection. The published installer (88,097,504 bytes) and ZIP (113,771,310 bytes) matched their GitHub release asset SHA-256 digests. `Get-AuthenticodeSignature` reported `NotSigned` for the installer and the extracted `ScreenshotBox.exe`.
+
+Microsoft Defender Antivirus was enabled with signatures updated the same day. Custom scans of the local installer and app EXE completed with zero new matching detections. This is a result from one machine and one signature set, not proof that the files are harmless or a way to establish SmartScreen reputation. [Download check record](../test-results/windows-0.1.4-download-check.json). The 0.1.4 release binaries and tag were not changed.
+
 ## 0.1.4 · 2026-09-26–27
 
 Environment: Windows 11 x64, one 2560 × 1440 display at 125% scaling; .NET SDK 10.0.401, runtime 10.0.12, CPU OCR. The Release build completed with 0 warnings and 0 errors, and all 42 Core tests passed.

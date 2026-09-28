@@ -14,7 +14,7 @@ The sections below describe the Windows release. Linux differences and unverifie
 - OCR uses a Chinese/English mobile model. Low-resolution text, handwriting, complex backgrounds, and tilted text may be inaccurate. Highlights cover entire text lines.
 - Annotations do not yet support text labels, solid redaction, or editing after saving. Mosaic does not guarantee secure redaction; erasing it during capture restores the original image.
 - The recycle bin supports deletion and restore, but not permanent emptying. Backups include recycled items.
-- Data encryption, application code signing, automatic updates, cloud sync, and accounts are not available.
+- Data encryption, automatic updates, cloud sync, and accounts are not available. The published Windows 0.1.4 installer and app are unsigned; later direct-download releases need a verified signing identity.
 
 ## Size and runtime
 

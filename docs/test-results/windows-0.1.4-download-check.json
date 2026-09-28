@@ -1,0 +1,35 @@
+{
+  "version": "0.1.4",
+  "checkedUtcDate": "2026-09-28",
+  "browserNotice": "Edge: not commonly downloaded; reputation notice, not a malware-detection result",
+  "installer": {
+    "name": "ScreenshotBox-0.1.4-win-x64-setup.exe",
+    "bytes": 88097504,
+    "sha256": "96b7ddfbad053630706e3c188ea0f22a31549f00df90a016744b100b2220a38e",
+    "githubAssetDigestMatched": true,
+    "authenticodeStatus": "NotSigned"
+  },
+  "portableZip": {
+    "name": "ScreenshotBox-0.1.4-win-x64.zip",
+    "bytes": 113771310,
+    "sha256": "5acb89e67c4032ff4187063ebc41748a6d7640040cba00f861944778f609e1b9",
+    "githubAssetDigestMatched": true
+  },
+  "applicationExe": {
+    "name": "ScreenshotBox.exe",
+    "sha256": "225a1f6131f85f2de26681206803f2b3d115fc9f59c4605d509fd992b17b8fe5",
+    "authenticodeStatus": "NotSigned"
+  },
+  "defenderScan": {
+    "scope": "Local published installer and extracted application EXE",
+    "antivirusEnabled": true,
+    "realTimeProtectionEnabled": true,
+    "signatureAgeDays": 0,
+    "signatureUpdatedUtc": "2026-09-28T03:39:09Z",
+    "startedUtc": "2026-09-28T14:02:18Z",
+    "scanCommandsCompleted": true,
+    "matchingNewDetections": 0,
+    "bothFilesPresentAfterScan": true
+  },
+  "limits": "Local Defender scan detects no known threat with the current signatures; it does not establish overall safety or change SmartScreen download reputation. The release remains unsigned."
+}

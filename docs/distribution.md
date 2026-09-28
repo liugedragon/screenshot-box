@@ -41,4 +41,16 @@ Uninstalling preserves settings and the library under `%LOCALAPPDATA%\Screenshot
 
 Release checks cover installation, offline startup, capture, clipboard, OCR, search, backup restore, and uninstall. Version-specific environments and results are in [validation](validation.md); untested conditions are in [known limitations](limitations.md).
 
-The app and installer currently have no project Authenticode signature. Windows may show an unknown publisher.
+The published **0.1.4** installer and `ScreenshotBox.exe` have no Authenticode signature. Edge may say the installer is “not commonly downloaded.” Microsoft describes this as a [download-reputation warning](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation), not a malware finding. It can also appear for newly signed files. Do not disable browser or Windows protection to install the app.
+
+Download from the [0.1.4 release](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.4) and compare the installer hash with the adjacent `.sha256` file. In PowerShell, run this in the download folder:
+
+```powershell
+(Get-FileHash .\ScreenshotBox-0.1.4-win-x64-setup.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+```
+
+Expected SHA-256: `96b7ddfbad053630706e3c188ea0f22a31549f00df90a016744b100b2220a38e` (88,097,504 bytes). The ZIP hash is `5acb89e67c4032ff4187063ebc41748a6d7640040cba00f861944778f609e1b9`. A match confirms that the downloaded bytes equal the release asset; it does not prove publisher identity or that the code is harmless. If Windows reports a specific malware detection, stop and include its name and the file hash in an issue.
+
+For a future direct-download release, use a code-signing certificate tied to a verified publisher and trusted on clean Windows installations. Both packaging scripts accept `-RequireSignature -CertificateThumbprint <40-hex-digit thumbprint> -TimestampUrl <CA RFC 3161 URL>`; `-SignToolPath` can point to the Windows SDK signer. `package.ps1` signs `ScreenshotBox.exe` before creating the checksums and ZIP. `installer.ps1` requires that signed executable, then asks Inno Setup to sign the generated uninstaller and setup. The scripts stop if required signing or verification fails. Keep private keys outside the repository.
+
+No signed release has been built with this path yet because no release-signing certificate is available on the current build machine. Test the resulting signatures, installation, and download behavior on a clean Windows machine before publishing. A valid signature improves publisher identity and reputation but does not guarantee that a new file will immediately stop showing the warning; [Microsoft documents](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation) both file-hash and publisher reputation. Existing 0.1.4 assets and tag remain unchanged.

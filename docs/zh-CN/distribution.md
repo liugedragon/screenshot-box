@@ -41,4 +41,16 @@ Run 命令超过 260 字符时会在安装前拒绝；需选择更短的安装�
 
 发行检查包括安装、离线启动、截图、剪贴板、OCR、搜索、备份恢复与卸载。各版本测试环境和结果见[验证记录](validation.md)，未验证条件见[已知限制](limitations.md)。
 
-应用和安装包目前没有项目 Authenticode 签名，Windows 可能显示未知发布者。
+已发布的 **0.1.4** 安装包与 `ScreenshotBox.exe` 均未进行 Authenticode 签名。Edge 可能显示“通常不会下载”。微软将此归为[下载信誉提示](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation)，它本身不是病毒检出；刚签名的新文件也可能显示该提示。无需关闭浏览器或 Windows 的安全保护。
+
+从 [0.1.4 发行页](https://github.com/liugedragon/screenshot-box/releases/tag/v0.1.4)下载，并与旁边的 `.sha256` 文件核对。在下载目录打开 PowerShell 运行：
+
+```powershell
+(Get-FileHash .\ScreenshotBox-0.1.4-win-x64-setup.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+```
+
+安装包预期 SHA-256 为 `96b7ddfbad053630706e3c188ea0f22a31549f00df90a016744b100b2220a38e`，大小 88,097,504 字节；ZIP 的 SHA-256 为 `5acb89e67c4032ff4187063ebc41748a6d7640040cba00f861944778f609e1b9`。一致只能证明下载文件与该发行附件相同，不能证明发布者身份或代码无害。如果 Windows 明确报告病毒，请停止运行，并在 Issue 中提供检测名称和文件哈希。
+
+后续直接下载的发行版需要与已验证发布者身份对应、能在全新 Windows 电脑上获得信任的代码签名证书。两个打包脚本都接受 `-RequireSignature -CertificateThumbprint <40 位十六进制证书指纹> -TimestampUrl <CA 提供的 RFC 3161 地址>`，也可用 `-SignToolPath` 指定 Windows SDK 的签名工具。`package.ps1` 先签名 `ScreenshotBox.exe`，再生成校验清单和 ZIP；`installer.ps1` 要求主程序已签名，并让 Inno Setup 为卸载程序和安装包签名。缺少必要的签名或校验失败时，脚本会停止。私钥不要放进仓库。
+
+当前构建机没有发行签名证书，因此尚未用这条流程生成签名发行版。发布前还需在干净的 Windows 环境验证签名、安装和下载表现。有效签名可改善发布者身份和信誉，但不保证新文件立刻不再提示；[微软说明](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation)会同时考虑文件哈希和发布者信誉。现有 0.1.4 附件与标签保持不变。

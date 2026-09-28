@@ -21,6 +21,8 @@ ScreenshotBox is a screenshot tool and local image library. Select a screen regi
 
 For **Windows 11 x64**. No account, API key, Python, or dedicated GPU required. OCR runs locally on the CPU with bundled models. **0.1.4 is a prerelease**; see [known limitations](docs/limitations.md) for current issues and untested configurations.
 
+**Windows download:** 0.1.4 is unsigned, so Edge may mark its installer as “not commonly downloaded.” This is a reputation warning, not a malware finding. Check the [published SHA-256 and signing status](docs/distribution.md#release-checks-and-signing) before opening it; a matching hash alone does not establish that software is safe.
+
 ![Screenshot library with text search and image details](docs/images/en/library-light.png)
 
 *Version 0.1.3, with English sample documents and metadata. All sample content is synthetic. The interface follows the Windows display language: Chinese for Chinese display languages, English for all others. Choose System, Simplified Chinese, or English in Settings; restart to apply.*

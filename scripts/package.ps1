@@ -1,9 +1,21 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^\d+\.\d+\.\d+([-.][A-Za-z0-9.-]+)?$')][string]$Version = '0.1.4',
-    [switch]$SkipBuild
+    [switch]$SkipBuild,
+    [switch]$RequireSignature,
+    [string]$CertificateThumbprint = '',
+    [string]$TimestampUrl = '',
+    [string]$SignToolPath = ''
 )
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'signing.ps1')
+$signRelease = Test-ReleaseSigningRequested -CertificateThumbprint $CertificateThumbprint -TimestampUrl $TimestampUrl -RequireSignature $RequireSignature.IsPresent
+if ($SignToolPath -and -not $signRelease) { throw '-SignToolPath requires -CertificateThumbprint.' }
+if ($signRelease) {
+    $signing = Get-ReleaseSigningCertificate -CertificateThumbprint $CertificateThumbprint
+    $SignToolPath = Get-ReleaseSignTool -SignToolPath $SignToolPath
+    $CertificateThumbprint = $signing.Certificate.Thumbprint
+}
 $repo = Split-Path -Parent $PSScriptRoot
 $localSdk = Join-Path $repo '.tools\dotnet\dotnet.exe'
 $dotnet = if (Test-Path $localSdk) { $localSdk } else { (Get-Command dotnet -ErrorAction Stop).Source }
@@ -11,6 +23,7 @@ $artifacts = Join-Path $repo 'artifacts'
 $name = "ScreenshotBox-$Version-win-x64"
 $destination = Join-Path $artifacts $name
 $zipPath = Join-Path $artifacts "$name.zip"
+$hashPath = Join-Path $artifacts "$name.sha256"
 $stage = Join-Path $artifacts ('.package-' + [Guid]::NewGuid().ToString('N'))
 $app = Join-Path $repo 'src\ScreenshotBox.App\ScreenshotBox.App.csproj'
 function Invoke-Dotnet([string[]]$Arguments) {
@@ -32,7 +45,8 @@ function Invoke-Dotnet([string[]]$Arguments) {
     $process.WaitForExit()
     if ($process.ExitCode -ne 0) { throw "dotnet command failed ($($process.ExitCode)): $($Arguments -join ' ')" }
 }
-if ((Test-Path $destination) -or (Test-Path $zipPath)) { throw 'Version output already exists. Choose a new version or move the previous output first.' }
+if ((Test-Path $destination) -or (Test-Path $zipPath) -or (Test-Path $hashPath)) { throw 'Version output already exists. Choose a new version or move the previous output first.' }
+$complete = $false
 Push-Location $repo
 try {
     if (-not $SkipBuild) { & (Join-Path $PSScriptRoot 'build.ps1') -Configuration Release }
@@ -75,6 +89,10 @@ try {
         $file = Join-Path $stage $relative
         if (-not (Test-Path $file -PathType Leaf) -or (Get-Item $file).Length -eq 0) { throw "Required publish dependency is missing: $relative" }
     }
+    if ($signRelease) {
+        Invoke-ReleaseSignature -Path (Join-Path $stage 'ScreenshotBox.exe') -CertificateThumbprint $CertificateThumbprint `
+            -TimestampUrl $TimestampUrl -SignToolPath $SignToolPath -Store $signing.Store
+    }
     $sources = Get-Content (Join-Path $repo 'models\chinese\sources.json') -Raw | ConvertFrom-Json
     foreach ($source in $sources) {
         $file = Join-Path $stage ('models\chinese\' + $source.file)
@@ -114,11 +132,17 @@ try {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [System.IO.Compression.ZipFile]::CreateFromDirectory($destination, $zipPath, [System.IO.Compression.CompressionLevel]::Optimal, $false)
     "$((Get-FileHash $zipPath -Algorithm SHA256).Hash.ToLowerInvariant())  $name.zip" |
-        Set-Content (Join-Path $artifacts "$name.sha256") -Encoding ASCII
+        Set-Content $hashPath -Encoding ASCII
+    $complete = $true
     Write-Host "Package: $zipPath"
     Write-Host 'Packaging succeeded. Real offline Windows smoke testing is still required before publishing.'
 }
 finally {
     if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
+    if ($signRelease -and -not $complete) {
+        Remove-Item -LiteralPath $hashPath -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $destination -Recurse -Force -ErrorAction SilentlyContinue
+    }
     Pop-Location
 }
